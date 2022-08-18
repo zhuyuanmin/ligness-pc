@@ -1,5 +1,1 @@
-# vite-vue3-demo
-
->npm run dev \
->npm run build \
->npm serve
+# Ligness PC管理后台项目
