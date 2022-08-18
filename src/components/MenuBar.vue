@@ -9,21 +9,7 @@
       :collapse="isCollapse"
       router
     >
-      <template v-for="(menu, index) in menuRoute">
-        <el-sub-menu :key="menu.name" v-if="menu.children" :index="menu.path">
-          <template #title>
-            <el-icon><SvgIcon :iconClass="menu.icon" /></el-icon>
-            <span>{{menu.name}}</span>
-          </template>
-          <template v-for="item in menu.children" :key="item.name">
-            <el-menu-item :index="item.path">{{item.name}}</el-menu-item>
-          </template>
-        </el-sub-menu>
-        <el-menu-item :key="index" v-else :index="menu.path">
-          <el-icon><SvgIcon :iconClass="menu.icon" /></el-icon>
-          <template #title>{{menu.name}}</template>
-        </el-menu-item>
-      </template>
+      <MenuItem :menuRoute="menuRoute" />
     </el-menu>
     <div class="right-content">
       <div class="nav-bar">
@@ -67,17 +53,15 @@
 import BoyImg from '@/assets/boy.png'
 import GirlImg from '@/assets/girl.png'
 import { menuRoute } from '@/router'
-import SvgIcon from '@/components/SvgIcon.vue'
 import { ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { Expand, Fold, ArrowDown } from '@element-plus/icons-vue'
+import MenuItem from '@/components/MenuItem.vue'
 import {
   ElRadioGroup,
   ElRadioButton,
   ElMenu,
-  ElSubMenu,
   ElIcon,
-  ElMenuItem,
   ElBreadcrumb,
   ElBreadcrumbItem,
   ElDropdown,
