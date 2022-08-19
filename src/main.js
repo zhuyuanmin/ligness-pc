@@ -1,7 +1,7 @@
 import { createApp } from 'vue'
 import axios from 'axios'
 import router from '@/router'
-import store from '@/store'
+import { createPinia } from 'pinia'
 
 import 'virtual:svg-icons-register'
 
@@ -14,5 +14,5 @@ app.config.globalProperties.$http = axios
 app.component('svg-icon', SvgIcon)
 
 app.use(router)
-  .use(store)
+  .use(createPinia())
   .mount('#app')

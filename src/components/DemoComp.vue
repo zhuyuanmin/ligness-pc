@@ -12,11 +12,11 @@
 </template>
 <script setup>
 import { ref, onMounted, onUnmounted, watch } from "vue";
-import { useStore } from "vuex";
+import counterStore from "@/store/counter"
 import { ElCarousel, ElCarouselItem } from "element-plus";
 
 const height = ref("");
-const store = useStore();
+const counter = counterStore()
 
 const props = defineProps({
   data: {
@@ -36,7 +36,7 @@ onMounted(() => {
   }, 500);
 });
 
-watch(() => store.state.activeKey, () => {
+watch(() => counter.count, () => {
   setTimeout(() => {
     computeImgHeight();
   }, 500);

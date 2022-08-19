@@ -10,11 +10,12 @@
     "@element-plus/icons-vue": "^2.0.9",
     "axios": "^0.21.1",
     "element-plus": "^1.1.0-beta.7",
+    "js-cookie": "^3.0.1",
+    "pinia": "^2.0.19",
     "qs": "^6.10.1",
     "sass": "^1.38.1",
     "vue": "^3.2.6",
-    "vue-router": "^4.0.11",
-    "vuex": "^4.0.2"
+    "vue-router": "^4.0.11"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^1.6.0",
