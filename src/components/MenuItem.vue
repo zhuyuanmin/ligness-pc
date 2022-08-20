@@ -1,6 +1,6 @@
 <template>
-  <template v-for="(menu, index) in menuRoute">
-    <el-sub-menu :key="menu.name" v-if="menu.children" :index="menu.path">
+  <template v-for="(menu, index) in menuRoute.filter(v => v.hidden !== true)">
+    <el-sub-menu :key="menu.name" v-if="menu.children && menu.children.filter(v => v.hidden !== true).length > 0" :index="menu.path">
       <template #title>
         <el-icon v-if="menu.icon"><SvgIcon :iconClass="menu.icon" /></el-icon>
         <span>{{ menu.name }}</span>

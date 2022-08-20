@@ -9,7 +9,7 @@
   "dependencies": {
     "@element-plus/icons-vue": "^2.0.9",
     "axios": "^0.21.1",
-    "element-plus": "^1.1.0-beta.7",
+    "element-plus": "^2.2.14",
     "js-cookie": "^3.0.1",
     "pinia": "^2.0.19",
     "qs": "^6.10.1",

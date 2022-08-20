@@ -1,7 +1,7 @@
 <template>
   <div class="class-menu">
     <el-menu
-      active-text-color="#ffd04b"
+      active-text-color="#3894FF"
       background-color="#545c64"
       text-color="#fff"
       :default-active="currentRoute.fullPath"
@@ -94,6 +94,9 @@ watch(() => router.currentRoute.value, () => {
   display: flex;
   .right-content {
     flex: 1;
+    height: 100vh;
+    min-width: calc(100% - 250px);
+    max-width: calc(100% - 64px);
     .content {
       background-color: #EFF0F1;
       padding: 16px;
@@ -132,6 +135,7 @@ watch(() => router.currentRoute.value, () => {
 }
 .el-menu-vertical-demo {
   height: 100vh;
+  overflow-y: auto;
   :deep {
     .el-menu-item, .el-sub-menu {
       font-size: 14px;
@@ -148,6 +152,5 @@ watch(() => router.currentRoute.value, () => {
 }
 .el-menu-vertical-demo:not(.el-menu--collapse) {
   width: 250px;
-  min-height: 400px;
 }
 </style>
