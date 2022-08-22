@@ -122,7 +122,7 @@ watch(() => router.currentRoute.value, () => {
         width: 20px;
         margin-right: 4px;
       }
-      :deep .el-dropdown-link {
+      :deep(.el-dropdown-link) {
         display: flex;
         align-items: center;
       }
@@ -136,17 +136,15 @@ watch(() => router.currentRoute.value, () => {
 .el-menu-vertical-demo {
   height: 100vh;
   overflow-y: auto;
-  :deep {
-    .el-menu-item, .el-sub-menu {
+  :deep(.el-menu-item, .el-sub-menu) {
+    font-size: 14px;
+    span, .el-menu-item-group__title {
       font-size: 14px;
-      span, .el-menu-item-group__title {
-        font-size: 14px;
-      }
-      .el-icon {
-        font-size: 16px;
-        margin-right: 8px;
-        transform: translateY(-3px);
-      }
+    }
+    .el-icon {
+      font-size: 16px;
+      margin-right: 8px;
+      transform: translateY(-3px);
     }
   }
 }

@@ -128,22 +128,18 @@ const handleCurrentChange = page => {
 <style lang="scss" scoped>
 .content-card {
   margin-top: 24px;
-  :deep {
-    .el-card__header {
-      padding: 16px;
-      border-bottom: 1px solid #e0e2ea;
-    }
-    .el-card__body {
-      padding: 16px;
-    }
+  :deep(.el-card__header) {
+    padding: 16px;
+    border-bottom: 1px solid #e0e2ea;
+  }
+  :deep(.el-card__body) {
+    padding: 16px;
   }
   .content-box {
     .table-class {
       margin-top: 16px;
-      :deep {
-        th.el-table__cell {
-          background-color: #fafafa;
-        }
+      :deep(th.el-table__cell) {
+        background-color: #fafafa;
       }
     }
   }

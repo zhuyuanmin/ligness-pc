@@ -151,14 +151,13 @@ defineExpose({ getSearchFormValue })
 <style lang="scss" scoped>
 .content-card {
   margin-top: 24px;
-  :deep {
-    .el-card__header {
-      padding: 16px;
-      border-bottom: 1px solid #e0e2ea;
-    }
-    .el-card__body {
-      padding: 16px;
-    }
+  :deep(.el-card__header) {
+    padding: 16px;
+    border-bottom: 1px solid #e0e2ea;
+  }
+
+  :deep(.el-card__body) {
+    padding: 16px;
   }
   .content-box {
     display: flex;
@@ -173,7 +172,7 @@ defineExpose({ getSearchFormValue })
         display: block;
       }
 
-      .avatar-uploader :deep .el-upload {
+      .avatar-uploader :deep(.el-upload) {
         border: 1px dashed var(--el-border-color);
         border-radius: 6px;
         cursor: pointer;
@@ -182,7 +181,7 @@ defineExpose({ getSearchFormValue })
         transition: var(--el-transition-duration-fast);
       }
 
-      .avatar-uploader :deep .el-upload:hover {
+      .avatar-uploader :deep(.el-upload:hover) {
         border-color: var(--el-color-primary);
       }
 

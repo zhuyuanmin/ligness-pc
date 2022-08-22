@@ -121,7 +121,7 @@ const submitForm = async formEl => {
     .form {
       .input-class {
         border-bottom: 1px solid #D8DAE1;
-        :deep .el-input__inner {
+        :deep(.el-input__inner) {
           border: none !important;
         }
       }

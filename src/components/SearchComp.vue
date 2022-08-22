@@ -105,7 +105,7 @@ defineExpose({ validFields })
 
 <style lang="scss" scoped>
 .demo-form-inline {
-  :deep .el-form-item {
+  :deep(.el-form-item) {
     margin-right: 20px;
   }
 }

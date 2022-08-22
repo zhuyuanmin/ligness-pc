@@ -117,10 +117,8 @@ const deleteRow = row => {
 
   .table-class {
     margin-top: 16px;
-    :deep {
-      th.el-table__cell {
-        background-color: #fafafa;
-      }
+    :deep(th.el-table__cell) {
+      background-color: #fafafa;
     }
   }
 }
