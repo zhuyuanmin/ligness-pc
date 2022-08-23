@@ -14,7 +14,7 @@ export const menuRoute = [
         children: [
           {
             path: '/net-management/device-model-list/detail/:id?',
-            name: '设备详情',
+            name: '设备型号详情',
             hidden: true,
             component: () => import('@/pages/net-management/DeviceModelDetail.vue')
           },
@@ -23,7 +23,15 @@ export const menuRoute = [
       {
         path: '/net-management/device-list',
         name: '设备列表',
-        component: () => import('@/pages/net-management/DeviceList.vue')
+        component: () => import('@/pages/net-management/DeviceList.vue'),
+        children: [
+          {
+            path: '/net-management/device-list/detail/:id?',
+            name: '设备详情',
+            hidden: true,
+            component: () => import('@/pages/net-management/DeviceListDetail.vue')
+          },
+        ]
       },
       {
         path: '/net-management/device-use-record',

@@ -69,7 +69,7 @@
       <template #footer>
         <span class="dialog-footer">
           <el-button @click="showModal = false">取消</el-button>
-          <el-button type="primary" @click="dialogVisible = false">确定</el-button>
+          <el-button type="primary" @click="showModal = false">确定</el-button>
         </span>
       </template>
     </el-dialog>
@@ -145,7 +145,7 @@ const handleCurrentChange = page => {
   }
 }
 </style>
-<style lang="scss">
+<style lang="scss" scoped>
 .modal-class {
   .search-input {
     position: absolute;
@@ -159,7 +159,7 @@ const handleCurrentChange = page => {
 
   .table-class {
     margin-top: 16px;
-    .el-table__header th.el-table__cell {
+    :deep(.el-table__header th.el-table__cell) {
       background-color: #fafafa;
     }
   }

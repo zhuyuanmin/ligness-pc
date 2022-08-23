@@ -80,7 +80,7 @@ const viewRow = (row, type) => {
 const deleteRow = row => {
   console.log(row);
   ElMessageBox.confirm(
-    '此操作将永久删除该项，是否继续',
+    '此操作将永久删除该项，是否继续？',
     '提示',
     {
       cancelButtonText: '取消',

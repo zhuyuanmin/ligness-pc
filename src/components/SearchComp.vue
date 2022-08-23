@@ -1,5 +1,5 @@
 <template>
-  <el-form :inline="true" ref="ruleFormRef" :model="formValues" class="demo-form-inline" label-width="120px" label-suffix="：" :rules="rules">
+  <el-form :inline="true" ref="ruleFormRef" :model="formValues" class="demo-form-inline" label-width="auto" label-suffix="：" :rules="rules">
     <el-form-item
       v-for="(item, index) in props.formItemList"
       :key="item.field || index"
@@ -26,6 +26,11 @@
       <template v-else-if="item.type === 'textarea'">
         <el-input type="textarea" show-word-limit :maxlength="item.maxLength" :autosize="{ minRows: 3, maxRows: 5 }" v-model="formValues[item.field]" :placeholder="item.placeholder" :disabled="item.disabled" clearable />
       </template>
+      <template v-else-if="item.type === 'select-custom'">
+        <el-select :model-value="(formValues[item.field] || []).map(v => v.value).join(';')" class="my-select" :placeholder="item.placeholder" readonly="readonly" @click="item.onClick" disabled="disabled">
+          <el-option v-for="v in formValues[item.field]" :label="v.label" :value="v.value" :key="v.value" />
+        </el-select>
+      </template>
       <template v-else>
         <el-input v-model="formValues[item.field]" :maxlength="item.maxLength" :placeholder="item.placeholder" :disabled="item.disabled" clearable />
       </template>
@@ -34,13 +39,17 @@
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue'
+import { ref, reactive, watch } from 'vue'
 import { ElForm, ElFormItem, ElInput, ElSelect, ElOption, ElButton } from 'element-plus'
 
 const props = defineProps({
   formItemList: {
     type: Array,
     default: []
+  },
+  data: {
+    type: Object,
+    default: {}
   },
 })
 
@@ -79,6 +88,12 @@ const rules = reactive({ ...rulesRef })
 
 const formValues = reactive({ ...dataRef })
 
+watch(() => props.data, () => {
+  Object.keys(props.data).forEach(key => {
+    formValues[key] = props.data[key]
+  })
+})
+
 const resetFormData = v => {
   Object.keys(formValues).forEach(key => {
     formValues[key] = dataRef[key]
@@ -94,9 +109,9 @@ const resetFormData = v => {
 //   initValue: '1',
 //   disabled: true,
 //   required: true,
-//   rules: [ {} ]
+//   rules: [ {} ],
 //   optionList: [ { label: '', value: '' }, { label: '', value: '' } ],
-//   children: [ { text: '搜索', type: 'submit', onClick: () => {} }, { text: 'reset', onClick: () => {} } ]
+//   children: [ { text: '查询', type: 'submit', onClick: () => {} }, { text: '重置', onClick: () => {} } ]
 // }
 
 // 暴露给父级调用
@@ -107,6 +122,14 @@ defineExpose({ validFields })
 .demo-form-inline {
   :deep(.el-form-item) {
     margin-right: 20px;
+    .my-select {
+      input {
+        cursor: pointer;
+      }
+      .is-disabled .el-input__wrapper {
+        background-color: #fff;
+      }
+    }
   }
 }
 </style>
