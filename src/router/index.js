@@ -49,7 +49,15 @@ export const menuRoute = [
       {
         path: '/product-management/product-list',
         name: '产品列表',
-        component: () => import('@/pages/product-management/ProductList.vue')
+        component: () => import('@/pages/product-management/ProductList.vue'),
+        children: [
+          {
+            path: '/product-management/product-list/detail/:id?',
+            name: '产品详情',
+            hidden: true,
+            component: () => import('@/pages/product-management/ProductListDetail.vue')
+          },
+        ]
       },
       {
         path: '/product-management/stock-list',

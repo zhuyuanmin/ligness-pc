@@ -16,9 +16,9 @@
             <span>{{scope.row.totalDuration}}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="unlockType" label="解锁方式" width="180">
+        <el-table-column prop="unlockType" label="解锁方式" width="150">
           <template #default>
-            <el-button plain type="primary">产品套盒解锁</el-button>
+            <el-button plain size="small" type="primary">产品套盒解锁</el-button>
           </template>
         </el-table-column>
       </el-table>
