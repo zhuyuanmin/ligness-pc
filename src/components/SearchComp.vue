@@ -12,7 +12,7 @@
         <el-button
           v-for="(v, i) in item.children"
           :key="i"
-          :type="v.type === 'submit' ? 'primary' : ''"
+          :type="v.type === 'submit' ? 'primary' : (v.style || '')"
           @click="v.type === 'reset' ? resetFormData(v) : v.onClick(formValues)"
         >
           {{ v.text }}
@@ -24,15 +24,15 @@
         </el-select>
       </template>
       <template v-else-if="item.type === 'textarea'">
-        <el-input type="textarea" show-word-limit :maxlength="item.maxLength" :autosize="{ minRows: 3, maxRows: 5 }" v-model="formValues[item.field]" :placeholder="item.placeholder" :disabled="item.disabled" clearable />
+        <el-input type="textarea" show-word-limit :maxlength="item.maxLength" :autosize="{ minRows: 3, maxRows: 5 }" v-model="formValues[item.field]" :placeholder="item.placeholder || '请输入'" :disabled="item.disabled" clearable />
       </template>
       <template v-else-if="item.type === 'select-custom'">
-        <el-select :model-value="(formValues[item.field] || []).map(v => v.value).join(';')" class="my-select" :placeholder="item.placeholder" readonly="readonly" @click="item.onClick" disabled="disabled">
+        <el-select :model-value="(formValues[item.field] || []).map(v => v.value).join(';')" class="my-select" :placeholder="item.placeholder" @click="item.onClick" disabled="disabled">
           <el-option v-for="v in formValues[item.field]" :label="v.label" :value="v.value" :key="v.value" />
         </el-select>
       </template>
       <template v-else>
-        <el-input v-model="formValues[item.field]" :maxlength="item.maxLength" :placeholder="item.placeholder" :disabled="item.disabled" clearable />
+        <el-input v-model="formValues[item.field]" :maxlength="item.maxLength" :placeholder="item.placeholder || '请输入'" :disabled="item.disabled" clearable />
       </template>
     </el-form-item>
   </el-form>

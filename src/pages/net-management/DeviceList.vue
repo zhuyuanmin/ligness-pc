@@ -14,8 +14,8 @@
         <el-table-column prop="factoryName" label="厂家" />
         <el-table-column prop="status" label="状态">
           <template #default="scope">
-            <el-button v-if="scope.row.status === 1" type="success" size="small">在线</el-button>
-            <el-button v-else type="danger" size="small">离线</el-button>
+            <el-button v-if="scope.row.status === 1" type="success" plain size="small">在线</el-button>
+            <el-button v-else type="danger" plain size="small">离线</el-button>
           </template>
         </el-table-column>
         <el-table-column prop="createTime" label="出厂时间" width="180" />
@@ -110,7 +110,7 @@ const searchFields = reactive([
         console.log(values)
       } },
       { text: "重置", type: "reset", onClick: () => {} },
-      { text: "绑定设备", onClick: () => {} },
+      { text: "绑定设备", style: 'primary', onClick: () => viewRow() },
     ],
   },
 ]);
