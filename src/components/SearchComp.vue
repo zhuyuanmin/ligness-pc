@@ -14,6 +14,7 @@
       :label="item.label"
       :required="item.required"
       :style="['textarea', 'file'].includes(item.type) ? { width: '100%' } : ''"
+      :class="['file'].includes(item.type) ? 'my-file' : ''"
       :prop="item.field"
     >
       <template v-if="item.type === 'btnList'">
@@ -87,6 +88,9 @@
           :action="item.action"
           list-type="picture-card"
           :on-remove="handleRemove"
+          :limit="item.limit"
+          :on-preview="handleReview"
+          :class="formValues[item.field].length === 1 ? 'hide-plus' : ''"
         >
           <el-icon><Plus /></el-icon>
         </el-upload>
@@ -167,6 +171,11 @@ const handleRemove = (uploadFile, uploadFiles) => {
   console.log(uploadFile, uploadFiles);
 };
 
+const handleReview = uploadFile => {
+  const { url } = uploadFile;
+  window.open(url)
+};
+
 watch(
   () => props.data,
   () => {
@@ -210,6 +219,16 @@ defineExpose({ validFields });
       }
       .is-disabled .el-input__wrapper {
         background-color: #fff;
+      }
+    }
+  }
+  .my-file {
+    :deep(.el-form-item__content) {
+      max-width: 100% !important;
+      .hide-plus {
+        .el-upload--picture-card {
+          display: none;
+        }
       }
     }
   }

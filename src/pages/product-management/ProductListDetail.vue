@@ -100,7 +100,11 @@ const searchFields = reactive([
   {
     type: "file",
     label: "图片",
-    initValue: [],
+    initValue: [{
+      name: 'food.jpeg',
+      url: 'https://picsum.photos/200',
+    }],
+    limit: 1,
     action: 'https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15',
     field: "productImg",
   },
