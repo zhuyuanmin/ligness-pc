@@ -3,7 +3,15 @@
     <div class="range" :class="verifyResult ? 'success' : ''">
       <div class="block" @mousedown="onStart" @touchstart="onStart">
         <span id="dragRef">
-          <SvgIcon :iconClass="verifyResult ? successIcon : verifyFailed ? 'error-verify' : startIcon"></SvgIcon>
+          <SvgIcon
+            :iconClass="
+              verifyResult
+                ? successIcon
+                : verifyFailed
+                ? 'error-verify'
+                : startIcon
+            "
+          ></SvgIcon>
         </span>
       </div>
       <span class="text">{{ verifyResult ? successText : startText }}</span>
@@ -69,7 +77,7 @@ const onStart = (ev: MouseEvent | TouchEvent) => {
     if (disX <= 0) {
       disX = 0;
     }
-    if (disX >= MaxX - iconWidth) {
+    if (disX >= MaxX - 20) {
       disX = MaxX;
     }
     ele.style.transition = ".1s all";
@@ -79,18 +87,18 @@ const onStart = (ev: MouseEvent | TouchEvent) => {
   // 滑块触摸结束
   const onEnd = () => {
     if (disX !== MaxX) {
-      verifyFailed.value = true
+      verifyFailed.value = true;
       const dragRef = document.querySelector("#dragRef") as HTMLElement;
       const el = document.querySelector(".drag-verify") as HTMLElement;
-      dragRef.style.background = 'red'
-      el.style.borderColor = 'red'
+      dragRef.style.background = "red";
+      el.style.borderColor = "red";
       setTimeout(() => {
-        verifyFailed.value = false
-        dragRef.style.background = '#fff'
-        el.style.borderColor = '#D8DAE1'
+        verifyFailed.value = false;
+        dragRef.style.background = "#fff";
+        el.style.borderColor = "#D8DAE1";
         ele.style.transition = ".5s all";
         ele.style.transform = "translateX(0)";
-      }, 800)
+      }, 800);
     } else {
       // 执行成功
       verifyResult.value = true;
@@ -106,7 +114,7 @@ const onStart = (ev: MouseEvent | TouchEvent) => {
 };
 </script>
 <style lang="scss" scoped>
-$color-primary: #17A717;
+$color-primary: #17a717;
 
 @mixin flex {
   display: flex;
@@ -115,7 +123,7 @@ $color-primary: #17A717;
 }
 .drag-verify {
   width: 100%;
-  border: 1px solid #D8DAE1;
+  border: 1px solid #d8dae1;
   border-radius: 4px;
   overflow: hidden;
   .range {
