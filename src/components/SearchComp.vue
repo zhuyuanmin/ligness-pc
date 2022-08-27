@@ -76,7 +76,8 @@
         <el-input-number
           v-model="formValues[item.field]"
           controls-position="right"
-          :maxlength="item.maxLength"
+          :min="0"
+          :max="item.maxLength"
           :placeholder="item.placeholder || '请输入'"
           :disabled="item.disabled"
           clearable
@@ -94,6 +95,28 @@
         >
           <el-icon><Plus /></el-icon>
         </el-upload>
+      </template>
+      <template v-else-if="item.type === 'date'">
+        <el-date-picker
+          v-model="formValues[item.field]"
+          type="date"
+          placeholder="item.placeholder || '请选择'"
+          :disabled-date="disabledDate"
+          format="YYYY/MM/DD"
+          :disabled="item.disabled"
+        />
+      </template>
+      <template v-else-if="item.type === 'date-range'">
+        <el-date-picker
+          v-model="formValues[item.field]"
+          type="daterange"
+          range-separator="-"
+          start-placeholder="开始时间"
+          end-placeholder="结束时间"
+          :disabled-date="disabledDate"
+          format="YYYY/MM/DD"
+          :disabled="item.disabled"
+        />
       </template>
       <template v-else>
         <el-input
@@ -120,6 +143,7 @@ import {
   ElButton,
   ElUpload,
   ElIcon,
+  ElDatePicker
 } from "element-plus";
 import { Plus } from "@element-plus/icons-vue";
 
@@ -170,6 +194,10 @@ const formValues = reactive({ ...dataRef });
 const handleRemove = (uploadFile, uploadFiles) => {
   console.log(uploadFile, uploadFiles);
 };
+
+const disabledDate = time => {
+  return time.getTime() > Date.now()
+}
 
 const handleReview = uploadFile => {
   const { url } = uploadFile;

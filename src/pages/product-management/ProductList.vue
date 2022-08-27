@@ -82,8 +82,6 @@ const searchFields = reactive([
   },
 ]);
 
-const showModal = ref(false)
-const selectValue = ref('')
 const currentPage = ref(1)
 const pageSize = ref(10)
 const router = useRouter()
