@@ -67,7 +67,15 @@ export const menuRoute = [
       {
         path: '/product-management/stock-use-record',
         name: '消耗明细',
-        component: () => import('@/pages/product-management/StockUseRecord.vue')
+        component: () => import('@/pages/product-management/StockUseRecord.vue'),
+        children: [
+          {
+            path: '/product-management/product-list/detail/:id',
+            name: '消耗明细详情',
+            hidden: true,
+            component: () => import('@/pages/product-management/StockUseRecordDetail.vue')
+          },
+        ]
       },
     ]
   },
