@@ -145,7 +145,7 @@ const handleCurrentChange = page => {
 
 const viewRow = (row, type) => {
   if (row) {
-    router.push(`/product-management/product-list/detail/${row.id}`)
+    router.push(`/product-management/stock-use-record/detail/${row.id}`)
   }
 }
 
