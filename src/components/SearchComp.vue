@@ -118,6 +118,37 @@
           :disabled="item.disabled"
         />
       </template>
+      <template v-else-if="item.type === 'password'">
+        <el-input
+          v-model="formValues[item.field]"
+          type="password"
+          :maxlength="item.maxLength"
+          :placeholder="item.placeholder || '请输入'"
+          :disabled="item.disabled"
+          clearable
+        />
+      </template>
+      <template v-else-if="item.type === 'cascade-select'">
+        <el-cascader
+          :placeholder="item.placeholder || '请选择'"
+          v-model="formValues[item.field]"
+          :options="item.optionList"
+          :disabled="item.disabled"
+          clearable
+        />
+      </template>
+      <template v-else-if="item.type === 'radio'">
+        <el-radio-group v-model="formValues[item.field]">
+          <el-radio
+            v-for="v in item.optionList"
+            :label="v.value"
+            size="large"
+            :key="v.value"
+          >
+            {{v.label}}
+          </el-radio>
+        </el-radio-group>
+      </template>
       <template v-else>
         <el-input
           v-model="formValues[item.field]"
@@ -143,7 +174,10 @@ import {
   ElButton,
   ElUpload,
   ElIcon,
-  ElDatePicker
+  ElDatePicker,
+  ElCascader,
+  ElRadioGroup,
+  ElRadio
 } from "element-plus";
 import { Plus } from "@element-plus/icons-vue";
 

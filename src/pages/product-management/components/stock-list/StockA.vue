@@ -103,9 +103,9 @@ const dialogFields = reactive([
     field: "storeNum",
     required: true,
     rules: [
-      { required: true, message: '入库数量', trigger: 'blur' },
+      { required: true, message: '请输入入库数量', trigger: 'blur' },
       { validator: checkAge, message: '入库数量必须大于等于1', trigger: 'blur' },
-      { required: true, message: '入库数量', trigger: 'change' }
+      { required: true, message: '请输入入库数量', trigger: 'change' }
     ]
   },
 ]);

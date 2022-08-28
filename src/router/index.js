@@ -88,7 +88,15 @@ export const menuRoute = [
       {
         path: '/customer-management/shop-list',
         name: '门店列表',
-        component: () => import('@/pages/customer-management/ShopList.vue')
+        component: () => import('@/pages/customer-management/ShopList.vue'),
+        children: [
+          {
+            path: '/customer-management/shop-list/detail/:id?',
+            name: '门店详情',
+            hidden: true,
+            component: () => import('@/pages/customer-management/ShopListDetail.vue')
+          },
+        ]
       },
     ]
   },
