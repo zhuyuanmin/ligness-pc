@@ -1,7 +1,8 @@
 <template>
   <div class="container">
     <template v-if="currentRoute.fullPath === '/net-management/device-model-list'">
-      <el-button type="primary" @click="viewRow()">新增</el-button>
+      <SearchComp :formItemList="searchFields" />
+
       <el-table :data="tableData" max-height="400" class="table-class">
         <el-table-column prop="id" label="序号" width="100" />
         <el-table-column prop="modelName" label="型号名称" />
@@ -32,6 +33,7 @@
   </div>
 </template>
 <script setup>
+import SearchComp from "@/components/SearchComp.vue";
 import { ref, reactive, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElTable, ElTableColumn, ElButton, ElPagination, ElMessageBox } from 'element-plus'
@@ -39,13 +41,32 @@ import { ElTable, ElTableColumn, ElButton, ElPagination, ElMessageBox } from 'el
 const tableData = reactive([
   {
     brandName: "深圳市欧迪丝生物科技有限公司",
-    createTime: "2022-03-14T02:03:32.000+00:00",
+    createTime: "2022-03-14 02:03:32",
     factoryName: "深圳市欧迪丝生物科技有限公司",
     id: 81,
     modelName: "MEI XIU SI",
     sum: 0,
   },
 ])
+
+const searchFields = reactive([
+  {
+    type: "input",
+    label: "设备名称",
+    field: "modelName",
+    placeholder: '请输入设备名称',
+  },
+  {
+    type: "btnList",
+    children: [
+      { text: "查询", type: "submit", onClick: values => {
+        console.log(values)
+      } },
+      { text: "重置", type: "reset", onClick: () => {} },
+      { text: "新增", style: 'primary', onClick: () => viewRow() },
+    ],
+  },
+]);
 
 const currentPage = ref(1)
 const pageSize = ref(10)
