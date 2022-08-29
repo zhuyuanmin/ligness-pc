@@ -117,7 +117,15 @@ export const menuRoute = [
     path: '/brand-management',
     name: '品牌管理',
     icon: 'brand-manage-icon',
-    component: () => import('@/pages/brand-management/BrandManagement.vue')
+    component: () => import('@/pages/brand-management/BrandManagement.vue'),
+    children: [
+      {
+        path: '/brand-management/detail/:id?',
+        name: '品牌详情',
+        hidden: true,
+        component: () => import('@/pages/brand-management/BrandManagementDetail.vue')
+      },
+    ]
   },
   {
     path: '/statistic-analysis',

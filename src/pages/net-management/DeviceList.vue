@@ -126,9 +126,8 @@ const router = useRouter()
 const curRoute = router.currentRoute.value
 const currentRoute = ref(curRoute)
 
-watch(() => router.currentRoute.value, () => {
-  const curRoute = router.currentRoute.value
-  currentRoute.value = curRoute
+watch(() => router.currentRoute.value, (newVal) => {
+  currentRoute.value = newVal
 })
 
 const handleSizeChange = size => {

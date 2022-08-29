@@ -4,7 +4,9 @@
       <span>{{mapName[route.query.type] || mapName.add}}产品</span>
       <el-button class="button" @click="router.back()">返回</el-button>
     </div>
-    <SearchComp :formItemList="searchFields" ref="ruleFormRef" />
+    <el-card>
+      <SearchComp :formItemList="searchFields" ref="ruleFormRef" />
+    </el-card>
     <div class="btn-bottom-list" v-if="route.query.type !== 'view'">
       <el-button type="primary" @click.prevent="saveFormData()">保存并上架</el-button>
       <el-button @click.prevent="router.back()">返回</el-button>
@@ -12,7 +14,7 @@
   </div>
 </template>
 <script setup>
-import { ElForm, ElFormItem, ElInput, ElSelect, ElOption, ElButton } from 'element-plus'
+import { ElCard, ElButton } from 'element-plus'
 import SearchComp from '@/components/SearchComp.vue'
 import { ref, reactive } from 'vue'
 import { useRoute, useRouter } from 'vue-router'

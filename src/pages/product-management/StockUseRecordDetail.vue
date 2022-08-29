@@ -4,31 +4,33 @@
       <span>消耗明细详情</span>
       <el-button class="button" @click="router.back()">返回</el-button>
     </div>
-    <div class="box">
-      <div class="left"><img src="https://picsum.photos/300/200" alt="" srcset="" /></div>
-      <div class="right">
-        <table>
-          <tr>
-            <td class="props">商品编码：</td>
-            <td>{{'1AA9918823854A69AAFD1D4498B61DE2'}}</td>
-            <td class="props">产品编码：</td>
-            <td>{{'P14684158926720901131638932605318'}}</td>
-          </tr>
-          <tr>
-            <td class="props">产品名称：</td>
-            <td>{{'D系列氢润妍体亮肤按摩霜'}}</td>
-            <td class="props">产品品牌：</td>
-            <td>{{'ODC'}}</td>
-          </tr>
-          <tr>
-            <td class="props">批次：</td>
-            <td>{{'B1639535834806'}}</td>
-            <td class="props">数字签名：</td>
-            <td>{{'01TnpnME@&az!}'}}</td>
-          </tr>
-        </table>
+    <el-card class="my-card">
+      <div class="box">
+        <div class="left"><img src="https://picsum.photos/300/200" alt="" srcset="" /></div>
+        <div class="right">
+          <table>
+            <tr>
+              <td class="props">商品编码：</td>
+              <td>{{'1AA9918823854A69AAFD1D4498B61DE2'}}</td>
+              <td class="props">产品编码：</td>
+              <td>{{'P14684158926720901131638932605318'}}</td>
+            </tr>
+            <tr>
+              <td class="props">产品名称：</td>
+              <td>{{'D系列氢润妍体亮肤按摩霜'}}</td>
+              <td class="props">产品品牌：</td>
+              <td>{{'ODC'}}</td>
+            </tr>
+            <tr>
+              <td class="props">批次：</td>
+              <td>{{'B1639535834806'}}</td>
+              <td class="props">数字签名：</td>
+              <td>{{'01TnpnME@&az!}'}}</td>
+            </tr>
+          </table>
+        </div>
       </div>
-    </div>
+    </el-card>
     <el-card>
       <template #header>
         <div><span>消耗情况</span></div>
@@ -80,10 +82,11 @@ const tableData = reactive([
     }
   }
 }
-
+.my-card {
+  margin-bottom: 24px;
+}
 .box {
   display: flex;
-  margin-bottom: 16px;
   .left {
     width: 300px;
   }

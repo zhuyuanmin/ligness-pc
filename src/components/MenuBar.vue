@@ -81,11 +81,10 @@ const handleLogout = () => {
   router.replace('/login')
 }
 
-watch(() => router.currentRoute.value, () => {
-  const curRoute = router.currentRoute.value
-  const listBreadcrumb = curRoute.matched.filter(v => v.path !== '/')
+watch(() => router.currentRoute.value, (newVal) => {
+  const listBreadcrumb = newVal.matched.filter(v => v.path !== '/')
   breadcrumbList.value = listBreadcrumb
-  currentRoute.value = curRoute
+  currentRoute.value = newVal
 })
 </script>
 
