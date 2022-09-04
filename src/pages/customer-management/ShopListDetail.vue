@@ -209,17 +209,6 @@ const getFieldsList = route => {
       disabled: type === 'view',
       placeholder: '请输入证件号码',
     },
-    {
-      type: "radio",
-      label: "权限角色",
-      field: "isAdmin",
-      initValue: '1',
-      disabled: type === 'view',
-      optionList: [
-        { label: "普通账号", value: "1" },
-        { label: "管理员账号", value: "2" },
-      ],
-    },
   ]
 
   if (type === 'edit') {

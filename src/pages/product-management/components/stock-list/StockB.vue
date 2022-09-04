@@ -57,9 +57,11 @@
             <span>{{scope.row.productUseNum}}</span>/<span>{{scope.row.productTotalNum}}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="outInNum" label="绑定门店">
+        <el-table-column prop="storeName" label="门店">
           <template #default="scope">
-            <el-button text type="primary" @click="handBindStore(scope.row)">绑定</el-button>
+            {{scope.row.storeName}}
+            <el-button v-if="scope.row.storeId" plain size="small" type="primary" @click="handBindStore(scope.row)">重新绑定</el-button>
+            <el-button v-else text type="primary" @click="handBindStore(scope.row)">绑定门店</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -119,6 +121,8 @@ const tableData2 = reactive([
     productSign: '01T!RVek^&Zz!}',
     productUseNum: '0',
     productTotalNum: '500',
+    storeId: '11232',
+    storeName: 'S24324'
   },
 ])
 
