@@ -1,68 +1,88 @@
-const baseUrl = ''
+const baseUrl = "/ligness";
 
 // 登录接口
+const login = baseUrl + "/staff/login";
 // 上传接口
-
+const upload = baseUrl + "/attachment/upload";
 
 // 物联网管理
 // 1. 设备型号管理
-// * 查询设备型号列表
-// * 删除设备型号
-// * 新增设备型号
-// * 编辑设备型号
-// * 查看设备型号
+const deviceType = {
+  list: baseUrl + "/devicetype/selectByConditionPage", // 查询设备型号列表
+  add: baseUrl + "/devicetype/insertSelective", // 新增设备型号
+  edit: baseUrl + "/devicetype/updateByPrimaryKeySelective", // 编辑设备型号
+  delete: baseUrl + "/devicetype/deleteByPrimaryKey", // 删除设备型号
+  view: baseUrl + "/devicetype/selectByPrimaryKey", // 查看设备型号
+};
 
-// 2. 设备列表
-// * 查询设备列表
-// * 删除设备
-// * 绑定（新增）设备
-// * 编辑设备
-// * 查看设备
+// 2. 设备管理
+const device = {
+  list: baseUrl + "/device/selectByDeviceInfoPage", // 查询设备列表
+  add: baseUrl + "/device/insertSelective", // 绑定（新增）设备
+  edit: baseUrl + "/device/updateByPrimaryKeySelective", // 编辑设备
+  delete: baseUrl + "/device/deleteByPrimaryKey", // 删除设备
+  view: baseUrl + "/device/selectByPrimaryKey", // 查看设备
+  usage: baseUrl + "/usagelog/selectByDeviceInfoPage", // 查询设备使用记录
+  analysis: baseUrl + "/device/statistics", // 设备统计分析
 
-// 3. 设备使用记录
-// * 查询设备使用记录
+  /* 小程序端使用 */
+  usage: baseUrl + "/device/entry", // 设备录入
+  analysis: baseUrl + "/device/scanQRCode", // 设备扫码
+};
 
-// // 产品管理
-// 1. 产品列表
-// * 查询产品列表
-// * 删除产品
-// * 添加产品
-// * 编辑产品（包含上下架？）
+// 产品管理
+const product = {
+  list: baseUrl + "/product/selectByProductInfoPage", // 查询产品列表和库存列表
+  add: baseUrl + "/product/insertSelective ", // 添加产品
+  edit: baseUrl + "/product/updateByPrimaryKeySelective", // 编辑产品（上下架/套盒绑定门店）
+  delete: baseUrl + "/product/deleteByPrimaryKey", // 删除产品
+  view: baseUrl + "/product/selectByPrimaryKey", // 查看产品
 
-// 2. 库存管理
-// * 查询库存列表
-// * 查询出入库记录
-// * 入库操作
-// * 绑定门店
+  entryStore: baseUrl + "/product/enterStorehouse", // 产品入库
+  entryStoreRecord: baseUrl + "/batch/selectByProductInfoPage", // 入库记录
+  consume: baseUrl + "/boxconsume/selectByProductInfoPage", // 套盒消耗列表
 
-// 3. 消耗明细
-// * 查询产品消耗明细
+  /* 小程序端使用 */
+  scan: baseUrl + "/box/scanQRCode", // 套盒扫码
+};
 
-// // 客户管理
-// 1. 门店列表
-// * 查询门店列表
-// * 新增门店
-// * 编辑门店
-// * 查询门店详情
-// * 新增密码
-// * 解绑登录手机号
-// * 修改登录手机号
+// 门店管理
+const shop = {
+  list: baseUrl + "/store/selectByConditionPage", // 查询门店列表
+  add: baseUrl + "/store/insertSelective ", // 新增门店
+  edit: baseUrl + "/store/updateByPrimaryKeySelective", // 编辑门店
+  delete: baseUrl + "/store/deleteByPrimaryKey", // 删除门店
+  view: baseUrl + "/store/selectByPrimaryKey", // 查询门店详情
 
-// // 员工管理
-// 1. 员工列表
-// * 查询员工列表
-// * 新增用户
-// * 编辑用户
-// * 删除用户
-// * 修改密码
-// * 修改登录手机号
+  /* 小程序端使用 */
+  login: baseUrl + "/store/login", // 门店登录
+};
 
-// // 品牌管理
-// * 查询品牌列表
-// * 新增品牌
-// * 编辑品牌
-// * 删除品牌
+// 员工管理
+const staff = {
+  list: baseUrl + "/staff/selectByConditionPage", // 查询员工列表
+  add: baseUrl + "/staff/insertSelective", // 新增用户
+  edit: baseUrl + "/staff/updateByPrimaryKeySelective", // 编辑用户(修改密码)
+  delete: baseUrl + "/staff/deleteByPrimaryKey", // 删除用户
+  view: baseUrl + "/staff/selectByPrimaryKey", // 查看员工
+};
 
-// // 统计分析
-// 1. 设备分析
-// * 查询设备型号数量
+// 品牌管理
+const brand = {
+  list: baseUrl + "/brand/selectAll", // 查询品牌列表
+  add: baseUrl + "/brand/insertSelective", // 新增品牌
+  edit: baseUrl + "/brand/updateByPrimaryKeySelective", // 编辑品牌
+  delete: baseUrl + "/brand/deleteByPrimaryKey", // 删除品牌
+  view: baseUrl + "/brand/selectByPrimaryKey", // 查看品牌
+};
+
+export default {
+  login,
+  upload,
+  deviceType,
+  device,
+  product,
+  shop,
+  staff,
+  brand,
+};

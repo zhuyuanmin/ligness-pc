@@ -3,7 +3,7 @@ import { ElMessageBox } from 'element-plus'
 
 const service = axios.create({
   baseURL: '/',
-  timeout: 15000,
+  timeout: 10000,
 })
 
 service.interceptors.request.use(
@@ -31,7 +31,7 @@ service.interceptors.response.use(
   },
   error => {
     ElMessageBox.confirm(
-      error.response ? `${error.response.statusText}` : '响应超时！',
+      error.response ? error.response.status === 404 ? '接口不存在！' : error.response.statusText : '响应超时！',
       '提示',
       {
         showCancelButton: false,

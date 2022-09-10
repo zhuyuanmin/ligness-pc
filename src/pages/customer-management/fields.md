@@ -1,0 +1,16 @@
+|字段名|描述|
+|--|--|
+|customName|客户名称|
+|storeContact|联系人|
+|customSex|性别|
+|storeContactPhoneNum|联系人手机号|
+|customAccount|客户账号|
+|customLoginPwd|登录密码|
+|customLoginPhoneNum|登录绑定手机|
+|customEmail|联系邮箱|
+|customIdType|证件类型|
+|customIdNum|证件号码|
+|customArea|所在区域|
+|storeAddr|详细地址|
+|storeDetail|详情介绍|
+|storeImg|客户照片|

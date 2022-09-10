@@ -104,7 +104,7 @@ const getStoreList = list => {
 const saveFormData = () => {
   // 保存数据
   if (!ruleFormRef.value) return
-  ruleFormRef.value.validate((valid, fields) => {
+  ruleFormRef.value.validate(valid => {
     if (valid) {
       console.log(formValues)
     }

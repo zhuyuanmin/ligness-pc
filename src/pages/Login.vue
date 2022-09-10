@@ -42,7 +42,7 @@
               class="submit-btn"
               @click="submitForm(ruleFormRef)"
               :loading="loading"
-              :disabled="!isVerifyPass || loading || (!form.account || !form.password)"
+              :disabled="!isVerifyPass || loading"
             >登录</el-button>
           </el-form-item>
         </el-form>
@@ -51,12 +51,16 @@
   </div>
 </template>
 <script setup>
-import imgSrc from "@/assets/login-bg.png";
-import { reactive, ref } from "vue";
+import imgSrc from "@/assets/login-bg.png"
+import { reactive, ref } from "vue"
 import { ElIcon, ElForm, ElFormItem, ElInput, ElButton } from 'element-plus'
 import { User, Unlock } from '@element-plus/icons-vue'
 import { useRouter } from 'vue-router'
 import DragVerify from '@/components/DragVerify.vue'
+import { login } from '@/utils/request'
+import userStore from "@/store/userStore"
+
+const userModel = userStore()
 
 const ruleFormRef = ref()
 const loading = ref(false)
@@ -78,14 +82,15 @@ const rules = reactive({
 })
 const submitForm = async formEl => {
   if (!formEl) return
-  await formEl.validate((valid, fields) => {
+  await formEl.validate(valid => {
     if (valid) {
       loading.value = true
-      console.log('submit:', fields)
-      setTimeout(() => {
+
+      login(form).then(res => {
         loading.value = false
+        userModel.updateUserInfo(res)
         router.replace('/')
-      }, 1000);
+      })
     }
   })
 }

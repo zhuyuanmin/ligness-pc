@@ -26,10 +26,10 @@
           </el-breadcrumb>
         </div>
         <div class="right">
-          <img :src="BoyImg" alt="" srcset="">
+          <img :src="avatar" alt="" srcset="">
           <el-dropdown>
             <span class="el-dropdown-link">
-              吴总
+              {{ userModel.userInfo.staffName }}
               <el-icon class="el-icon--right">
                 <arrow-down />
               </el-icon>
@@ -53,10 +53,11 @@
 import BoyImg from '@/assets/boy.png'
 import GirlImg from '@/assets/girl.png'
 import { menuRoute } from '@/router'
-import { ref, watch } from 'vue'
+import { ref, watch, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { Expand, Fold, ArrowDown } from '@element-plus/icons-vue'
 import MenuItem from '@/components/MenuItem.vue'
+import userStore from '@/store/userStore'
 import {
   ElRadioGroup,
   ElRadioButton,
@@ -68,6 +69,8 @@ import {
   ElDropdownItem,
   ElDropdownMenu,
 } from 'element-plus'
+
+const userModel = userStore()
 
 const router = useRouter()
 const isCollapse = ref(false)
@@ -85,6 +88,16 @@ watch(() => router.currentRoute.value, (newVal) => {
   const listBreadcrumb = newVal.matched.filter(v => v.path !== '/')
   breadcrumbList.value = listBreadcrumb
   currentRoute.value = newVal
+})
+
+const avatar = computed(() => {
+  if (userModel.userInfo.staffImg) {
+    return userModel.userInfo.staffImg
+  }
+  if (!userModel.userInfo.staffSex || userModel.userInfo.staffSex === '男') {
+    return BoyImg
+  }
+  return GirlImg
 })
 </script>
 

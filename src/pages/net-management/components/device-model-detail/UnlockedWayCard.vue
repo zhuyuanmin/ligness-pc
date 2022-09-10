@@ -76,7 +76,7 @@
   </el-card>
 </template>
 <script setup>
-import { ElCard, ElSwitch, ElTable, ElTableColumn, ElButton, ElIcon, ElDialog, ElInput, ElPagination, ElTag } from "element-plus";
+import { ElCard, ElSwitch, ElTable, ElTableColumn, ElButton, ElIcon, ElDialog, ElInput, ElPagination, ElTag, ElMessageBox } from "element-plus";
 import { ref, reactive } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { FolderAdd } from '@element-plus/icons-vue'
@@ -123,6 +123,22 @@ const handleSizeChange = size => {
 const handleCurrentChange = page => {
   console.log(page);
   currentPage.value = page
+}
+
+const deleteRow = row => {
+  console.log(row);
+  ElMessageBox.confirm(
+    '此操作将永久删除该项，是否继续？',
+    '提示',
+    {
+      cancelButtonText: '取消',
+      confirmButtonText: '确定',
+      draggable: true,
+      type: 'warning',
+    }
+  ).then(() => {
+    // 删除操作
+  }, () => {})
 }
 </script>
 <style lang="scss" scoped>
