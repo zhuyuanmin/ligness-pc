@@ -22,7 +22,7 @@
           label="序号"
           width="100"
         ></el-table-column>
-        <el-table-column prop="storeId" label="产品编码" />
+        <el-table-column prop="storeId" label="门店编码" />
         <el-table-column prop="storeName" label="门店名称" />
       </el-table>
       <el-pagination

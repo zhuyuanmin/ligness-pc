@@ -4,11 +4,11 @@
       <SearchComp :formItemList="searchFields" />
 
       <el-table :data="tableData" max-height="400" class="table-class">
-        <el-table-column prop="id" label="序号" width="100" />
-        <el-table-column prop="modelName" label="型号名称" />
+        <el-table-column prop="deviceTypeOrderNo" label="序号" width="100" />
+        <el-table-column prop="deviceTypeName" label="型号名称" />
         <el-table-column prop="factoryName" label="生产厂家" />
         <el-table-column prop="brandName" label="所属品牌商" />
-        <el-table-column prop="sum" label="设备数量" width="100" />
+        <el-table-column prop="deviceCount" label="设备数量" width="100" />
         <el-table-column prop="createTime" label="创建时间" width="180" />
         <el-table-column fixed="right" label="操作" width="150">
           <template #default="scope">
@@ -24,7 +24,7 @@
         v-model:page-size="pageSize"
         :page-sizes="[5, 10, 15, 20]"
         layout="total, sizes, prev, pager, next, jumper"
-        :total="100"
+        :total="total"
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
       />
@@ -36,33 +36,39 @@
 import SearchComp from "@/components/SearchComp.vue";
 import { ref, reactive, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import { ElTable, ElTableColumn, ElButton, ElPagination, ElMessageBox } from 'element-plus'
+import { ElTable, ElTableColumn, ElButton, ElPagination, ElMessageBox, ElMessage } from 'element-plus'
+import { getDeviceTypeList, deleteDeviceType } from './request/deviceType'
 
-const tableData = reactive([
+const tableData = ref([
   {
     brandName: "深圳市欧迪丝生物科技有限公司",
     createTime: "2022-03-14 02:03:32",
     factoryName: "深圳市欧迪丝生物科技有限公司",
-    id: 81,
-    modelName: "MEI XIU SI",
-    sum: 0,
+    deviceTypeOrderNo: 81,
+    deviceTypeName: "MEI XIU SI",
+    deviceCount: 0,
   },
 ])
 
 const searchFields = reactive([
   {
     type: "input",
-    label: "设备名称",
-    field: "modelName",
-    placeholder: '请输入设备名称',
+    label: "型号名称",
+    field: "deviceTypeName",
+    placeholder: '请输入型号名称',
   },
   {
     type: "btnList",
     children: [
       { text: "查询", type: "submit", onClick: values => {
         console.log(values)
+        currentPage.value = 1
+        fetchListData({ ...values, currentPage: 1, pageSize: pageSize.value })
       } },
-      { text: "重置", type: "reset", onClick: () => {} },
+      { text: "重置", type: "reset", onClick: () => {
+        currentPage.value = 1
+        fetchListData({ currentPage: 1, pageSize: pageSize.value })
+      } },
       { text: "新增", style: 'primary', onClick: () => viewRow() },
     ],
   },
@@ -70,6 +76,7 @@ const searchFields = reactive([
 
 const currentPage = ref(1)
 const pageSize = ref(10)
+const total = ref(100)
 const router = useRouter()
 
 const curRoute = router.currentRoute.value
@@ -79,19 +86,34 @@ watch(() => router.currentRoute.value, (newVal) => {
   currentRoute.value = newVal
 })
 
+const fetchListData = params => {
+  getDeviceTypeList(params).then(res => {
+    const { currentPage, pageSize, pageCount, totalCount, pageList } = res || {}
+    tableData.value = pageList
+    total.value = totalCount
+  })
+}
+
+onMounted(() => {
+  if (currentRoute.value.fullPath === '/net-management/device-model-list') {
+    fetchListData({})
+  }
+})
+
 const handleSizeChange = size => {
-  console.log(size);
+  currentPage.value = 1
   pageSize.value = size
+  fetchListData({ currentPage: 1, pageSize: size })
 }
 const handleCurrentChange = page => {
-  console.log(page);
   currentPage.value = page
+  fetchListData({ currentPage: page, pageSize: pageSize.value })
 }
 
 const viewRow = (row, type) => {
   console.log(row);
   if (row) {
-    router.push(`/net-management/device-model-list/detail/${row.id}?type=${type}`)
+    router.push(`/net-management/device-model-list/detail/${row.deviceTypeOrderNo}?type=${type}`)
   } else {
     router.push('/net-management/device-model-list/detail')
   }
@@ -120,6 +142,13 @@ const deleteRow = row => {
       }
     ).then(({ value }) =>  {
       console.log(value);
+      if (value === '@ligness@#?!8888') {
+        deleteDeviceType(row.deviceTypeOrderNo).then(() => {
+          ElMessage.success('操作成功！')
+        })
+      } else {
+        ElMessage.error('密码错误！')
+      }
     }, () => {})
   }, () => {})
 }

@@ -17,10 +17,11 @@
             <p>请上传一张透明背景图片</p>
             <el-upload
               class="avatar-uploader"
-              action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15"
+              :action="apis.upload"
               :show-file-list="false"
-              :on-success="handleAvatarSuccess"
-              :before-upload="beforeAvatarUpload"
+              :on-success="handleSuccess"
+              :before-upload="beforeUpload"
+              :on-error="handleError"
               accept=".png"
               :disabled="route.query.type === 'view'"
             >
@@ -37,17 +38,27 @@
   </el-card>
 </template>
 <script setup>
-import { ref, reactive } from "vue";
+import { ref, reactive, watch } from "vue";
 import SearchComp from "@/components/SearchComp.vue";
-import { ElCard, ElUpload, ElIcon, ElMessage } from "element-plus";
+import { ElCard, ElUpload, ElIcon, ElMessage, ElMessageBox } from "element-plus";
 import { Plus } from "@element-plus/icons-vue";
 import { useRoute, useRouter } from "vue-router";
-import { reject } from "lodash";
+import apis from "@/config/api";
 
 const route = useRoute();
-
 const imageUrl = ref("");
 const searchRef = ref();
+
+const props = defineProps({
+  deviceTypeData: {
+    type: Object,
+    default: {}
+  }
+})
+
+watch(() => props.deviceTypeData, newVal => {
+  imageUrl.value = newVal.deviceTypeImg
+})
 
 const fieldsFn = route => {
   const { query, params } = route
@@ -56,7 +67,7 @@ const fieldsFn = route => {
       type: "input",
       label: "序号",
       placeholder: "",
-      field: "id",
+      field: "deviceTypeOrderNo",
       initValue: params.id,
       disabled: true,
     },
@@ -64,7 +75,7 @@ const fieldsFn = route => {
       type: "input",
       label: "型号名称",
       placeholder: "请输入",
-      field: "modelName",
+      field: "deviceTypeName",
       required: true,
       rules: [
         { required: true, message: '请输入型号名称', trigger: 'blur' },
@@ -75,7 +86,7 @@ const fieldsFn = route => {
       type: "select",
       label: "品牌",
       placeholder: "请选择",
-      field: "brand",
+      field: "brandId",
       optionList: [
         { label: "ODC", value: "1" },
         { label: "DTM", value: "2" },
@@ -90,26 +101,13 @@ const fieldsFn = route => {
       type: "textarea",
       label: "型号描述",
       placeholder: "请输入描述信息",
-      field: "describe",
+      field: "deviceTypeRemark",
       maxLength: 200,
       optionList: [
         { label: "ODC", value: "1" },
         { label: "DTM", value: "2" },
       ],
     },
-    // {
-    //   type: 'btnList',
-    //   children: [
-    //     { text: '查询', type: 'submit', onClick: values => {
-    //       console.log(values)
-    //       console.log('搜索数据')
-    //     } },
-    //     { text: '重置', type: 'reset', onClick: values => {
-    //       console.log(values)
-    //       console.log('重置搜索数据')
-    //     } }
-    //   ]
-    // }
   ];
   if (!query.type || query.type === 'add') {
     arrList.shift()
@@ -129,11 +127,24 @@ const getSearchFormValue = () => {
 
 const searchFields = reactive(fieldsFn(route));
 
-const handleAvatarSuccess = (response, uploadFile) => {
+const handleSuccess = (response, uploadFile) => {
   imageUrl.value = URL.createObjectURL(uploadFile.raw);
 };
 
-const beforeAvatarUpload = (rawFile) => {
+const handleError = (error, uploadFile) => {
+  ElMessageBox.confirm(
+    error ? error.status === 404 ? '接口不存在！' : error.message : '响应超时！',
+    '提示',
+    {
+      showCancelButton: false,
+      showConfirmButton: false,
+      draggable: true,
+      type: 'error',
+    }
+  )
+};
+
+const beforeUpload = (rawFile) => {
   if (rawFile.type !== "image/png") {
     ElMessage.error("Avatar picture must be PNG format!");
     return false;
@@ -141,7 +152,7 @@ const beforeAvatarUpload = (rawFile) => {
     ElMessage.error("Avatar picture size can not exceed 2MB!");
     return false;
   }
-  imageUrl.value = URL.createObjectURL(rawFile);
+
   return true;
 };
 

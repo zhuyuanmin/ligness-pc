@@ -1,4 +1,4 @@
-import request from './index'
+import request from '@/utils'
 import api from '@/config/api'
 
 // 查询设备列表

@@ -46,9 +46,9 @@
         <el-table :data="tableData2" max-height="400" class="table-class" @selection-change="handleSelectionChange">
           <el-table-column type="selection" width="55" />
           <el-table-column type="index" label="序号" width="100"></el-table-column>
-          <el-table-column prop="id" label="产品ID" width="200" />
-          <el-table-column prop="name" label="产品名称" />
-          <el-table-column prop="time" label="时长（分钟）" width="200">
+          <el-table-column prop="productId" label="产品ID" width="200" />
+          <el-table-column prop="productName" label="产品名称" />
+          <el-table-column prop="theoryDuration" label="时长（分钟）" width="200">
             <template #default="scope">
               <el-input type="number" :value="scope.row" @change="handleChange()"></el-input>
             </template>
@@ -77,15 +77,16 @@
 </template>
 <script setup>
 import { ElCard, ElSwitch, ElTable, ElTableColumn, ElButton, ElIcon, ElDialog, ElInput, ElPagination, ElTag, ElMessageBox } from "element-plus";
-import { ref, reactive } from "vue";
+import { ref, reactive, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { FolderAdd } from '@element-plus/icons-vue'
+import { getProductList } from '@/pages/product-management/request/product'
 
 const route = useRoute();
 const switchValue = ref(true);
 const showModal = ref(false);
 const multipleSelection = ref([])
-const tableData = reactive([
+const tableData = ref([
   { productId: 13, productName: "B系列氢润女性胸部凝胶" },
   { productId: 14, productName: "B系列氢润女性胸部凝胶" },
   { productId: 15, productName: "B系列氢润女性胸部凝胶" },
@@ -96,20 +97,30 @@ const tableData = reactive([
   { productId: 20, productName: "B系列氢润女性胸部凝胶" },
 ]);
 const tableData2 = reactive([
-  { id: 13, name: "B系列氢润女性胸部凝胶" },
-  { id: 14, name: "B系列氢润女性胸部凝胶" },
-  { id: 15, name: "B系列氢润女性胸部凝胶" },
-  { id: 16, name: "B系列氢润女性胸部凝胶" },
-  { id: 17, name: "B系列氢润女性胸部凝胶" },
-  { id: 18, name: "B系列氢润女性胸部凝胶" },
-  { id: 19, name: "B系列氢润女性胸部凝胶" },
-  { id: 20, name: "B系列氢润女性胸部凝胶" },
+  { productId: 13, productName: "B系列氢润女性胸部凝胶" },
+  { productId: 14, productName: "B系列氢润女性胸部凝胶" },
+  { productId: 15, productName: "B系列氢润女性胸部凝胶" },
+  { productId: 16, productName: "B系列氢润女性胸部凝胶" },
+  { productId: 17, productName: "B系列氢润女性胸部凝胶" },
+  { productId: 18, productName: "B系列氢润女性胸部凝胶" },
+  { productId: 19, productName: "B系列氢润女性胸部凝胶" },
+  { productId: 20, productName: "B系列氢润女性胸部凝胶" },
 ]);
 
-const tags = tableData.map(v => ({ name: v.productName }))
+const tags = tableData.value.map(v => ({ name: v.productName }))
 
 const currentPage = ref(1)
 const pageSize = ref(10)
+
+const fetchProductList = params => {
+  getProductList(params).then(res => {
+    tableData.value = res
+  })
+}
+
+onMounted(() => {
+  fetchProductList({})
+})
 
 const handleChange = () => {}
 const handleSelectionChange = val => {
@@ -124,6 +135,8 @@ const handleCurrentChange = page => {
   console.log(page);
   currentPage.value = page
 }
+
+const getSwitchValue = () => switchValue.value
 
 const deleteRow = row => {
   console.log(row);
@@ -140,6 +153,8 @@ const deleteRow = row => {
     // 删除操作
   }, () => {})
 }
+
+defineExpose({ getSwitchValue })
 </script>
 <style lang="scss" scoped>
 .content-card {
