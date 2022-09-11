@@ -86,7 +86,7 @@ const submitForm = async formEl => {
     if (valid) {
       loading.value = true
 
-      login(form).then(res => {
+      login({staffAccount: form.account, staffPwd: form.password}).then(res => {
         loading.value = false
         userModel.updateUserInfo(res)
         router.replace('/')
