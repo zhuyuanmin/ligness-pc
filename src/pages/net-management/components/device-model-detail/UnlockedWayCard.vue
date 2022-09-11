@@ -119,7 +119,9 @@ const fetchProductList = params => {
 }
 
 onMounted(() => {
-  fetchProductList({})
+  if (route.params.id) {
+    fetchProductList({})
+  }
 })
 
 const handleChange = () => {}
