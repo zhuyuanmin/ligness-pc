@@ -6,8 +6,9 @@
       :summary-method="getSummaryFn"
       max-height="400"
       class="table-class"
+      v-loading="loading"
     >
-      <el-table-column prop="deviceName" label="设备型号" />
+      <el-table-column prop="deviceTypeName" label="设备型号" />
       <el-table-column prop="online" label="在线设备" />
       <el-table-column prop="offline" label="离线设备" />
       <el-table-column prop="fault" label="异常设备" />
@@ -20,38 +21,43 @@
   </div>
 </template>
 <script setup>
-import { ElTable, ElTableColumn } from "element-plus";
-import { reactive, ref } from "vue";
+import { ElTable, ElTableColumn, ElLoading } from "element-plus";
+import { ref, onMounted } from "vue";
+import { getDeviceAnalysis } from './request/analysis'
 
-const tableData = reactive([
+const vLoading = ElLoading.directive
+
+const loading = ref(false)
+
+const tableData = ref([
   {
-    deviceName: "欧洲之星:时尚塑形大师",
-    deviceCode: "68",
-    deviceNum: 101,
+    deviceTypeName: "欧洲之星:时尚塑形大师",
+    deviceNo: "68",
+    deviceCount: 101,
     online: 0,
     offline: 101,
     fault: 0,
   },
   {
-    deviceName: "欧洲之星:生命能量抗衰雕塑大师",
-    deviceCode: "69",
-    deviceNum: 52,
+    deviceTypeName: "欧洲之星:生命能量抗衰雕塑大师",
+    deviceNo: "69",
+    deviceCount: 52,
     online: 1,
     offline: 51,
     fault: 0,
   },
   {
-    deviceName: "欧洲之星:生命能量抗衰雕塑大师plus",
-    deviceCode: "80",
-    deviceNum: 29,
+    deviceTypeName: "欧洲之星:生命能量抗衰雕塑大师plus",
+    deviceNo: "80",
+    deviceCount: 29,
     online: 1,
     offline: 28,
     fault: 0,
   },
   {
-    deviceName: "MEI XIU SI",
-    deviceCode: "81",
-    deviceNum: 0,
+    deviceTypeName: "MEI XIU SI",
+    deviceNo: "81",
+    deviceCount: 0,
     online: 0,
     offline: 0,
     fault: 0,
@@ -69,7 +75,7 @@ const getSummaryFn = (param) => {
 
     let values = []
     if (index === 4) {
-      values = data.map((item) => Number(item.deviceNum))
+      values = data.map((item) => Number(item.deviceCount))
     } else {
       values = data.map((item) => Number(item[column.property]))
     }
@@ -89,7 +95,21 @@ const getSummaryFn = (param) => {
   })
 
   return sums
-};
+}
+
+const fetchListData = params => {
+  loading.value = true
+  getDeviceAnalysis(params).then(res => {
+    const { pageList } = res || {}
+    tableData.value = pageList
+  }).finally(() => {
+    loading.value = false
+  })
+}
+
+onMounted(() => {
+  fetchListData({})
+})
 </script>
 <style lang="scss" scoped>
 .container {
