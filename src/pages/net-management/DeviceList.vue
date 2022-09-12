@@ -4,22 +4,22 @@
       <SearchComp :formItemList="searchFields" :data="valueObj" ref="searchRef" />
       <ModalSelect v-model:showModal="showModal" :getStoreList="getStoreList" :value="selectValue" />
 
-      <el-table :data="tableData" max-height="400" class="table-class">
-        <el-table-column prop="id" label="序号" width="100" />
-        <el-table-column prop="name" label="设备型号" />
-        <el-table-column prop="code" label="设备编号" />
+      <el-table :data="tableData" max-height="400" class="table-class" v-loading="loading">
+        <el-table-column prop="deviceOrderNo" label="序号" width="100" />
+        <el-table-column prop="deviceTypeName" label="设备型号" />
+        <el-table-column prop="deviceNo" label="设备编号" />
         <el-table-column prop="brandName" label="品牌商" width="100" />
-        <el-table-column prop="brandMerchantName" label="品牌" />
+        <!-- <el-table-column prop="brandMerchantName" label="品牌" /> -->
         <el-table-column prop="storeName" label="绑定门店" />
-        <el-table-column prop="factoryName" label="厂家" />
-        <el-table-column prop="status" label="状态">
+        <!-- <el-table-column prop="factoryName" label="厂家" /> -->
+        <el-table-column prop="deviceStatus" label="状态">
           <template #default="scope">
-            <el-button v-if="scope.row.status === 1" type="success" plain size="small">在线</el-button>
+            <el-button v-if="scope.row.deviceStatus === 1" type="success" plain size="small">在线</el-button>
             <el-button v-else type="danger" plain size="small">离线</el-button>
           </template>
         </el-table-column>
         <el-table-column prop="createTime" label="出厂时间" width="180" />
-        <el-table-column prop="offLineTime" label="下线时间" width="180" />
+        <el-table-column prop="closeLockTime" label="下线时间" width="180" />
         <el-table-column fixed="right" label="操作" width="150">
           <template #default="scope">
             <el-button text type="primary" size="small" @click.prevent="viewRow(scope.row, 'edit')">编辑</el-button>
@@ -34,7 +34,7 @@
         v-model:page-size="pageSize"
         :page-sizes="[5, 10, 15, 20]"
         layout="total, sizes, prev, pager, next, jumper"
-        :total="100"
+        :total="total"
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
       />
@@ -45,9 +45,12 @@
 <script setup>
 import SearchComp from "@/components/SearchComp.vue";
 import ModalSelect from "./components/device-list/ModalSelect.vue";
-import { ElTable, ElTableColumn, ElButton, ElPagination, ElMessageBox } from 'element-plus'
-import { ref, reactive, watch } from "vue";
+import { ElTable, ElTableColumn, ElButton, ElPagination, ElMessageBox, ElMessage, ElLoading } from 'element-plus'
+import { ref, reactive, watch, onMounted } from "vue";
 import { useRouter } from 'vue-router'
+import { getDeviceList, deleteDevice } from './request/device'
+
+const vLoading = ElLoading.directive
 
 const showModalFn = () => {
   if (!searchRef.value) return
@@ -59,16 +62,14 @@ const showModalFn = () => {
 
 const tableData = reactive([
   {
-    id: '464',
-    name: '欧洲之星:生命能量抗衰雕塑大师plus',
-    code: 'odc213668558077953',
+    deviceOrderNo: '464',
+    deviceTypeName: '欧洲之星:生命能量抗衰雕塑大师plus',
+    deviceNo: 'odc213668558077953',
     brandName: "深圳市欧迪丝生物科技有限公司",
-    brandMerchantName: 'ODC',
     storeName: 'c88888',
-    factoryName: "深圳市欧迪丝生物科技有限公司",
-    status: 1,
-    createTime: "2022-03-14T02:03:32.000+00:00",
-    offLineTime: "2022-08-14T02:03:32.000+00:00",
+    deviceStatus: 1,
+    createTime: "2022-03-14 02:03:32",
+    closeLockTime: "2022-08-14 02:03:32",
   },
 ])
 
@@ -76,24 +77,15 @@ const searchFields = reactive([
   {
     type: "input",
     label: "设备编号",
-    field: "code",
+    field: "deviceNo",
   },
   {
     type: "select",
     label: "设备型号",
-    field: "modelId",
+    field: "deviceTypeName",
     optionList: [
       { label: "MEI XIU SI", value: "81" },
       { label: "欧洲之星", value: "80" },
-    ],
-  },
-  {
-    type: "select",
-    label: "所属厂家",
-    field: "factoryId",
-    optionList: [
-      { label: "莱特妮丝", value: "1" },
-      { label: "ODC", value: "2" },
     ],
   },
   {
@@ -116,27 +108,47 @@ const searchFields = reactive([
 ]);
 
 const showModal = ref(false)
+const loading = ref(false)
 const searchRef = ref()
 const valueObj = ref({})
 const selectValue = ref('')
 const currentPage = ref(1)
 const pageSize = ref(10)
+const total = ref(50)
 const router = useRouter()
 
 const curRoute = router.currentRoute.value
 const currentRoute = ref(curRoute)
 
+const fetchListData = params => {
+  loading.value = true
+  getDeviceList(params).then(res => {
+    const { currentPage, pageSize, pageCount, totalCount, pageList } = res || {}
+    tableData.value = pageList
+    total.value = totalCount
+  }).finally(() => {
+    loading.value = false
+  })
+}
+
 watch(() => router.currentRoute.value, (newVal) => {
   currentRoute.value = newVal
 })
 
+onMounted(() => {
+  if (currentRoute.value.fullPath === '/net-management/device-list') {
+    fetchListData({})
+  }
+})
+
 const handleSizeChange = size => {
-  console.log(size);
+  currentPage.value = 1
   pageSize.value = size
+  fetchListData({ currentPage: 1, pageSize: size })
 }
 const handleCurrentChange = page => {
-  console.log(page);
   currentPage.value = page
+  fetchListData({ currentPage: page, pageSize: pageSize.value })
 }
 
 const getStoreList = list => {
@@ -150,7 +162,7 @@ const getStoreList = list => {
 const viewRow = (row, type) => {
   console.log(row);
   if (row) {
-    router.push(`/net-management/device-list/detail/${row.id}?type=${type}`)
+    router.push(`/net-management/device-list/detail/${row.deviceNo}?type=${type}`)
   } else {
     router.push('/net-management/device-list/detail')
   }
@@ -169,6 +181,10 @@ const deleteRow = row => {
     }
   ).then(() => {
     // 删除操作
+    deleteDevice(row.deviceNo).then(() => {
+      ElMessage.success('操作成功！')
+      fetchListData({ currentPage: page, pageSize: pageSize.value })
+    })
   }, () => {})
 }
 </script>

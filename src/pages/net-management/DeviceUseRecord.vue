@@ -4,16 +4,15 @@
       <SearchComp :formItemList="searchFields" :data="valueObj" ref="searchRef" />
       <ModalSelect v-model:showModal="showModal" :getStoreList="getStoreList" :value="selectValue" />
 
-      <el-table :data="tableData" max-height="400" class="table-class">
-        <el-table-column prop="id" label="序号" width="100" />
-        <el-table-column prop="name" label="设备型号" />
-        <el-table-column prop="code" label="设备编号" />
+      <el-table :data="tableData" max-height="400" class="table-class" v-loading="loading">
+        <el-table-column prop="deviceOrderNo" label="序号" width="100" />
+        <el-table-column prop="deviceTypeName" label="设备型号" />
+        <el-table-column prop="deviceNo" label="设备编号" />
         <el-table-column prop="storeName" label="绑定门店" />
-        <el-table-column prop="startTime" label="解锁时间" />
+        <el-table-column prop="unlockTime" label="解锁时间" />
         <el-table-column prop="durationTime" label="使用时长/解锁时长(分钟)">
           <template #default="scope">
-            <span>{{scope.row.duration}}</span>/
-            <span>{{scope.row.totalDuration}}</span>
+            <span>{{scope.row.duration}}</span>/<span>{{scope.row.theoryDuration}}</span>
           </template>
         </el-table-column>
         <el-table-column prop="unlockType" label="解锁方式" width="150">
@@ -28,7 +27,7 @@
         v-model:page-size="pageSize"
         :page-sizes="[5, 10, 15, 20]"
         layout="total, sizes, prev, pager, next, jumper"
-        :total="100"
+        :total="total"
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
       />
@@ -39,9 +38,12 @@
 <script setup>
 import SearchComp from "@/components/SearchComp.vue";
 import ModalSelect from "./components/device-list/ModalSelect.vue";
-import { ElTable, ElTableColumn, ElButton, ElPagination } from 'element-plus'
-import { ref, reactive, watch } from "vue";
+import { ElTable, ElTableColumn, ElButton, ElPagination, ElMessage, ElLoading } from 'element-plus'
+import { ref, reactive, watch, onMounted } from "vue";
 import { useRouter } from 'vue-router'
+import { usageDevice } from './request/device'
+
+const vLoading = ElLoading.directive
 
 const showModalFn = () => {
   if (!searchRef.value) return
@@ -53,14 +55,15 @@ const showModalFn = () => {
 
 const tableData = reactive([
   {
-    id: '464',
-    name: '欧洲之星:生命能量抗衰雕塑大师',
-    code: 'odc213668558077953',
+    deviceOrderNo: '464',
+    deviceTypeName: '欧洲之星:生命能量抗衰雕塑大师',
+    deviceNo: 'odc213668558077953',
     storeName: "s00442",
-    startTime: "2022-03-14T02:03:32.000+00:00",
+    unlockTime: "2022-03-14 02:03:32",
+    closeLockTime: "2022-03-14 02:03:32",
     unlockType: 1,
     duration: 45,
-    totalDuration: 45,
+    theoryDuration: 45,
   },
 ])
 
@@ -68,12 +71,12 @@ const searchFields = reactive([
   {
     type: "input",
     label: "设备编号",
-    field: "code",
+    field: "deviceNo",
   },
   {
     type: "select",
     label: "设备型号",
-    field: "modelId",
+    field: "deviceTypeId",
     optionList: [
       { label: "MEI XIU SI", value: "81" },
       { label: "欧洲之星", value: "80" },
@@ -98,27 +101,47 @@ const searchFields = reactive([
 ]);
 
 const showModal = ref(false)
+const loading = ref(false)
 const searchRef = ref()
 const valueObj = ref({})
 const selectValue = ref('')
 const currentPage = ref(1)
 const pageSize = ref(10)
+const total = ref(100)
 const router = useRouter()
 
 const curRoute = router.currentRoute.value
 const currentRoute = ref(curRoute)
+
+const fetchListData = params => {
+  loading.value = true
+  usageDevice(params).then(res => {
+    const { currentPage, pageSize, pageCount, totalCount, pageList } = res || {}
+    tableData.value = pageList
+    total.value = totalCount
+  }).finally(() => {
+    loading.value = false
+  })
+}
+
+onMounted(() => {
+  if (currentRoute.value.fullPath === '/net-management/device-use-record') {
+    fetchListData({})
+  }
+})
 
 watch(() => router.currentRoute.value, (newVal) => {
   currentRoute.value = newVal
 })
 
 const handleSizeChange = size => {
-  console.log(size);
+  currentPage.value = 1
   pageSize.value = size
+  fetchListData({ currentPage: 1, pageSize: size })
 }
 const handleCurrentChange = page => {
-  console.log(page);
   currentPage.value = page
+  fetchListData({ currentPage: page, pageSize: pageSize.value })
 }
 
 const getStoreList = list => {

@@ -7,19 +7,19 @@
     <el-card class="my-card">
       <el-form :inline="true" ref="ruleFormRef" :model="formValues" class="demo-form-inline" label-width="auto" label-suffix="：" :rules="rules">
         <el-form-item v-if="['edit', 'view'].includes(route.query.type)" label="序号">{{route.params.id}}</el-form-item>
-        <el-form-item label="设备编号" required prop="deviceCode">
-          <el-input v-model="formValues.deviceCode" class="my-input" :maxlength="200" placeholder="请输入设备编号" :disabled="['edit', 'view'].includes(route.query.type)" clearable />
+        <el-form-item label="设备编号" required prop="deviceNo">
+          <el-input v-model="formValues.deviceNo" class="my-input" :maxlength="200" placeholder="请输入设备编号" :disabled="['edit', 'view'].includes(route.query.type)" clearable />
         </el-form-item>
         <el-form-item v-if="['edit', 'view'].includes(route.query.type)" label="当前状态">
-          <el-button v-if="formValues.status === 1" type="success" plain size="small">在线</el-button>
+          <el-button v-if="formValues.deviceStatus === 1" type="success" plain size="small">在线</el-button>
           <el-button v-else type="danger" plain size="small">离线</el-button>
         </el-form-item>
         <el-form-item v-if="['edit', 'view'].includes(route.query.type)" label="激活状态">
           <el-button v-if="formValues.activeStatus === 1" type="success" plain size="small">已激活</el-button>
           <el-button v-else type="danger" plain size="small">未激活</el-button>
         </el-form-item>
-        <el-form-item label="设备型号" required prop="deviceModel">
-          <el-select v-model="formValues.deviceModel" :disabled="['edit', 'view'].includes(route.query.type)" clearable>
+        <el-form-item label="设备型号" required prop="deviceTypeId">
+          <el-select v-model="formValues.deviceTypeId" :disabled="['edit', 'view'].includes(route.query.type)" clearable>
             <el-option v-for="v in optionList" :label="v.label" :value="v.value" :key="v.value" />
           </el-select>
         </el-form-item>
@@ -29,7 +29,7 @@
           </el-select>
         </el-form-item>
         <el-form-item label="设备说明" style="width: 100%">
-          <el-input type="textarea" :disabled="route.query.type === 'view'" show-word-limit :maxlength="500" :autosize="{ minRows: 3, maxRows: 5 }" v-model="formValues.deviceDescribe" placeholder="请输入" clearable />
+          <el-input type="textarea" :disabled="route.query.type === 'view'" show-word-limit :maxlength="500" :autosize="{ minRows: 3, maxRows: 5 }" v-model="formValues.deviceRemark" placeholder="请输入" clearable />
         </el-form-item>
       </el-form>
       <el-divider />
@@ -50,10 +50,11 @@
   </div>
 </template>
 <script setup>
-import { ElCard, ElForm, ElFormItem, ElInput, ElSelect, ElOption, ElButton, ElDivider } from 'element-plus'
+import { ElCard, ElForm, ElFormItem, ElInput, ElSelect, ElOption, ElButton, ElDivider, ElMessage } from 'element-plus'
 import ModalSelect from './components/device-list/ModalSelect.vue'
-import { ref, reactive } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { addDevice, editDevice, viewDevice } from './request/device'
 
 const router = useRouter()
 const route = useRoute()
@@ -79,14 +80,23 @@ const mapName = reactive({
   'view': '查看',
 })
 const rules = reactive({
-  deviceCode: [
+  deviceNo: [
     { required: true, message: '请输入设备编号', trigger: 'blur' },
     { required: true, message: '请输入设备编号', trigger: 'change' }
   ],
-  deviceModel: [
+  deviceTypeId: [
     { required: true, message: '请选择设备型号', trigger: 'blur' },
     { required: true, message: '请选择设备型号', trigger: 'change' }
   ],
+})
+
+onMounted(() => {
+  if (route.params.id) {
+    viewDevice(route.params.id).then(res => {
+      console.log(res)
+      deviceTypeData.value = res
+    })
+  }
 })
 
 const showStoreModal = () => {
@@ -107,6 +117,16 @@ const saveFormData = () => {
   ruleFormRef.value.validate(valid => {
     if (valid) {
       console.log(formValues)
+
+      if (route.params.id) {
+        editDevice({ ...formValues, id: route.params.id }).then(() => {
+          ElMessage.success('修改成功！')
+        })
+      } else {
+        addDevice({ ...formValues }).then(() => {
+          ElMessage.success('新增成功！')
+        })
+      }
     }
   })
 }

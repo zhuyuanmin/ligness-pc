@@ -3,11 +3,11 @@
     <template v-if="currentRoute.fullPath === '/net-management/device-model-list'">
       <SearchComp :formItemList="searchFields" />
 
-      <el-table :data="tableData" max-height="400" class="table-class">
+      <el-table :data="tableData" max-height="400" class="table-class" v-loading="loading">
         <el-table-column prop="deviceTypeOrderNo" label="序号" width="100" />
         <el-table-column prop="deviceTypeName" label="型号名称" />
         <el-table-column prop="factoryName" label="生产厂家" />
-        <el-table-column prop="brandName" label="所属品牌商" />
+        <el-table-column prop="brandName" label="品牌商" />
         <el-table-column prop="deviceCount" label="设备数量" width="100" />
         <el-table-column prop="createTime" label="创建时间" width="180" />
         <el-table-column fixed="right" label="操作" width="150">
@@ -36,8 +36,10 @@
 import SearchComp from "@/components/SearchComp.vue";
 import { ref, reactive, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import { ElTable, ElTableColumn, ElButton, ElPagination, ElMessageBox, ElMessage } from 'element-plus'
+import { ElTable, ElTableColumn, ElButton, ElPagination, ElMessageBox, ElMessage, ElLoading } from 'element-plus'
 import { getDeviceTypeList, deleteDeviceType } from './request/deviceType'
+
+const vLoading = ElLoading.directive
 
 const tableData = ref([
   {
@@ -78,6 +80,7 @@ const currentPage = ref(1)
 const pageSize = ref(10)
 const total = ref(100)
 const router = useRouter()
+const loading = ref(false)
 
 const curRoute = router.currentRoute.value
 const currentRoute = ref(curRoute)
@@ -87,10 +90,13 @@ watch(() => router.currentRoute.value, (newVal) => {
 })
 
 const fetchListData = params => {
+  loading.value = true
   getDeviceTypeList(params).then(res => {
     const { currentPage, pageSize, pageCount, totalCount, pageList } = res || {}
     tableData.value = pageList
     total.value = totalCount
+  }).finally(() => {
+    loading.value = false
   })
 }
 
@@ -145,6 +151,7 @@ const deleteRow = row => {
       if (value === '@ligness@#?!8888') {
         deleteDeviceType(row.deviceTypeOrderNo).then(() => {
           ElMessage.success('操作成功！')
+          fetchListData({ currentPage: page, pageSize: pageSize.value })
         })
       } else {
         ElMessage.error('密码错误！')
