@@ -4,19 +4,19 @@
       <SearchComp :formItemList="searchFields" :data="valueObj" ref="searchRef" />
       <ModalSelect v-model:showModal="showModal" :getStoreList="getStoreList" :value="selectValue" />
 
-      <el-table :data="tableData" max-height="400" class="table-class">
+      <el-table :data="tableData" max-height="400" class="table-class" v-loading="loading">
         <el-table-column type="index" label="序号" width="100" />
-        <el-table-column prop="productSerialNum" label="商品编码" />
+        <el-table-column prop="boxNo" label="商品编码" />
         <el-table-column prop="productName" label="产品名称" />
-        <el-table-column prop="productModel" label="产品编码" />
-        <el-table-column prop="productBrandName" label="品牌" />
-        <el-table-column prop="productBatch" label="批次" />
-        <el-table-column prop="depleteDate" label="消耗时间" />
+        <el-table-column prop="productNum" label="产品编码" />
+        <el-table-column prop="brandName" label="品牌" />
+        <el-table-column prop="batchNo" label="批次" />
+        <el-table-column prop="createTime" label="消耗时间" />
         <!-- <el-table-column prop="totalNumber" label="使用次数" /> -->
-        <el-table-column prop="lastNum" label="剩余次数" />
-        <el-table-column prop="depleteStoreName" label="消耗门店" />
-        <el-table-column prop="deviceCode" label="设备编号" />
-        <el-table-column prop="modifierName" label="操作人" />
+        <el-table-column prop="consumeRemainTimes" label="剩余次数" />
+        <el-table-column prop="storeName" label="消耗门店" />
+        <el-table-column prop="deviceNo" label="设备编号" />
+        <el-table-column prop="updater" label="操作人" />
         <el-table-column fixed="right" label="操作" width="100">
           <template #default="scope">
             <el-button text type="primary" size="small" @click.prevent="viewRow(scope.row)">查看</el-button>
@@ -29,7 +29,7 @@
         v-model:page-size="pageSize"
         :page-sizes="[5, 10, 15, 20]"
         layout="total, sizes, prev, pager, next, jumper"
-        :total="100"
+        :total="total"
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
       />
@@ -40,9 +40,12 @@
 <script setup>
 import SearchComp from "@/components/SearchComp.vue";
 import ModalSelect from "../net-management/components/device-list/ModalSelect.vue";
-import { ElTable, ElTableColumn, ElButton, ElPagination, ElMessageBox } from 'element-plus'
-import { ref, reactive, watch } from "vue";
+import { ElTable, ElTableColumn, ElButton, ElPagination, ElMessageBox, ElMessage, ElLoading } from 'element-plus'
+import { ref, reactive, watch, onMounted } from "vue";
 import { useRouter } from 'vue-router'
+import { consumeProduct } from './request/product'
+
+const vLoading = ElLoading.directive
 
 const showModalFn = () => {
   if (!searchRef.value) return
@@ -54,16 +57,16 @@ const showModalFn = () => {
 
 const tableData = reactive([
   {
-    productSerialNum: '1AA9918823854A69AAFD1D4498B61DE2',
+    boxNo: '1AA9918823854A69AAFD1D4498B61DE2',
     productName: "D系列氢润妍体亮肤按摩霜",
-    productModel: "P14684158926720901131638932605318",
-    productBrandName: "ODC",
-    productBatch: "B1639535834806",
-    depleteDate: "2022-08-28 02:35:51",
-    lastNum: "4",
-    depleteStoreName: "c06998",
-    deviceCode: "odc195335374831617",
-    modifierName: "成小梅",
+    productNum: "P14684158926720901131638932605318",
+    brandName: "ODC",
+    batchNo: "B1639535834806",
+    createTime: "2022-08-28 02:35:51",
+    consumeRemainTimes: "4",
+    storeName: "c06998",
+    deviceNo: "odc195335374831617",
+    updater: "成小梅",
   },
 ])
 
@@ -78,12 +81,12 @@ const searchFields = reactive([
     type: "input",
     label: "产品编码",
     placeholder: '请输入产品编码',
-    field: "productModel",
+    field: "productNum",
   },
   {
     type: "select",
     label: "所属品牌",
-    field: "productBrandId",
+    field: "brandId",
     optionList: [
       { label: "ODC", value: "1" },
       { label: "莱特妮丝", value: "2" },
@@ -98,7 +101,7 @@ const searchFields = reactive([
     type: "input",
     label: "设备编号",
     placeholder: '请输入设备编号',
-    field: "deviceCode",
+    field: "deviceNo",
   },
   {
     type: "select-custom",
@@ -120,7 +123,9 @@ const searchFields = reactive([
 
 const currentPage = ref(1)
 const pageSize = ref(10)
+const total = ref(100)
 const showModal = ref(false)
+const loading = ref(false)
 const valueObj = ref({})
 const selectValue = ref('')
 const searchRef = ref()
@@ -129,22 +134,39 @@ const router = useRouter()
 const curRoute = router.currentRoute.value
 const currentRoute = ref(curRoute)
 
+const fetchListData = params => {
+  loading.value = true
+  consumeProduct(params).then(res => {
+    const { currentPage, pageSize, pageCount, totalCount, pageList } = res || {}
+    tableData.value = pageList
+    total.value = totalCount
+  }).finally(() => {
+    loading.value = false
+  })
+}
+
 watch(() => router.currentRoute.value, (newVal) => {
   currentRoute.value = newVal
 })
 
+onMounted(() => {
+  if (currentRoute.value.fullPath === '/product-management/stock-use-record') {
+    fetchListData({})
+  }
+})
+
 const handleSizeChange = size => {
-  console.log(size);
   pageSize.value = size
+  fetchListData({ currentPage: 1, pageSize: size })
 }
 const handleCurrentChange = page => {
-  console.log(page);
   currentPage.value = page
+  fetchListData({ currentPage: page, pageSize: pageSize.value })
 }
 
 const viewRow = (row, type) => {
   if (row) {
-    router.push(`/product-management/stock-use-record/detail/${row.id}`)
+    router.push(`/product-management/stock-use-record/detail/${row.boxNo}`)
   }
 }
 

@@ -3,14 +3,14 @@
     <template v-if="currentRoute.fullPath === '/product-management/product-list'">
       <SearchComp :formItemList="searchFields" />
 
-      <el-table :data="tableData" max-height="400" class="table-class">
-        <el-table-column type="index" label="序号" width="100" />
-        <el-table-column prop="name" label="产品名称" />
+      <el-table :data="tableData" max-height="400" class="table-class" v-loading="loading">
+        <el-table-column prop="productNo" label="序号" width="100" />
+        <el-table-column prop="productName" label="产品名称" />
         <el-table-column prop="productNum" label="产品编号" />
-        <el-table-column prop="shortName" label="简称" />
-        <el-table-column prop="brandInfoName" label="品牌" />
-        <el-table-column prop="totalNumber" label="消耗次数" />
-        <el-table-column prop="natureTypeName" label="卖品/非卖品" />
+        <el-table-column prop="productShortForm" label="简称" />
+        <el-table-column prop="brandName" label="品牌" />
+        <el-table-column prop="productInventory" label="消耗次数" />
+        <!-- <el-table-column prop="natureTypeName" label="卖品/非卖品" /> -->
         <el-table-column fixed="right" label="操作" width="150">
           <template #default="scope">
             <el-button v-if="scope.row.status === 1" text type="danger" size="small" @click.prevent="handleStoreStatus(0)">下架</el-button>
@@ -26,7 +26,7 @@
         v-model:page-size="pageSize"
         :page-sizes="[5, 10, 15, 20]"
         layout="total, sizes, prev, pager, next, jumper"
-        :total="100"
+        :total="total"
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
       />
@@ -36,19 +36,22 @@
 </template>
 <script setup>
 import SearchComp from "@/components/SearchComp.vue";
-import { ElTable, ElTableColumn, ElButton, ElPagination, ElMessageBox } from 'element-plus'
-import { ref, reactive, watch } from "vue";
+import { ElTable, ElTableColumn, ElButton, ElPagination, ElMessageBox, ElMessage, ElLoading } from 'element-plus'
+import { ref, reactive, watch, onMounted } from "vue";
 import { useRouter } from 'vue-router'
+import { getProductList, deleteProduct, editProduct } from './request/product'
 
-const tableData = reactive([
+const vLoading = ElLoading.directive
+
+const tableData = ref([
   {
-    name: '门店培训五次',
+    productNo: '1321',
+    productName: '门店培训五次',
     productNum: 'P1538796514674085889',
-    shortName: '门店培训五次',
-    brandInfoName: "深圳市欧迪丝生物科技有限公司",
-    totalNumber: '12',
-    natureType: 1,
-    natureTypeName: "非卖品"
+    productShortForm: '门店培训五次',
+    brandName: "深圳市欧迪丝生物科技有限公司",
+    productInventory: '12',
+    productType: 1,
   },
 ])
 
@@ -57,7 +60,7 @@ const searchFields = reactive([
     type: "input",
     label: "产品名称",
     placeholder: '产品名称/产品编码/简称',
-    field: "name",
+    field: "productName",
   },
   {
     type: "select",
@@ -85,33 +88,58 @@ const searchFields = reactive([
 const currentPage = ref(1)
 const pageSize = ref(10)
 const router = useRouter()
+const total = ref(100)
+const loading = ref(false)
 
 const curRoute = router.currentRoute.value
 const currentRoute = ref(curRoute)
+
+const fetchListData = params => {
+  loading.value = true
+  getProductList(params).then(res => {
+    const { currentPage, pageSize, pageCount, totalCount, pageList } = res || {}
+    tableData.value = pageList
+    total.value = totalCount
+  }).finally(() => {
+    loading.value = false
+  })
+}
 
 watch(() => router.currentRoute.value, (newVal) => {
   currentRoute.value = newVal
 })
 
+onMounted(() => {
+  if (currentRoute.value.fullPath === '/product-management/product-list') {
+    fetchListData({})
+  }
+})
+
 const handleSizeChange = size => {
-  console.log(size);
+  currentPage.value = 1
   pageSize.value = size
+  fetchListData({ currentPage: 1, pageSize: size })
 }
 const handleCurrentChange = page => {
-  console.log(page);
   currentPage.value = page
+  fetchListData({ currentPage: page, pageSize: pageSize.value })
 }
 
 const viewRow = (row, type) => {
   console.log(row);
   if (row) {
-    router.push(`/product-management/product-list/detail/${row.id}?type=${type}`)
+    router.push(`/product-management/product-list/detail/${row.productNum}?type=${type}`)
   } else {
     router.push('/product-management/product-list/detail')
   }
 }
 
-const handleStoreStatus = state => {}
+const handleStoreStatus = state => {
+  editProduct(state).then(() => {
+    ElMessage.success('操作成功！')
+    fetchListData({ currentPage: page, pageSize: pageSize.value })
+  })
+}
 
 const deleteRow = row => {
   console.log(row);
@@ -126,6 +154,10 @@ const deleteRow = row => {
     }
   ).then(() => {
     // 删除操作
+    deleteProduct(row.deviceNo).then(() => {
+      ElMessage.success('操作成功！')
+      fetchListData({ currentPage: page, pageSize: pageSize.value })
+    })
   }, () => {})
 }
 </script>

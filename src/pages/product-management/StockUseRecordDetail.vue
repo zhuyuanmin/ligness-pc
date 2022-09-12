@@ -37,31 +37,45 @@
       </template>
       <el-table :data="tableData" max-height="400" class="table-class">
         <el-table-column type="index" label="序号" width="100" />
-        <el-table-column prop="depleteDate" label="消耗时间" />
-        <el-table-column prop="deviceCode" label="操作设备" />
-        <el-table-column prop="modifierName" label="操作人" />
-        <el-table-column prop="depleteStoreName" label="操作门店" />
-        <el-table-column prop="lastNum" label="剩余次数" />
+        <el-table-column prop="createTime" label="消耗时间" />
+        <el-table-column prop="deviceNo" label="操作设备" />
+        <el-table-column prop="updater" label="操作人" />
+        <el-table-column prop="storeName" label="操作门店" />
+        <el-table-column prop="consumeRemainTimes" label="剩余次数" />
       </el-table>
     </el-card>
   </div>
 </template>
 <script setup>
 import { ElButton, ElCard, ElTable, ElTableColumn } from "element-plus";
-import { ref, reactive } from "vue";
-import { useRouter } from 'vue-router'
+import { ref, reactive, onMounted } from "vue";
+import { useRoute, useRouter } from 'vue-router'
+import { viewProduct, consumeProduct } from './request/product'
 
 const router = useRouter()
+const route = useRoute()
 
 const tableData = reactive([
   {
-    depleteDate: "2022-08-28 02:35:51",
-    lastNum: "4",
-    depleteStoreName: "c06998",
-    deviceCode: "odc195335374831617",
-    modifierName: "成小梅",
+    createTime: "2022-08-28 02:35:51",
+    consumeRemainTimes: "4",
+    storeName: "c06998",
+    deviceNo: "odc195335374831617",
+    updater: "成小梅",
   },
 ]);
+
+onMounted(() => {
+  if (route.params.id) {
+    viewProduct(route.params.id).then(res => {
+      console.log(res)
+    })
+
+    consumeProduct(route.params.id).then(res => {
+      console.log(res)
+    })
+  }
+})
 </script>
 <style lang="scss" scoped>
 .card-header {

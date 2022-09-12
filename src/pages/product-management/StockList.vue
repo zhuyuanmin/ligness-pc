@@ -15,6 +15,7 @@ import { ElTabs, ElTabPane } from 'element-plus'
 import StockA from './components/stock-list/StockA.vue'
 import StockB from './components/stock-list/StockB.vue'
 import { ref } from 'vue'
+
 const activeName = ref('first')
 const searchData = ref({})
 

@@ -14,14 +14,16 @@
   </div>
 </template>
 <script setup>
-import { ElCard, ElButton } from 'element-plus'
+import { ElCard, ElButton, ElMessage } from 'element-plus'
 import SearchComp from '@/components/SearchComp.vue'
-import { ref, reactive } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { addProduct, editProduct, viewProduct } from './request/product'
 
 const router = useRouter()
 const route = useRoute()
 const ruleFormRef = ref()
+const productData = ref({})
 
 const mapName = reactive({
   'add': '添加',
@@ -29,20 +31,20 @@ const mapName = reactive({
 })
 
 const searchFields = reactive([
-  {
-    type: "select",
-    label: "产品性质",
-    field: "productType",
-    required: true,
-    rules: [
-      { required: true, message: '请选择产品性质', trigger: 'blur' },
-      { required: true, message: '请选择产品性质', trigger: 'change' }
-    ],
-    optionList: [
-      { label: "卖品", value: "1" },
-      { label: "非卖品", value: "2" },
-    ],
-  },
+  // {
+  //   type: "select",
+  //   label: "产品性质",
+  //   field: "productType",
+  //   required: true,
+  //   rules: [
+  //     { required: true, message: '请选择产品性质', trigger: 'blur' },
+  //     { required: true, message: '请选择产品性质', trigger: 'change' }
+  //   ],
+  //   optionList: [
+  //     { label: "卖品", value: "1" },
+  //     { label: "非卖品", value: "2" },
+  //   ],
+  // },
   {
     type: "select",
     label: "产品类型",
@@ -68,7 +70,7 @@ const searchFields = reactive([
   {
     type: "input",
     label: "产品名称",
-    field: "name",
+    field: "productName",
     required: true,
     rules: [
       { required: true, message: '请输入产品名称', trigger: 'blur' },
@@ -78,17 +80,17 @@ const searchFields = reactive([
   {
     type: "input",
     label: "简称",
-    field: "shortName",
+    field: "productShortForm",
   },
   {
     type: "input",
     label: "产品编码",
-    field: "code",
+    field: "productNum",
   },
   {
     type: "select",
     label: "品牌",
-    field: "brand",
+    field: "brandId",
     required: true,
     rules: [
       { required: true, message: '请选择品牌', trigger: 'blur' },
@@ -112,11 +114,30 @@ const searchFields = reactive([
   },
 ])
 
+onMounted(() => {
+  if (route.params.id) {
+    viewProduct(route.params.id).then(res => {
+      console.log(res)
+      productData.value = res
+    })
+  }
+})
+
 const saveFormData = () => {
   // 保存数据
   if (!ruleFormRef.value) return
   ruleFormRef.value.validFields().then(values => {
     console.log(values)
+
+    if (route.params.id) {
+      editProduct({ ...values, id: route.params.id }).then(() => {
+        ElMessage.success('修改成功！')
+      })
+    } else {
+      addProduct({ ...values }).then(() => {
+        ElMessage.success('新增成功！')
+      })
+    }
   })
 }
 </script>

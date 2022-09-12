@@ -94,7 +94,7 @@ onMounted(() => {
   if (route.params.id) {
     viewDevice(route.params.id).then(res => {
       console.log(res)
-      deviceTypeData.value = res
+      // deviceData.value = res
     })
   }
 })
