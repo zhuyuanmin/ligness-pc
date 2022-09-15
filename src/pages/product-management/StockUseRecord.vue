@@ -115,8 +115,13 @@ const searchFields = reactive([
     children: [
       { text: "查询", type: "submit", onClick: values => {
         console.log(values)
+        currentPage.value = 1
+        fetchListData({ ...values, currentPage: 1, pageSize: pageSize.value })
       } },
-      { text: "重置", type: "reset", onClick: () => {} },
+      { text: "重置", type: "reset", onClick: () => {
+        currentPage.value = 1
+        fetchListData({ currentPage: 1, pageSize: pageSize.value })
+      } },
     ],
   },
 ]);
@@ -156,6 +161,7 @@ onMounted(() => {
 })
 
 const handleSizeChange = size => {
+  currentPage.value = 1
   pageSize.value = size
   fetchListData({ currentPage: 1, pageSize: size })
 }

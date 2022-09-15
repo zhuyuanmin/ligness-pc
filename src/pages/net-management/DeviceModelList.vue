@@ -151,7 +151,8 @@ const deleteRow = row => {
       if (value === '@ligness@#?!8888') {
         deleteDeviceType(row.deviceTypeOrderNo).then(() => {
           ElMessage.success('操作成功！')
-          fetchListData({ currentPage: page, pageSize: pageSize.value })
+          currentPage.value = 1
+          fetchListData({ currentPage: 1, pageSize: pageSize.value })
         })
       } else {
         ElMessage.error('密码错误！')

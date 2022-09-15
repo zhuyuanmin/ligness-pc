@@ -100,8 +100,13 @@ const searchFields = reactive([
     children: [
       { text: "查询", type: "submit", onClick: values => {
         console.log(values)
+        currentPage.value = 1
+        fetchListData({ ...values, currentPage: 1, pageSize: pageSize.value })
       } },
-      { text: "重置", type: "reset", onClick: () => {} },
+      { text: "重置", type: "reset", onClick: () => {
+        currentPage.value = 1
+        fetchListData({ currentPage: 1, pageSize: pageSize.value })
+      } },
       { text: "绑定设备", style: 'primary', onClick: () => viewRow() },
     ],
   },
@@ -183,7 +188,8 @@ const deleteRow = row => {
     // 删除操作
     deleteDevice(row.deviceNo).then(() => {
       ElMessage.success('操作成功！')
-      fetchListData({ currentPage: page, pageSize: pageSize.value })
+      currentPage.value = 1
+      fetchListData({ currentPage: 1, pageSize: pageSize.value })
     })
   }, () => {})
 }

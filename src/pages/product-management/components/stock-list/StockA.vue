@@ -1,12 +1,12 @@
 <template>
   <SearchComp :formItemList="searchFields" />
 
-  <el-table :data="tableData" max-height="400" class="table-class">
+  <el-table :data="tableData" max-height="400" class="table-class" v-loading="loading">
     <el-table-column type="index" label="序号" width="100" />
     <el-table-column prop="productName" label="产品名称" />
     <el-table-column prop="productNum" label="产品编号" />
-    <el-table-column prop="totalNumber" label="消耗次数" />
-    <el-table-column prop="stock" label="可用库存" />
+    <el-table-column prop="consumeRemainTimes" label="消耗次数" />
+    <el-table-column prop="batchInventory" label="可用库存" />
     <el-table-column fixed="right" label="操作" width="150">
       <template #default="scope">
         <el-button text type="primary" size="small" @click.prevent="handleSwitchTab(scope.row)">出入库明细</el-button>
@@ -20,7 +20,7 @@
     v-model:page-size="pageSize"
     :page-sizes="[5, 10, 15, 20]"
     layout="total, sizes, prev, pager, next, jumper"
-    :total="100"
+    :total="total"
     @size-change="handleSizeChange"
     @current-change="handleCurrentChange"
   />
@@ -47,8 +47,11 @@
 </template>
 <script setup>
 import SearchComp from "@/components/SearchComp.vue";
-import { ElTable, ElTableColumn, ElButton, ElPagination, ElDialog, ElInput } from 'element-plus'
-import { ref, reactive } from 'vue'
+import { ElTable, ElTableColumn, ElButton, ElPagination, ElDialog, ElInput, ElLoading, ElMessage } from 'element-plus'
+import { ref, reactive, onMounted } from 'vue'
+import { getProductList, entryProductStore } from '../../request/product'
+
+const vLoading = ElLoading.directive
 
 const props = defineProps({
   switchTab: {
@@ -60,8 +63,8 @@ const tableData = reactive([
   {
     productName: '门店培训五次',
     productNum: 'P1538796514674085889',
-    totalNumber: '12',
-    stock: 1,
+    consumeRemainTimes: '12',
+    batchInventory: 1,
   },
 ])
 
@@ -84,15 +87,20 @@ const searchFields = reactive([
     type: "input",
     label: "产品编号",
     placeholder: '请输入产品编号',
-    field: "productSerialNum",
+    field: "productNum",
   },
   {
     type: "btnList",
     children: [
       { text: "查询", type: "submit", onClick: values => {
         console.log(values)
+        currentPage.value = 1
+        fetchListData({ ...values, currentPage: 1, pageSize: pageSize.value })
       } },
-      { text: "重置", type: "reset", onClick: () => {} },
+      { text: "重置", type: "reset", onClick: () => {
+        currentPage.value = 1
+        fetchListData({ currentPage: 1, pageSize: pageSize.value })
+      } },
     ],
   },
 ]);
@@ -115,15 +123,34 @@ const pageSize = ref(10)
 const showModal = ref(false)
 const title = ref('')
 const dialogRef = ref()
+const loading = ref(false)
+const total = ref(100)
 
 const handleSizeChange = size => {
-  console.log(size);
+  currentPage.value = 1
   pageSize.value = size
+  fetchListData({ currentPage: 1, pageSize: size })
 }
 const handleCurrentChange = page => {
-  console.log(page);
   currentPage.value = page
+  fetchListData({ currentPage: page, pageSize: pageSize.value })
 }
+
+const fetchListData = params => {
+  loading.value = true
+  getProductList(params).then(res => {
+    const { currentPage, pageSize, pageCount, totalCount, pageList } = res || {}
+    tableData.value = pageList
+    total.value = totalCount
+  }).finally(() => {
+    loading.value = false
+  })
+}
+
+onMounted(() => {
+  fetchListData({})
+})
+
 
 const handleSwitchTab = row => {
   props.switchTab('second', row)
@@ -139,6 +166,12 @@ const handleSubmit = () => {
   dialogRef.value.validFields().then(values => {
     console.log(values);
     showModal.value = false
+    entryProductStore(values.storeNum).then(() => {
+      // 操作成功
+      ElMessage.success('操作成功！')
+      currentPage.value = 1
+      fetchListData({ currentPage: 1, pageSize: pageSize.value })
+    })
   })
 }
 </script>

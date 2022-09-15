@@ -1,14 +1,14 @@
 <template>
   <SearchComp :key="dateRef" :formItemList="searchFields" />
 
-  <el-table :data="tableData" max-height="400" class="table-class">
+  <el-table :data="tableData" max-height="400" class="table-class" v-loading="loading">
     <el-table-column type="index" label="序号" width="100" />
     <el-table-column prop="productName" label="产品名称" />
-    <el-table-column prop="productModel" label="产品编号" />
-    <el-table-column prop="productBatch" label="批次" />
-    <el-table-column prop="productBrandName" label="所属品牌" />
-    <el-table-column prop="outInNum" label="产品数量" />
-    <el-table-column prop="createTime" label="入库时间" />
+    <el-table-column prop="brandName" label="产品编号" />
+    <el-table-column prop="batchNo" label="批次" />
+    <el-table-column prop="brandName" label="所属品牌" />
+    <el-table-column prop="batchInventory" label="产品数量" />
+    <el-table-column prop="operateTime" label="入库时间" />
     <el-table-column prop="modifierName" label="操作人" />
     <el-table-column fixed="right" label="操作" width="80">
       <template #default="scope">
@@ -22,9 +22,9 @@
     v-model:page-size="pageSize"
     :page-sizes="[5, 10, 15, 20]"
     layout="total, sizes, prev, pager, next, jumper"
-    :total="100"
-    @size-change="handleSizeChange('first')"
-    @current-change="handleCurrentChange('first')"
+    :total="total"
+    @size-change="size => handleSizeChange('first', size)"
+    @current-change="page => handleCurrentChange('first', page)"
   />
 
   <el-dialog
@@ -46,7 +46,7 @@
 
       <el-table :data="tableData2" max-height="400" class="table-class">
         <el-table-column type="index" label="序号" width="100" />
-        <el-table-column prop="productSerialNum" label="产品编号" />
+        <el-table-column prop="boxNo" label="产品编号" />
         <el-table-column prop="productSign" label="产品二维码">
           <template #default="scope">
             <el-button text type="primary" @click="handViewQRCode(scope.row)">查看</el-button>
@@ -54,7 +54,7 @@
         </el-table-column>
         <el-table-column label="已用次数/可用次数">
           <template #default="scope">
-            <span>{{scope.row.productUseNum}}</span>/<span>{{scope.row.productTotalNum}}</span>
+            <span>{{scope.row.boxUsedTimes}}</span>/<span>{{scope.row.boxAvailableTimes}}</span>
           </template>
         </el-table-column>
         <el-table-column prop="storeName" label="门店">
@@ -71,10 +71,10 @@
         v-model:page-size="pageSize2"
         :page-sizes="[5, 10, 15, 20]"
         layout="total, sizes, prev, pager, next, jumper"
-        :total="100"
+        :total="total2"
         small
-        @size-change="handleSizeChange('second')"
-        @current-change="handleCurrentChange('second')"
+        @size-change="size => handleSizeChange('second', size)"
+        @current-change="page => handleCurrentChange('second', page)"
       />
     </div>
     <template #footer>
@@ -88,11 +88,13 @@
 </template>
 <script setup>
 import SearchComp from "@/components/SearchComp.vue";
-import { ElTable, ElTableColumn, ElButton, ElPagination, ElDialog, ElRow, ElCol, ElMessageBox } from 'element-plus'
-import { ref, reactive, watch, h } from 'vue'
-import ModalSelect from '../../../net-management/components/device-list/ModalSelect.vue'
+import { ElTable, ElTableColumn, ElButton, ElPagination, ElDialog, ElRow, ElCol, ElMessageBox, ElLoading } from 'element-plus'
+import { ref, reactive, watch, h, onMounted } from 'vue'
+import ModalSelect from '@/pages/net-management/components/device-list/ModalSelect.vue'
 import QRCode from 'qrcode'
+import { entryProductStoreRecord } from '../../request/product'
 
+const vLoading = ElLoading.directive
 
 const props = defineProps({
   searchData: {
@@ -106,21 +108,20 @@ const props = defineProps({
 const tableData = reactive([
   {
     productName: '按摩霜D套盒10次',
-    productModel: 'P1538796514674085889',
-    productBatch: 'B1660470391251',
-    productBrandName: '莱特妮丝',
-    outInNum: "11",
-    createTime: '2022-08-14 17:46:31',
+    productNum: 'P1538796514674085889',
+    batchNo: 'B1660470391251',
+    brandName: '莱特妮丝',
+    batchInventory: "11",
+    operateTime: '2022-08-14 17:46:31',
     modifierName: '吴总',
   },
 ])
 
 const tableData2 = reactive([
   {
-    productSerialNum: 'A7BA9D3C459F46278208E2A28F1C5144',
-    productSign: '01T!RVek^&Zz!}',
-    productUseNum: '0',
-    productTotalNum: '500',
+    boxNo: 'A7BA9D3C459F46278208E2A28F1C5144',
+    boxUsedTimes: '0',
+    boxAvailableTimes: '500',
     storeId: '11232',
     storeName: 'S24324'
   },
@@ -128,11 +129,11 @@ const tableData2 = reactive([
 
 const dialogFields = reactive([
   { label: '产品名称', value: '', field: 'productName' },
-  { label: '产品编码', value: '', field: 'productModel' },
-  { label: '产品批次', value: '', field: 'productBatch' },
-  { label: '品牌商', value: '', field: 'productBrandName' },
-  { label: '入库时间', value: '', field: 'createTime' },
-  { label: '入库数量', value: '', field: 'outInNum' },
+  { label: '产品编码', value: '', field: 'productNum' },
+  { label: '产品批次', value: '', field: 'batchNo' },
+  { label: '品牌商', value: '', field: 'brandName' },
+  { label: '入库时间', value: '', field: 'operateTime' },
+  { label: '入库数量', value: '', field: 'batchInventory' },
   { label: '操作人', value: '', field: 'modifierName' },
 ])
 
@@ -153,7 +154,7 @@ const searchFields = reactive([
   {
     type: "select",
     label: "品牌",
-    field: "brand",
+    field: "brandId",
     optionList: [
       { label: "莱特妮丝", value: "80" },
       { label: "ODC", value: "81" },
@@ -162,18 +163,22 @@ const searchFields = reactive([
   {
     type: "date-range",
     label: "入库时间",
-    field: "storeTime",
+    field: "operateTime",
   },
   {
     type: "btnList",
     children: [
       { text: "查询", type: "submit", onClick: values => {
         console.log(values)
+        currentPage.value = 1
+        fetchListData({ ...values, currentPage: 1, pageSize: pageSize.value })
       } },
       { text: "重置", type: "reset", onClick: () => {
         searchFields[1].initValue = ''
         dateRef.value = Date.now()
         props.changeDataFn()
+        currentPage.value = 1
+        fetchListData({ currentPage: 1, pageSize: pageSize.value })
       } },
     ],
   },
@@ -183,6 +188,9 @@ const currentPage = ref(1)
 const pageSize = ref(10)
 const currentPage2 = ref(1)
 const pageSize2 = ref(10)
+const total = ref(100)
+const total2 = ref(100)
+const loading = ref(false)
 const showModal = ref(false)
 const showStoreModal = ref(false)
 const selectValue = ref('')
@@ -193,20 +201,41 @@ watch(() => props.searchData, () => {
   dateRef.value = Date.now()
 })
 
+const fetchListData = params => {
+  loading.value = true
+  entryProductStoreRecord(params).then(res => {
+    const { currentPage, pageSize, pageCount, totalCount, pageList } = res || {}
+    tableData.value = pageList
+    total.value = totalCount
+  }).finally(() => {
+    loading.value = false
+  })
+}
+
+onMounted(() => {
+  fetchListData({})
+})
+
 const handleSizeChange = (type, size) => {
   console.log(size);
   if (type === 'first') {
+    currentPage.value = 1
     pageSize.value = size
+    fetchListData({ currentPage: 1, pageSize: size })
   } else {
+    currentPage2.value = 1
     pageSize2.value = size
+    fetchListData({ currentPage: 1, pageSize2: size })
   }
 }
 const handleCurrentChange = (type, page) => {
   console.log(page);
   if (type === 'first') {
     currentPage.value = page
+    fetchListData({ currentPage: page, pageSize: pageSize.value })
   } else {
     currentPage2.value = page
+    fetchListData({ currentPage: page, pageSize2: pageSize2.value })
   }
 }
 
@@ -219,7 +248,7 @@ const handleShowModal = row => {
 
 const handViewQRCode = row => {
   QRCode
-    .toDataURL(row.productSign, { errorCorrectionLevel: 'H' })
+    .toDataURL(row.boxNo, { errorCorrectionLevel: 'H' })
     .then(url => {
       ElMessageBox({
         title: '查看二维码',
