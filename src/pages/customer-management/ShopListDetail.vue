@@ -45,9 +45,11 @@
 import { ElCard, ElButton, ElUpload, ElIcon } from 'element-plus'
 import { Plus } from '@element-plus/icons-vue'
 import SearchComp from '@/components/SearchComp.vue'
-import { ref, reactive } from "vue";
+import { ref, reactive, onMounted } from "vue";
 import { useRoute, useRouter } from 'vue-router'
 import jsonData from "china-area-data";
+
+import { addShop, editShop, viewShop } from './request/shop'
 
 const pData = Object.keys(jsonData["86"]).map((key) => ({
   label: jsonData["86"][key],
@@ -90,6 +92,16 @@ const checkEmail = (rule, value, cb) => {
   }
 }
 
+onMounted(() => {
+  const { type } = route.query || {}
+  const { id } = route.params || {}
+  if (['edit', 'view'].includes(type)) {
+    viewShop(id).then(res => {
+      console.log(res)
+    })
+  }
+})
+
 const getFieldsList = route => {
   const { type } = route.query || {}
 
@@ -97,7 +109,7 @@ const getFieldsList = route => {
     {
       type: "input",
       label: "客户名称",
-      field: "storeName",
+      field: "customName",
       placeholder: '请输入客户名称',
       required: true,
       disabled: type === 'view',
@@ -109,7 +121,7 @@ const getFieldsList = route => {
     {
       type: "input",
       label: "联系人",
-      field: "contact",
+      field: "storeContact",
       placeholder: '请输入联系人',
       required: true,
       disabled: type === 'view',
@@ -121,7 +133,7 @@ const getFieldsList = route => {
     {
       type: "select",
       label: "性别",
-      field: "gender",
+      field: "customSex",
       required: true,
       disabled: type === 'view',
       rules: [
@@ -136,7 +148,7 @@ const getFieldsList = route => {
     {
       type: "input",
       label: "联系人手机",
-      field: "contactPhone",
+      field: "storeContactPhoneNum",
       placeholder: '请输入联系人手机',
       required: true,
       disabled: type === 'view',
@@ -148,7 +160,7 @@ const getFieldsList = route => {
     {
       type: "input",
       label: "客户账号",
-      field: "account",
+      field: "customAccount",
       placeholder: '请输入客户账号',
       required: true,
       disabled: ['edit', 'view'].includes(type),
@@ -160,7 +172,7 @@ const getFieldsList = route => {
     {
       type: "input",
       label: "登录密码",
-      field: "password",
+      field: "customLoginPwd",
       required: true,
       disabled: type === 'view',
       placeholder: '请输入登录密码',
@@ -172,7 +184,7 @@ const getFieldsList = route => {
     {
       type: "input",
       label: "登录绑定手机",
-      field: "bindPhone",
+      field: "customLoginPhoneNum",
       placeholder: '请输入登录绑定手机',
       required: true,
       disabled: ['edit', 'view'].includes(type),
@@ -184,7 +196,7 @@ const getFieldsList = route => {
     {
       type: "input",
       label: "联系邮箱",
-      field: "email",
+      field: "customEmail",
       disabled: type === 'view',
       placeholder: '请输入联系邮箱',
       rules: [
@@ -195,7 +207,7 @@ const getFieldsList = route => {
     {
       type: "select",
       label: "证件类型",
-      field: "IDType",
+      field: "customIdType",
       disabled: type === 'view',
       optionList: [
         { label: "身份证", value: "1" },
@@ -205,7 +217,7 @@ const getFieldsList = route => {
     {
       type: "input",
       label: "证件号码",
-      field: "IDCode",
+      field: "customIdNum",
       disabled: type === 'view',
       placeholder: '请输入证件号码',
     },
@@ -222,7 +234,7 @@ const searchFields2 = reactive([
   {
     type: "cascade-select",
     label: "所在区域",
-    field: "area",
+    field: "customArea",
     required: true,
     disabled: route.query.type === 'view',
     initValue: ['330000', '330100', '330101'],
@@ -235,7 +247,7 @@ const searchFields2 = reactive([
   {
     type: "input",
     label: "详细地址",
-    field: "address",
+    field: "storeAddr",
     placeholder: '请输入详细地址',
     required: true,
     disabled: route.query.type === 'view',
@@ -247,7 +259,7 @@ const searchFields2 = reactive([
   {
     type: "textarea",
     label: "详情介绍",
-    field: "describe",
+    field: "storeDetail",
     placeholder: '请输入介绍信息',
     maxLength: 200,
     disabled: route.query.type === 'view',
@@ -262,9 +274,21 @@ const saveFormData = () => {
   if (!ruleFormRef2.value) return
   ruleFormRef.value.validFields().then(values => {
     console.log(values)
-  })
-  ruleFormRef2.value.validFields().then(values => {
-    console.log(values)
+    ruleFormRef2.value.validFields().then(result => {
+      console.log(result)
+
+      if (route.params?.id) {
+        editShop({ ...values, ...result, storeImg: imageUrl, id: route.params?.id }).then(res => {
+          ElMessage.success('保存成功！')
+          router.back()
+        })
+      } else {
+        addShop({ ...values, ...result, storeImg: imageUrl }).then(res => {
+          ElMessage.success('新增成功！')
+          router.back()
+        })
+      }
+    })
   })
 }
 
@@ -274,10 +298,10 @@ const handleAvatarSuccess = (response, uploadFile) => {
 
 const beforeAvatarUpload = (rawFile) => {
   if (rawFile.type !== "image/png") {
-    ElMessage.error("Avatar picture must be PNG format!");
+    ElMessage.error("请上传 png 格式的图片!");
     return false;
   } else if (rawFile.size / 1024 / 1024 > 2) {
-    ElMessage.error("Avatar picture size can not exceed 2MB!");
+    ElMessage.error("图片大小不能超过 2MB!");
     return false;
   }
   imageUrl.value = URL.createObjectURL(rawFile);

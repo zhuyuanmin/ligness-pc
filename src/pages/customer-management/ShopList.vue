@@ -3,17 +3,17 @@
     <template v-if="currentRoute.fullPath === '/customer-management/shop-list'">
       <SearchComp :formItemList="searchFields" />
 
-      <el-table :data="tableData" max-height="400" class="table-class">
-        <el-table-column prop="trunkId" label="编号" width="100" />
-        <el-table-column prop="account" label="账号" />
-        <el-table-column prop="trunkName" label="门店名称" />
-        <el-table-column prop="address" label="所在地区" />
-        <el-table-column prop="contact" label="联系人" />
-        <el-table-column prop="contactPhone" label="登录手机号" />
+      <el-table :data="tableData" max-height="400" class="table-class" v-loading="loading">
+        <el-table-column type="index" label="编号" width="100" />
+        <el-table-column prop="customAccount" label="账号" />
+        <el-table-column prop="customName" label="门店名称" />
+        <el-table-column prop="customArea" label="所在地区" />
+        <el-table-column prop="storeContact" label="联系人" />
+        <el-table-column prop="customLoginPhoneNum" label="登录手机号" />
         <el-table-column prop="createTime" label="创建时间" />
         <el-table-column prop="status" label="启用状态">
           <template #default="scope">
-            <el-switch :model-value="scope.row.status === 1" />
+            <el-switch :model-value="scope.row.status === 1" @change="handleUpdateShopInfo(scope.row)" />
           </template>
         </el-table-column>
         <el-table-column fixed="right" label="操作" width="150">
@@ -47,7 +47,7 @@
                 <template #dropdown>
                   <el-dropdown-menu>
                     <el-dropdown-item @click="handleModifyPassword(scope.row)">修改密码</el-dropdown-item>
-                    <el-dropdown-item @click="handleUnBindPhone(scope.row)">解绑登录手机号</el-dropdown-item>
+                    <!-- <el-dropdown-item @click="handleUnBindPhone(scope.row)">解绑登录手机号</el-dropdown-item> -->
                     <el-dropdown-item @click="handleModifyPhone(scope.row)">修改登录手机号</el-dropdown-item>
                   </el-dropdown-menu>
                 </template>
@@ -62,7 +62,7 @@
         v-model:page-size="pageSize"
         :page-sizes="[5, 10, 15, 20]"
         layout="total, sizes, prev, pager, next, jumper"
-        :total="100"
+        :total="total"
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
       />
@@ -106,20 +106,24 @@ import {
   ElDropdownMenu,
   ElIcon,
   ElDialog,
-  ElFormItem
+  ElFormItem,
+  ElLoading,
+  ElMessage
 } from "element-plus";
-import { ArrowDown } from '@element-plus/icons-vue'
-import { ref, reactive, watch } from "vue";
+import { ArrowDown } from '@element-plus/icons-vue';
+import { ref, reactive, watch, onMounted } from "vue";
 import { useRouter } from "vue-router";
+import { getShopList, editShop } from './request/shop'
+
+const vLoading = ElLoading.directive
 
 const tableData = reactive([
   {
-    trunkId: 150,
-    account: "C0703501",
-    trunkName: "C07035",
-    address: "山西省 太原市 晋源区",
-    contact: '冯亚琦',
-    contactPhone: "15803594395",
+    customAccount: "C0703501",
+    customName: "C07035",
+    customArea: "山西省 太原市 晋源区",
+    storeContact: '冯亚琦',
+    storeContactPhoneNum: "15803594395",
     createTime: '2022-08-12 21:02:42',
     status: 1,
   },
@@ -130,19 +134,19 @@ const searchFields = reactive([
     type: "input",
     label: "门店名称",
     placeholder: "请输入门店名称",
-    field: "storeName",
+    field: "customName",
   },
   {
     type: "input",
     label: "联系人",
     placeholder: "请输入联系人",
-    field: "contact",
+    field: "storeContact",
   },
   {
     type: "input",
     label: "账号/手机号",
     placeholder: "请输入账号/手机号",
-    field: "accountNumber",
+    field: "customAccount",
   },
   {
     type: "btnList",
@@ -152,9 +156,14 @@ const searchFields = reactive([
         type: "submit",
         onClick: (values) => {
           console.log(values);
+          currentPage.value = 1
+          fetchListData({ ...values, currentPage: 1, pageSize: pageSize.value })
         },
       },
-      { text: "重置", type: "reset", onClick: () => {} },
+      { text: "重置", type: "reset", onClick: () => {
+        currentPage.value = 1
+        fetchListData({ currentPage: 1, pageSize: pageSize.value })
+      } },
       { text: "新增", style: "primary", onClick: () => viewRow() },
     ],
   },
@@ -187,6 +196,8 @@ const dialogFieldsList = [
 
 const currentPage = ref(1);
 const pageSize = ref(10);
+const total = ref(100);
+const loading = ref(false);
 const router = useRouter();
 const showModal = ref(false)
 const title = ref('')
@@ -197,21 +208,44 @@ const dialogFields = ref([])
 const curRoute = router.currentRoute.value;
 const currentRoute = ref(curRoute);
 
-watch(
-  () => router.currentRoute.value,
-  () => {
-    const curRoute = router.currentRoute.value;
-    currentRoute.value = curRoute;
+const fetchListData = params => {
+  loading.value = true
+  getShopList(params).then(res => {
+    const { currentPage, pageSize, pageCount, totalCount, pageList } = res || {}
+    tableData.value = pageList
+    total.value = totalCount
+  }).finally(() => {
+    loading.value = false
+  })
+}
+
+const handleUpdateShopInfo = params => {
+  editShop(params).then(res => {
+    ElMessage.success('操作成功！')
+    currentPage.value = 1
+    fetchListData({ currentPage: 1, pageSize: pageSize.value })
+  })
+}
+
+watch(() => router.currentRoute.value, (newVal) => {
+  currentRoute.value = newVal
+})
+
+onMounted(() => {
+  if (currentRoute.value.fullPath === '/customer-management/shop-list') {
+    fetchListData({})
   }
-);
+})
 
 const handleSizeChange = (size) => {
-  console.log(size);
-  pageSize.value = size;
+  currentPage.value = 1
+  pageSize.value = size
+  fetchListData({ currentPage: 1, pageSize: size })
 };
+
 const handleCurrentChange = (page) => {
-  console.log(page);
-  currentPage.value = page;
+  currentPage.value = page
+  fetchListData({ currentPage: page, pageSize: pageSize.value })
 };
 
 const viewRow = (row, type) => {
@@ -228,6 +262,8 @@ const handleSubmit = () => {
   dialogRef.value.validFields().then(values => {
     console.log(values);
     showModal.value = false
+
+    handleUpdateShopInfo(values)
   })
 }
 
