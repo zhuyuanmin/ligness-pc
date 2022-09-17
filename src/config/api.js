@@ -24,10 +24,6 @@ const device = {
   view: baseUrl + "/device/selectByPrimaryKey", // 查看设备
   usage: baseUrl + "/usagelog/selectByDeviceInfoPage", // 查询设备使用记录
   analysis: baseUrl + "/device/statistics", // 设备统计分析
-
-  /* 小程序端使用 */
-  usage: baseUrl + "/device/entry", // 设备录入
-  analysis: baseUrl + "/device/scanQRCode", // 设备扫码
 };
 
 // 产品管理
@@ -41,9 +37,6 @@ const product = {
   entryStore: baseUrl + "/product/enterStorehouse", // 产品入库
   entryStoreRecord: baseUrl + "/batch/selectByProductInfoPage", // 入库记录
   consume: baseUrl + "/boxconsume/selectByProductInfoPage", // 套盒消耗列表
-
-  /* 小程序端使用 */
-  scan: baseUrl + "/box/scanQRCode", // 套盒扫码
 };
 
 // 门店管理
@@ -53,9 +46,6 @@ const shop = {
   edit: baseUrl + "/store/updateByPrimaryKeySelective", // 编辑门店
   delete: baseUrl + "/store/deleteByPrimaryKey", // 删除门店
   view: baseUrl + "/store/selectByPrimaryKey", // 查询门店详情
-
-  /* 小程序端使用 */
-  login: baseUrl + "/store/login", // 门店登录
 };
 
 // 员工管理
