@@ -36,8 +36,9 @@
 import { ElCard, ElButton, ElUpload, ElIcon } from "element-plus";
 import { Plus } from "@element-plus/icons-vue";
 import SearchComp from "@/components/SearchComp.vue";
-import { ref, reactive } from "vue";
+import { ref, reactive, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
+import { addBrand, editBrand, viewBrand } from './request/brand'
 
 const router = useRouter();
 const route = useRoute();
@@ -54,7 +55,7 @@ const searchFields = reactive([
   {
     type: "input",
     label: "品牌名称",
-    field: "name",
+    field: "brandName",
     placeholder: "请输入品牌名称",
     required: true,
     rules: [
@@ -65,7 +66,7 @@ const searchFields = reactive([
   {
     type: "select",
     label: "所属类型",
-    field: "type",
+    field: "brandType",
     required: true,
     rules: [
       { required: true, message: "请选择所属类型", trigger: "blur" },
@@ -79,22 +80,44 @@ const searchFields = reactive([
   {
     type: "input",
     label: "品牌负责人",
-    field: "contact",
+    field: "brandLeader",
     placeholder: "请输入品牌负责人",
   },
   {
     type: "textarea",
     label: "品牌描述",
-    field: "describe",
+    field: "brandRemark",
     placeholder: "请输入描述信息",
   },
 ]);
+
+onMounted(() => {
+  const { type } = route.query || {}
+  const { id } = route.params || {}
+  if (['edit', 'view'].includes(type)) {
+    viewBrand(id).then(res => {
+      console.log(res)
+    })
+  }
+})
 
 const saveFormData = () => {
   // 保存数据
   if (!ruleFormRef.value) return
   ruleFormRef.value.validFields().then(values => {
     console.log(values)
+
+    if (route.params?.id) {
+        addBrand({ ...values, brandImg: imageUrl, id: route.params?.id }).then(res => {
+          ElMessage.success('保存成功！')
+          router.back()
+        })
+      } else {
+        editBrand({ ...values, brandImg: imageUrl }).then(res => {
+          ElMessage.success('新增成功！')
+          router.back()
+        })
+      }
   })
 }
 

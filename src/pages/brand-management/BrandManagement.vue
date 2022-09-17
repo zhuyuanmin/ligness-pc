@@ -22,9 +22,10 @@
 </template>
 <script setup>
 import SearchComp from "@/components/SearchComp.vue";
-import { ElCard, ElDivider, ElButton, ElMessageBox } from 'element-plus'
-import { ref, reactive, watch } from "vue";
+import { ElCard, ElDivider, ElButton, ElMessageBox, ElMessage } from 'element-plus'
+import { ref, reactive, watch, onMounted } from "vue";
 import { useRouter } from 'vue-router'
+import { getBrandList, deleteBrand } from './request/brand'
 
 const searchFields = reactive([
   {
@@ -38,8 +39,11 @@ const searchFields = reactive([
     children: [
       { text: "查询", type: "submit", onClick: values => {
         console.log(values)
+        fetchListData({ ...values })
       } },
-      { text: "重置", type: "reset", onClick: () => {} },
+      { text: "重置", type: "reset", onClick: () => {
+        fetchListData({})
+      } },
       { text: "新增品牌", style: 'primary', onClick: () => viewRow() },
     ],
   },
@@ -55,6 +59,18 @@ const router = useRouter()
 
 const curRoute = router.currentRoute.value
 const currentRoute = ref(curRoute)
+
+const fetchListData = params => {
+  getBrandList(params).then(res => {
+    console.log(res)
+  })
+}
+
+onMounted(() => {
+  if (currentRoute.value.fullPath === '/brand-management') {
+    fetchListData({})
+  }
+})
 
 watch(() => router.currentRoute.value, (newVal) => {
   currentRoute.value = newVal
@@ -82,6 +98,10 @@ const deleteRow = row => {
     }
   ).then(() => {
     // 删除操作
+    deleteBrand(row).then(res => {
+      ElMessage.success('操作成功！')
+      fetchListData({})
+    })
   }, () => {})
 }
 </script>

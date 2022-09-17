@@ -271,7 +271,7 @@ const handleModifyPassword = row => {
   console.log(row);
   showModal.value = true
   title.value = '修改密码'
-  account.value = row.account
+  account.value = row.customAccount
   dialogFields.value = dialogFieldsList.slice(0, 1)
 };
 
@@ -295,7 +295,7 @@ const handleModifyPhone = row => {
   console.log(row);
   showModal.value = true
   title.value = '修改登录手机号'
-  account.value = row.account
+  account.value = row.customAccount
   dialogFields.value = dialogFieldsList.slice(1, 2)
 };
 </script>

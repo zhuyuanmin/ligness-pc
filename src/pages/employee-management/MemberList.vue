@@ -2,21 +2,21 @@
   <div class="container">
     <SearchComp :formItemList="searchFields" />
 
-    <el-table :data="tableData" max-height="400" class="table-class">
-      <el-table-column prop="userId" label="编号" width="100" />
-      <el-table-column prop="account" label="账号" />
-      <el-table-column prop="realName" label="姓名" />
-      <el-table-column prop="accountType" label="权限角色">
+    <el-table :data="tableData" max-height="400" class="table-class" v-loading="loading">
+      <el-table-column prop="staffNo" label="编号" width="100" />
+      <el-table-column prop="staffAccount" label="账号" />
+      <el-table-column prop="staffName" label="姓名" />
+      <el-table-column prop="staffPermRole" label="权限角色">
         <template #default="scope">
           <span v-if="scope.row.accountType === 1">系统管理员</span>
           <span v-else>普通账号</span>
         </template>
       </el-table-column>
-      <el-table-column prop="phone" label="登录手机号" />
+      <el-table-column prop="staffLoginPhoneNum" label="登录手机号" />
       <el-table-column prop="createTime" label="创建时间" />
-      <el-table-column prop="accountStatus" label="启用状态">
+      <el-table-column prop="staffStatus" label="启用状态">
         <template #default="scope">
-          <el-switch :model-value="scope.row.accountStatus === 1" />
+          <el-switch :model-value="scope.row.staffStatus === 1" @change="handleUpdateStaffInfo(scope.row)"/>
         </template>
       </el-table-column>
       <el-table-column fixed="right" label="操作" width="150">
@@ -64,7 +64,7 @@
       v-model:page-size="pageSize"
       :page-sizes="[5, 10, 15, 20]"
       layout="total, sizes, prev, pager, next, jumper"
-      :total="100"
+      :total="total"
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
     />
@@ -125,24 +125,27 @@ import {
   ElDropdownMenu,
   ElIcon,
   ElDialog,
-  ElFormItem
+  ElFormItem,
+  ElLoading,
+  ElMessage,
 } from "element-plus";
 import { ArrowDown } from '@element-plus/icons-vue'
-import { ref, reactive } from "vue";
+import { ref, reactive, onMounted } from "vue";
 import { useRoute } from "vue-router";
+import { getStaffList, deleteStaff, editStaff, addStaff } from './request/staff'
 
+const vLoading = ElLoading.directive
 const route = useRoute();
 
 const tableData = reactive([
   {
-    userId: 293,
-    account: "ltns001",
-    realName: "chen",
-    accountType: 0,
-    accountStatus: 1,
-    phone: "15803594395",
+    staffNo: 293,
+    staffAccount: "ltns001",
+    staffName: "chen",
+    staffPermRole: 0,
+    staffStatus: 1,
+    staffLoginPhoneNum: "15803594395",
     createTime: '2022-08-12 21:02:42',
-    status: 1,
   },
 ]);
 
@@ -170,9 +173,14 @@ const searchFields = reactive([
         type: "submit",
         onClick: (values) => {
           console.log(values);
+          currentPage.value = 1
+          fetchListData({ ...values, currentPage: 1, pageSize: pageSize.value })
         },
       },
-      { text: "重置", type: "reset", onClick: () => {} },
+      { text: "重置", type: "reset", onClick: () => {
+        currentPage.value = 1
+        fetchListData({ currentPage: 1, pageSize: pageSize.value })
+      } },
       { text: "新增用户", style: "primary", onClick: () => viewRow() },
     ],
   },
@@ -182,7 +190,7 @@ const dialogFieldsList = [
   {
     type: "password",
     label: "新密码",
-    field: "password",
+    field: "staffPwd",
     placeholder: '请输入新密码',
     required: true,
     rules: [
@@ -193,7 +201,7 @@ const dialogFieldsList = [
   {
     type: "input",
     label: "新登录手机号",
-    field: "phone",
+    field: "staffLoginPhoneNum",
     placeholder: '请输入新登录手机号',
     required: true,
     rules: [
@@ -207,7 +215,7 @@ const dialogFields2List = [
   {
     type: "input",
     label: "账号",
-    field: "account",
+    field: "staffAccount",
     placeholder: '请输入账号',
     required: true,
     rules: [
@@ -218,7 +226,7 @@ const dialogFields2List = [
   {
     type: "input",
     label: "姓名",
-    field: "name",
+    field: "staffName",
     placeholder: '请输入姓名',
     required: true,
     rules: [
@@ -229,7 +237,7 @@ const dialogFields2List = [
   {
     type: "input",
     label: "登录手机号",
-    field: "phone",
+    field: "staffLoginPhoneNum",
     placeholder: '请输入登录手机号',
     required: true,
     rules: [
@@ -240,7 +248,7 @@ const dialogFields2List = [
   {
     type: "password",
     label: "密码",
-    field: "password",
+    field: "staffPwd",
     placeholder: '请输入密码',
     required: true,
     rules: [
@@ -248,21 +256,21 @@ const dialogFields2List = [
       { required: true, message: '请输入密码', trigger: 'change' }
     ]
   },
-  {
-    type: "password",
-    label: "确认密码",
-    field: "confirmPassword",
-    placeholder: '请输入确认密码',
-    required: true,
-    rules: [
-      { required: true, message: '请输入确认密码', trigger: 'blur' },
-      { required: true, message: '请输入确认密码', trigger: 'change' }
-    ]
-  },
+  // {
+  //   type: "password",
+  //   label: "确认密码",
+  //   field: "confirmPassword",
+  //   placeholder: '请输入确认密码',
+  //   required: true,
+  //   rules: [
+  //     { required: true, message: '请输入确认密码', trigger: 'blur' },
+  //     { required: true, message: '请输入确认密码', trigger: 'change' }
+  //   ]
+  // },
   {
     type: "input",
     label: "邮箱",
-    field: "email",
+    field: "staffEmail",
     placeholder: '请输入邮箱',
     rules: [
       { validator: checkEmail, message: '请输入正确的邮箱格式', trigger: 'blur' },
@@ -272,7 +280,7 @@ const dialogFields2List = [
   {
     type: "select",
     label: "性别",
-    field: "gender",
+    field: "staffSex",
     required: true,
     rules: [
       { required: true, message: '请选择性别', trigger: 'blur' },
@@ -286,7 +294,7 @@ const dialogFields2List = [
   {
     type: "file",
     label: "头像",
-    field: "avatar",
+    field: "staffImg",
     initValue: [{
       name: 'food.jpeg',
       url: 'https://picsum.photos/200',
@@ -297,7 +305,7 @@ const dialogFields2List = [
   {
     type: "radio",
     label: "权限角色",
-    field: "isAdmin",
+    field: "staffPermRole",
     initValue: '1',
     optionList: [
       { label: "普通账号", value: "1" },
@@ -308,6 +316,8 @@ const dialogFields2List = [
 
 const currentPage = ref(1);
 const pageSize = ref(10);
+const total = ref(100)
+const loading = ref(false)
 const showModal = ref(false)
 const showUserInfoModal = ref(false)
 const title = ref('')
@@ -319,13 +329,45 @@ const dialogFields = ref([])
 const dialogFields2 = ref([])
 
 const handleSizeChange = (size) => {
-  console.log(size);
-  pageSize.value = size;
+  currentPage.value = 1
+  pageSize.value = size
+  fetchListData({ currentPage: 1, pageSize: size })
 };
 const handleCurrentChange = (page) => {
-  console.log(page);
-  currentPage.value = page;
+  currentPage.value = page
+  fetchListData({ currentPage: page, pageSize: pageSize.value })
 };
+
+const fetchListData = params => {
+  loading.value = true
+  getStaffList(params).then(res => {
+    const { currentPage, pageSize, pageCount, totalCount, pageList } = res || {}
+    tableData.value = pageList
+    total.value = totalCount
+  }).finally(() => {
+    loading.value = false
+  })
+}
+
+const handleUpdateStaffInfo = params => {
+  if (title2.value === '编辑用户') {
+    editStaff(params).then(res => {
+      ElMessage.success('操作成功！')
+      currentPage.value = 1
+      fetchListData({ currentPage: 1, pageSize: pageSize.value })
+    })
+  } else {
+    addStaff(params).then(res => {
+      ElMessage.success('操作成功！')
+      currentPage.value = 1
+      fetchListData({ currentPage: 1, pageSize: pageSize.value })
+    })
+  }
+}
+
+onMounted(() => {
+  fetchListData({})
+})
 
 const viewRow = (row, type) => {
   title2.value = row ? '编辑用户' : '新增用户'
@@ -360,6 +402,11 @@ const deleteRow = row => {
     }
   ).then(() => {
     // 删除操作
+    deleteStaff(row).then(res => {
+      ElMessage.success('操作成功！')
+      currentPage.value = 1
+      fetchListData({ currentPage: 1, pageSize: pageSize.value })
+    })
   }, () => {})
 };
 
@@ -368,6 +415,7 @@ const handleSubmit = () => {
   dialogRef.value.validFields().then(values => {
     console.log(values);
     showModal.value = false
+    handleUpdateStaffInfo(values)
   })
 }
 
@@ -376,6 +424,7 @@ const handleSubmitInfo = () => {
   dialogRef2.value.validFields().then(values => {
     console.log(values);
     showUserInfoModal.value = false
+    handleUpdateStaffInfo(values)
   })
 }
 
@@ -383,7 +432,7 @@ const handleModifyPassword = row => {
   console.log(row);
   showModal.value = true
   title.value = '修改密码'
-  account.value = row.account
+  account.value = row.staffAccount
   dialogFields.value = dialogFieldsList.slice(0, 1)
 };
 
@@ -391,7 +440,7 @@ const handleModifyPhone = row => {
   console.log(row);
   showModal.value = true
   title.value = '修改登录手机号'
-  account.value = row.account
+  account.value = row.staffAccount
   dialogFields.value = dialogFieldsList.slice(1, 2)
 };
 </script>
