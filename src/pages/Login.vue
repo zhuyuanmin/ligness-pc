@@ -87,9 +87,10 @@ const submitForm = async formEl => {
       loading.value = true
 
       login({staffAccount: form.account, staffPwd: form.password}).then(res => {
-        loading.value = false
         userModel.updateUserInfo(res)
         router.replace('/')
+      }).finally(() => {
+        loading.value = false
       })
     }
   })

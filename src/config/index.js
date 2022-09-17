@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { ElMessageBox } from 'element-plus'
+import { ElMessageBox, ElMessage } from 'element-plus'
 
 const service = axios.create({
   baseURL: '/',
@@ -27,6 +27,10 @@ service.interceptors.request.use(
 
 service.interceptors.response.use(
   function (config) {
+    if (config.data.code !== 200) {
+      ElMessage.error(config.data.msg)
+      return Promise.reject(error)
+    }
     return config
   },
   error => {

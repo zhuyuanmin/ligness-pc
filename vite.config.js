@@ -26,10 +26,10 @@ export default defineConfig({
   },
   server: {
     proxy: {
-      '/api': {
-        target: 'http://jsonplaceholder.typicode.com',
+      '/ligness': {
+        target: 'http://121.12.78.36:10001',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, '')
+        // rewrite: (path) => path.replace(/^\/ligness/, '')
       }
     }
   }
