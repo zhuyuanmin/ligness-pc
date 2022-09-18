@@ -7,8 +7,8 @@
         <template v-if="brandList.length > 0">
           <li class="card" v-for="item in brandList" :key="item.id">
             <el-card>
-              <div class="top"><img :src="item.logo" alt="" srcset=""></div>
-              <p>{{item.name}}</p>
+              <div class="top"><img :src="item.imgPath" alt="图片" srcset=""></div>
+              <p>{{item.brandName}}</p>
               <el-divider />
               <div class="btn-list">
                 <el-button text type="primary" size="small" @click.prevent="viewRow(item, 'edit')">编辑</el-button>
@@ -43,7 +43,6 @@ const searchFields = reactive([
     type: "btnList",
     children: [
       { text: "查询", type: "submit", onClick: values => {
-        console.log(values)
         fetchListData({ ...values })
       } },
       { text: "重置", type: "reset", onClick: () => {
@@ -54,7 +53,7 @@ const searchFields = reactive([
   },
 ]);
 
-const brandList = reactive([])
+const brandList = ref([])
 
 const router = useRouter()
 
@@ -63,7 +62,7 @@ const currentRoute = ref(curRoute)
 
 const fetchListData = params => {
   getBrandList(params).then(res => {
-    console.log(res)
+    brandList.value = res
   })
 }
 
@@ -75,19 +74,21 @@ onMounted(() => {
 
 watch(() => router.currentRoute.value, (newVal) => {
   currentRoute.value = newVal
+
+  if (newVal.fullPath === '/brand-management') {
+    fetchListData({})
+  }
 })
 
 const viewRow = (row, type) => {
-  console.log(row);
   if (row) {
-    router.push(`/brand-management/detail/${row.id}?type=${type}`)
+    router.push(`/brand-management/detail/${row.brandId}?type=${type}`)
   } else {
     router.push('/brand-management/detail')
   }
 }
 
 const deleteRow = row => {
-  console.log(row);
   ElMessageBox.confirm(
     '此操作将永久删除该项，是否继续？',
     '提示',
@@ -99,7 +100,7 @@ const deleteRow = row => {
     }
   ).then(() => {
     // 删除操作
-    deleteBrand(row).then(res => {
+    deleteBrand({ brandId: row.brandId }).then(res => {
       ElMessage.success('操作成功！')
       fetchListData({})
     })

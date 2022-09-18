@@ -52,15 +52,13 @@
 </template>
 <script setup>
 import imgSrc from "@/assets/login-bg.png"
-import { reactive, ref } from "vue"
+import { reactive, ref, onMounted } from "vue"
 import { ElIcon, ElForm, ElFormItem, ElInput, ElButton } from 'element-plus'
 import { User, Unlock } from '@element-plus/icons-vue'
 import { useRouter } from 'vue-router'
 import DragVerify from '@/components/DragVerify.vue'
 import { login } from '@/utils/request'
-import userStore from "@/store/userStore"
-
-const userModel = userStore()
+import jsCookie from 'js-cookie'
 
 const ruleFormRef = ref()
 const loading = ref(false)
@@ -72,14 +70,22 @@ const form = reactive({
 });
 const rules = reactive({
   account: [
-    { required: true, message: '请输入用户名', trigger: 'blur' },
-    { required: true, message: '请输入用户名', trigger: 'change' },
+    { required: true, message: '请输入用户名', trigger: ['blur', 'change'] },
   ],
   password: [
-    { required: true, message: '请输入密码', trigger: 'blur' },
-    { required: true, message: '请输入密码', trigger: 'change' },
+    { required: true, message: '请输入密码', trigger: ['blur', 'change'] },
   ],
 })
+
+onMounted(() => {
+  const userInfo = window.localStorage.getItem('userInfo')
+  const { token } = userInfo ? JSON.parse(userInfo) : {}
+
+  if (token) {
+    router.replace('/')
+  }
+})
+
 const submitForm = async formEl => {
   if (!formEl) return
   await formEl.validate(valid => {
@@ -87,7 +93,16 @@ const submitForm = async formEl => {
       loading.value = true
 
       login({staffAccount: form.account, staffPwd: form.password}).then(res => {
-        userModel.updateUserInfo(res)
+        const jsonStr = window.atob(jsCookie.get(res.staffId))
+        const { ligness_token } = JSON.parse(jsonStr)[res.staffId]
+
+        window.localStorage.setItem(
+          'userInfo',
+          JSON.stringify({
+            ...res,
+            token: ligness_token,
+          })
+        )
         router.replace('/')
       }).finally(() => {
         loading.value = false

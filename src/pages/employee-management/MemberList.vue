@@ -13,7 +13,7 @@
         </template>
       </el-table-column>
       <el-table-column prop="staffLoginPhoneNum" label="登录手机号" />
-      <el-table-column prop="updateTime" label="创建时间">
+      <el-table-column prop="updateTime" label="更新时间">
         <template #default="scope">
           <span>{{dayjs(scope.row.updateTime).format('YYYY-MM-DD HH:mm:ss')}}</span>
         </template>
@@ -209,6 +209,7 @@ const dialogFieldsList = [
     required: true,
     rules: [
       { required: true, message: '请输入新登录手机号', trigger: ['blur', 'change'] },
+      { validator: checkPhone.toString(), message: '手机号格式不正确', trigger: 'blur' }
     ]
   },
 ]
@@ -346,7 +347,19 @@ const fetchListData = params => {
 
 const handleUpdateStaffInfo = params => {
   if (['编辑用户'].includes(title2.value) || ['修改登录手机号', '修改密码'].includes(title.value) || params.staffId) {
-    editStaff(params.staffId ? { staffStatus: 0, staffId: params.staffId} : { ...params, staffId: currentRow.value.staffId }).then(res => {
+    editStaff(
+      params.staffId
+        ? {
+          staffStatus: params.staffStatus === 0 ? 1 : 0,
+          staffId: params.staffId,
+          refreshFlag: false
+        }
+        : {
+          ...params,
+          staffId: currentRow.value.staffId,
+          refreshFlag: !!params.staffPwd
+        }
+    ).then(res => {
       ElMessage.success('操作成功！')
       currentPage.value = 1
       fetchListData({ currentPage: 1, pageSize: pageSize.value })

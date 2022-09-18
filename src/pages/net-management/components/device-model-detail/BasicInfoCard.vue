@@ -78,8 +78,7 @@ const fieldsFn = route => {
       field: "deviceTypeName",
       required: true,
       rules: [
-        { required: true, message: '请输入型号名称', trigger: 'blur' },
-        { required: true, message: '请输入型号名称', trigger: 'change' }
+        { required: true, message: '请输入型号名称', trigger: ['blur', 'change'] },
       ]
     },
     {
@@ -93,8 +92,7 @@ const fieldsFn = route => {
       ],
       required: true,
       rules: [
-        { required: true, message: '请选择品牌', trigger: 'blur' },
-        { required: true, message: '请选择品牌', trigger: 'change' }
+        { required: true, message: '请选择品牌', trigger: ['blur', 'change'] },
       ]
     },
     {

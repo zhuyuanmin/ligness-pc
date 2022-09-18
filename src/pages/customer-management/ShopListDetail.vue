@@ -8,7 +8,7 @@
       <template #header>
         <div><span>基础信息</span></div>
       </template>
-      <SearchComp :formItemList="searchFields" ref="ruleFormRef" />
+      <SearchComp :formItemList="searchFields" ref="ruleFormRef" :key="dateKey" />
     </el-card>
     <el-card class="card-2">
       <template #header>
@@ -19,7 +19,8 @@
           <p>请上传图片</p>
           <el-upload
             class="avatar-uploader"
-            action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15"
+            :data="{ attachmentBizTypeEnum: 'STORE_CATEGORY', attachmentBizId: (route.params || {}).id}"
+            :action="api.upload"
             :show-file-list="false"
             :on-success="handleAvatarSuccess"
             :before-upload="beforeAvatarUpload"
@@ -31,7 +32,7 @@
           </el-upload>
         </div>
         <div class="right">
-          <SearchComp :formItemList="searchFields2" ref="ruleFormRef2" />
+          <SearchComp :formItemList="searchFields2" ref="ruleFormRef2" :key="dateKey2" />
         </div>
       </div>
     </el-card>
@@ -42,14 +43,14 @@
   </div>
 </template>
 <script setup>
-import { ElCard, ElButton, ElUpload, ElIcon } from 'element-plus'
+import { ElCard, ElButton, ElUpload, ElIcon, ElMessage } from 'element-plus'
 import { Plus } from '@element-plus/icons-vue'
 import SearchComp from '@/components/SearchComp.vue'
 import { ref, reactive, onMounted } from "vue";
 import { useRoute, useRouter } from 'vue-router'
 import jsonData from "china-area-data";
-
 import { addShop, editShop, viewShop } from './request/shop'
+import api from '@/config/api'
 
 const pData = Object.keys(jsonData["86"]).map((key) => ({
   label: jsonData["86"][key],
@@ -61,6 +62,9 @@ const route = useRoute()
 const ruleFormRef = ref()
 const ruleFormRef2 = ref()
 const imageUrl = ref("");
+const dateKey = ref(Date.now());
+const dateKey2 = ref(Date.now());
+const fileResponse = ref({})
 
 const mapName = reactive({
   'add': '新增',
@@ -92,12 +96,34 @@ const checkEmail = (rule, value, cb) => {
   }
 }
 
+const checkPhone = (rule, value, cb) => {
+  const regPhone = /^1[3-9]\d{9}$/
+  if (regPhone.test(value)) {
+    cb()
+  } else {
+    cb(new Error(rule.message))
+  }
+}
+
 onMounted(() => {
   const { type } = route.query || {}
   const { id } = route.params || {}
   if (['edit', 'view'].includes(type)) {
-    viewShop(id).then(res => {
-      console.log(res)
+    viewShop({ storeId: id }).then(res => {
+      searchFields.forEach(v => {
+        v.initValue = res[v.field]
+      })
+      searchFields2.forEach(v => {
+        if (v.field === 'customArea') {
+          v.initValue = JSON.parse(res[v.field])
+        } else {
+          v.initValue = res[v.field]
+        }
+      })
+      // 更新
+      dateKey.value = Date.now()
+      dateKey2.value = Date.now()
+      imageUrl.value = res.imgPath
     })
   }
 })
@@ -114,8 +140,7 @@ const getFieldsList = route => {
       required: true,
       disabled: type === 'view',
       rules: [
-        { required: true, message: '请输入客户名称', trigger: 'blur' },
-        { required: true, message: '请输入客户名称', trigger: 'change' }
+        { required: true, message: '请输入客户名称', trigger: ['blur', 'change'] },
       ],
     },
     {
@@ -126,8 +151,7 @@ const getFieldsList = route => {
       required: true,
       disabled: type === 'view',
       rules: [
-        { required: true, message: '请输入联系人', trigger: 'blur' },
-        { required: true, message: '请输入联系人', trigger: 'change' }
+        { required: true, message: '请输入联系人', trigger: ['blur', 'change'] },
       ],
     },
     {
@@ -137,12 +161,11 @@ const getFieldsList = route => {
       required: true,
       disabled: type === 'view',
       rules: [
-        { required: true, message: '请选择性别', trigger: 'blur' },
-        { required: true, message: '请选择性别', trigger: 'change' }
+        { required: true, message: '请选择性别', trigger: ['blur', 'change'] },
       ],
       optionList: [
-        { label: "男", value: "1" },
-        { label: "女", value: "2" },
+        { label: "男", value: 1 },
+        { label: "女", value: 2 },
       ],
     },
     {
@@ -153,8 +176,8 @@ const getFieldsList = route => {
       required: true,
       disabled: type === 'view',
       rules: [
-        { required: true, message: '请输入联系人手机', trigger: 'blur' },
-        { required: true, message: '请输入联系人手机', trigger: 'change' }
+        { required: true, message: '请输入联系人手机', trigger: ['blur', 'change'] },
+        { validator: checkPhone.toString(), message: '手机号格式不正确', trigger: 'blur' }
       ],
     },
     {
@@ -165,8 +188,7 @@ const getFieldsList = route => {
       required: true,
       disabled: ['edit', 'view'].includes(type),
       rules: [
-        { required: true, message: '请输入客户账号', trigger: 'blur' },
-        { required: true, message: '请输入客户账号', trigger: 'change' }
+        { required: true, message: '请输入客户账号', trigger: ['blur', 'change'] },
       ],
     },
     {
@@ -177,8 +199,7 @@ const getFieldsList = route => {
       disabled: type === 'view',
       placeholder: '请输入登录密码',
       rules: [
-        { required: true, message: '请输入登录密码', trigger: 'blur' },
-        { required: true, message: '请输入登录密码', trigger: 'change' }
+        { required: true, message: '请输入登录密码', trigger: ['blur', 'change'] },
       ],
     },
     {
@@ -189,8 +210,8 @@ const getFieldsList = route => {
       required: true,
       disabled: ['edit', 'view'].includes(type),
       rules: [
-        { required: true, message: '请输入登录绑定手机', trigger: 'blur' },
-        { required: true, message: '请输入登录绑定手机', trigger: 'change' }
+        { required: true, message: '请输入登录绑定手机', trigger: ['blur', 'change'] },
+        { validator: checkPhone.toString(), message: '手机号格式不正确', trigger: 'blur' }
       ],
     },
     {
@@ -200,8 +221,7 @@ const getFieldsList = route => {
       disabled: type === 'view',
       placeholder: '请输入联系邮箱',
       rules: [
-        { validator: checkEmail, message: '请输入正确的邮箱格式', trigger: 'blur' },
-        { validator: checkEmail, message: '请输入正确的邮箱格式', trigger: 'change' }
+        { validator: checkEmail.toString(), message: '请输入正确的邮箱格式', trigger: ['blur', 'change'] },
       ],
     },
     {
@@ -237,10 +257,9 @@ const searchFields2 = reactive([
     field: "customArea",
     required: true,
     disabled: route.query.type === 'view',
-    initValue: ['330000', '330100', '330101'],
+    // initValue: ['330000', '330100', '330101'],
     rules: [
-      { required: true, message: '请选择所在区域', trigger: 'blur' },
-      { required: true, message: '请选择所在区域', trigger: 'change' }
+      { required: true, message: '请选择所在区域', trigger: ['blur', 'change'] },
     ],
     optionList: result,
   },
@@ -252,8 +271,7 @@ const searchFields2 = reactive([
     required: true,
     disabled: route.query.type === 'view',
     rules: [
-      { required: true, message: '请输入详细地址', trigger: 'blur' },
-      { required: true, message: '请输入详细地址', trigger: 'change' }
+      { required: true, message: '请输入详细地址', trigger: ['blur', 'change'] },
     ],
   },
   {
@@ -276,15 +294,28 @@ const saveFormData = () => {
     console.log(values)
     ruleFormRef2.value.validFields().then(result => {
       console.log(result)
+      const { customArea, ...rest } = result
 
       if (route.params?.id) {
-        editShop({ ...values, ...result, storeImg: imageUrl, id: route.params?.id }).then(res => {
+        editShop({
+          ...values,
+          customArea: JSON.stringify(customArea),
+          ...rest,
+          storeId: route.params?.id,
+        }).then(res => {
           ElMessage.success('保存成功！')
+          fileResponse.value = {}
           router.back()
         })
       } else {
-        addShop({ ...values, ...result, storeImg: imageUrl }).then(res => {
+        addShop({
+          ...values,
+          customArea: JSON.stringify(customArea),
+          ...rest,
+          storeId: fileResponse.value.attachmentBizId || undefined
+        }).then(res => {
           ElMessage.success('新增成功！')
+          fileResponse.value = {}
           router.back()
         })
       }
@@ -293,15 +324,20 @@ const saveFormData = () => {
 }
 
 const handleAvatarSuccess = (response, uploadFile) => {
-  imageUrl.value = URL.createObjectURL(uploadFile.raw);
+  if (response.code !== 200) {
+    ElMessage.error(response.msg)
+  } else {
+    imageUrl.value = URL.createObjectURL(uploadFile.raw);
+    fileResponse.value = response.data
+  }
 };
 
 const beforeAvatarUpload = (rawFile) => {
   if (rawFile.type !== "image/png") {
-    ElMessage.error("请上传 png 格式的图片!");
+    ElMessage.error("请上传 .png 格式的图片!");
     return false;
-  } else if (rawFile.size / 1024 / 1024 > 2) {
-    ElMessage.error("图片大小不能超过 2MB!");
+  } else if (rawFile.size / 1024 / 1024 > 5) {
+    ElMessage.error("图片大小不能超过 5MB!");
     return false;
   }
   imageUrl.value = URL.createObjectURL(rawFile);

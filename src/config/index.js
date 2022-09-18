@@ -1,6 +1,9 @@
 import axios from 'axios'
 import { ElMessageBox, ElMessage } from 'element-plus'
 
+const userInfo = window.localStorage.getItem('userInfo')
+const { token } = userInfo ? JSON.parse(userInfo) : {}
+
 const service = axios.create({
   baseURL: '/',
   timeout: 10000,
@@ -8,6 +11,11 @@ const service = axios.create({
 
 service.interceptors.request.use(
   function (config) {
+    config.headers = {
+      ...config.headers,
+      endType: 0,
+      ligness_token: token || ''
+    }
     return config
   },
   error => {
@@ -30,7 +38,9 @@ service.interceptors.response.use(
     if (config.data.code !== 200) {
       ElMessage.error(config.data.msg)
       if (config.data.code === 401) {
-        window.location.replace('/login')
+        if (window.location.pathname !== '/login') {
+          window.location.replace('/login')
+        }
       }
       return Promise.reject(config.data.msg)
     }

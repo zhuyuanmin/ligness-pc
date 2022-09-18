@@ -29,7 +29,7 @@
           <img :src="avatar" alt="" srcset="">
           <el-dropdown>
             <span class="el-dropdown-link">
-              {{ userModel.userInfo.staffName }}
+              {{ userInfo.staffName }}
               <el-icon class="el-icon--right">
                 <arrow-down />
               </el-icon>
@@ -53,11 +53,10 @@
 import BoyImg from '@/assets/boy.png'
 import GirlImg from '@/assets/girl.png'
 import { menuRoute } from '@/router'
-import { ref, watch, computed } from 'vue'
+import { ref, watch, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { Expand, Fold, ArrowDown } from '@element-plus/icons-vue'
 import MenuItem from '@/components/MenuItem.vue'
-import userStore from '@/store/userStore'
 import {
   ElRadioGroup,
   ElRadioButton,
@@ -70,19 +69,22 @@ import {
   ElDropdownMenu,
 } from 'element-plus'
 
-const userModel = userStore()
-
 const router = useRouter()
 const isCollapse = ref(false)
 const curRoute = router.currentRoute.value
 const listBreadcrumb = curRoute.matched.filter(v => v.path !== '/')
 const breadcrumbList = ref(listBreadcrumb)
 const currentRoute = ref(curRoute)
+const userInfo = ref({})
 
 const handleLogout = () => {
   // 清理 token 信息
   router.replace('/login')
 }
+
+onMounted(() => {
+  userInfo.value = JSON.parse(window.localStorage.getItem('userInfo') || '{}')
+})
 
 watch(() => router.currentRoute.value, (newVal) => {
   const listBreadcrumb = newVal.matched.filter(v => v.path !== '/')
@@ -91,10 +93,10 @@ watch(() => router.currentRoute.value, (newVal) => {
 })
 
 const avatar = computed(() => {
-  if (userModel.userInfo.staffImg) {
-    return userModel.userInfo.staffImg
+  if (userInfo.staffImg) {
+    return userInfo.staffImg
   }
-  if (!userModel.userInfo.staffSex || userModel.userInfo.staffSex === '男') {
+  if (!userInfo.staffSex || userInfo.staffSex === '男') {
     return BoyImg
   }
   return GirlImg

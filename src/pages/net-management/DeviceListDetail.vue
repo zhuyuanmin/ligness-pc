@@ -81,12 +81,10 @@ const mapName = reactive({
 })
 const rules = reactive({
   deviceNo: [
-    { required: true, message: '请输入设备编号', trigger: 'blur' },
-    { required: true, message: '请输入设备编号', trigger: 'change' }
+    { required: true, message: '请输入设备编号', trigger: ['blur', 'change'] },
   ],
   deviceTypeId: [
-    { required: true, message: '请选择设备型号', trigger: 'blur' },
-    { required: true, message: '请选择设备型号', trigger: 'change' }
+    { required: true, message: '请选择设备型号', trigger: ['blur', 'change'] },
   ],
 })
 

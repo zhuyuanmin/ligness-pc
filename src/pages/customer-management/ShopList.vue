@@ -7,13 +7,21 @@
         <el-table-column type="index" label="编号" width="100" />
         <el-table-column prop="customAccount" label="账号" />
         <el-table-column prop="customName" label="门店名称" />
-        <el-table-column prop="customArea" label="所在地区" />
+        <el-table-column prop="customArea" label="所在地区">
+          <template #default="scope">
+            <span>{{computeAreaName(scope.row.customArea)}}</span>
+          </template>
+        </el-table-column>
         <el-table-column prop="storeContact" label="联系人" />
         <el-table-column prop="customLoginPhoneNum" label="登录手机号" />
-        <el-table-column prop="createTime" label="创建时间" />
-        <el-table-column prop="status" label="启用状态">
+        <el-table-column prop="createTime" label="更新时间">
           <template #default="scope">
-            <el-switch :model-value="scope.row.status === 1" @change="handleUpdateShopInfo(scope.row)" />
+            <span>{{dayjs(scope.row.updateTime).format('YYYY-MM-DD HH:mm:ss')}}</span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="storeStatus" label="启用状态">
+          <template #default="scope">
+            <el-switch :model-value="scope.row.storeStatus === 1" @change="handleUpdateShopInfo(scope.row)" />
           </template>
         </el-table-column>
         <el-table-column fixed="right" label="操作" width="150">
@@ -114,20 +122,21 @@ import { ArrowDown } from '@element-plus/icons-vue';
 import { ref, reactive, watch, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { getShopList, editShop } from './request/shop'
+import dayjs from 'dayjs'
+import jsonData from "china-area-data";
 
 const vLoading = ElLoading.directive
 
-const tableData = ref([
-  {
-    customAccount: "C0703501",
-    customName: "C07035",
-    customArea: "山西省 太原市 晋源区",
-    storeContact: '冯亚琦',
-    storeContactPhoneNum: "15803594395",
-    createTime: '2022-08-12 21:02:42',
-    status: 1,
-  },
-]);
+const tableData = ref([]);
+
+const checkPhone = (rule, value, cb) => {
+  const regPhone = /^1[3-9]\d{9}$/
+  if (regPhone.test(value)) {
+    cb()
+  } else {
+    cb(new Error(rule.message))
+  }
+}
 
 const searchFields = reactive([
   {
@@ -173,23 +182,22 @@ const dialogFieldsList = [
   {
     type: "password",
     label: "新密码",
-    field: "password",
+    field: "customLoginPwd",
     placeholder: '请输入新密码',
     required: true,
     rules: [
-      { required: true, message: '请输入新密码', trigger: 'blur' },
-      { required: true, message: '请输入新密码', trigger: 'change' }
+      { required: true, message: '请输入新密码', trigger: ['blur', 'change'] },
     ]
   },
   {
     type: "input",
     label: "新登录手机号",
-    field: "phone",
+    field: "customLoginPhoneNum",
     placeholder: '请输入新登录手机号',
     required: true,
     rules: [
-      { required: true, message: '请输入新登录手机号', trigger: 'blur' },
-      { required: true, message: '请输入新登录手机号', trigger: 'change' }
+      { required: true, message: '请输入新登录手机号', trigger: ['blur', 'change'] },
+      { validator: checkPhone.toString(), message: '手机号格式不正确', trigger: 'blur' }
     ]
   },
 ]
@@ -204,6 +212,7 @@ const title = ref('')
 const dialogRef = ref()
 const account = ref('')
 const dialogFields = ref([])
+const currentRow = ref({})
 
 const curRoute = router.currentRoute.value;
 const currentRoute = ref(curRoute);
@@ -220,7 +229,17 @@ const fetchListData = params => {
 }
 
 const handleUpdateShopInfo = params => {
-  editShop(params).then(res => {
+  editShop(
+    params.storeId ? {
+      storeId: params.storeId ,
+      storeStatus: params.storeStatus === 0 ? 1 : 0,
+      refreshFlag: false
+    } : {
+      ...params,
+      storeId: currentRow.value.storeId,
+      refreshFlag: !!params.customLoginPwd
+    }
+  ).then(res => {
     ElMessage.success('操作成功！')
     currentPage.value = 1
     fetchListData({ currentPage: 1, pageSize: pageSize.value })
@@ -237,6 +256,15 @@ onMounted(() => {
   }
 })
 
+const computeAreaName = area => {
+  const list = JSON.parse(area)
+  const province = jsonData['86'][list[0]]
+  const city = jsonData[list[0]][list[1]]
+  const district = jsonData[list[1]][list[2]]
+
+  return `${province} ${city} ${district}`
+}
+
 const handleSizeChange = (size) => {
   currentPage.value = 1
   pageSize.value = size
@@ -251,7 +279,7 @@ const handleCurrentChange = (page) => {
 const viewRow = (row, type) => {
   console.log(row);
   if (row) {
-    router.push(`/customer-management/shop-list/detail/${row.trunkId}?type=${type}`);
+    router.push(`/customer-management/shop-list/detail/${row.storeId}?type=${type}`);
   } else {
     router.push("/customer-management/shop-list/detail");
   }
@@ -268,7 +296,7 @@ const handleSubmit = () => {
 }
 
 const handleModifyPassword = row => {
-  console.log(row);
+  currentRow.value = row
   showModal.value = true
   title.value = '修改密码'
   account.value = row.customAccount
@@ -292,7 +320,7 @@ const handleUnBindPhone = row => {
 };
 
 const handleModifyPhone = row => {
-  console.log(row);
+  currentRow.value = row
   showModal.value = true
   title.value = '修改登录手机号'
   account.value = row.customAccount

@@ -37,8 +37,7 @@ const searchFields = reactive([
   //   field: "productType",
   //   required: true,
   //   rules: [
-  //     { required: true, message: '请选择产品性质', trigger: 'blur' },
-  //     { required: true, message: '请选择产品性质', trigger: 'change' }
+  //     { required: true, message: '请选择产品性质', trigger: ['blur', 'change'] },
   //   ],
   //   optionList: [
   //     { label: "卖品", value: "1" },
@@ -51,14 +50,13 @@ const searchFields = reactive([
     field: "productCategory",
     required: true,
     rules: [
-      { required: true, message: '请选择产品类型', trigger: 'blur' },
-      { required: true, message: '请选择产品类型', trigger: 'change' }
+      { required: true, message: '请选择产品类型', trigger: ['blur', 'change'] },
     ],
     optionList: [
-      { label: "普通产品", value: "1" },
-      { label: "服务耗材", value: "2" },
-      { label: "院装产品", value: "3" },
-      { label: "套盒产品", value: "4" },
+      { label: "普通产品", value: 1 },
+      { label: "服务耗材", value: 2 },
+      { label: "院装产品", value: 3 },
+      { label: "套盒产品", value: 4 },
     ],
   },
   {
@@ -73,8 +71,7 @@ const searchFields = reactive([
     field: "productName",
     required: true,
     rules: [
-      { required: true, message: '请输入产品名称', trigger: 'blur' },
-      { required: true, message: '请输入产品名称', trigger: 'change' }
+      { required: true, message: '请输入产品名称', trigger: ['blur', 'change'] },
     ],
   },
   {
@@ -93,8 +90,7 @@ const searchFields = reactive([
     field: "brandId",
     required: true,
     rules: [
-      { required: true, message: '请选择品牌', trigger: 'blur' },
-      { required: true, message: '请选择品牌', trigger: 'change' }
+      { required: true, message: '请选择品牌', trigger: ['blur', 'change'] },
     ],
     optionList: [
       { label: "莱特妮丝", value: "80" },

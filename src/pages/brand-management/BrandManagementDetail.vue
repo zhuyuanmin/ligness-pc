@@ -10,7 +10,7 @@
           <p>请上传图片</p>
           <el-upload
             class="avatar-uploader"
-            :data="{ attachmentBizTypeEnum: 'BRAND_CATEGORY' }"
+            :data="{ attachmentBizTypeEnum: 'BRAND_CATEGORY', attachmentBizId: (route.params || {}).id}"
             :action="api.upload"
             :show-file-list="false"
             :on-success="handleAvatarSuccess"
@@ -23,7 +23,7 @@
           </el-upload>
         </div>
         <div class="right">
-          <SearchComp :formItemList="searchFields" ref="ruleFormRef" />
+          <SearchComp :formItemList="searchFields" ref="ruleFormRef" :key="dateKey" />
         </div>
       </div>
     </el-card>
@@ -34,7 +34,7 @@
   </div>
 </template>
 <script setup>
-import { ElCard, ElButton, ElUpload, ElIcon } from "element-plus";
+import { ElCard, ElButton, ElUpload, ElIcon, ElMessage } from "element-plus";
 import { Plus } from "@element-plus/icons-vue";
 import SearchComp from "@/components/SearchComp.vue";
 import { ref, reactive, onMounted } from "vue";
@@ -42,10 +42,18 @@ import { useRoute, useRouter } from "vue-router";
 import { addBrand, editBrand, viewBrand } from './request/brand'
 import api from '@/config/api'
 
+// DEVICE_TYPE_CATEGORY(0L, "设备型号类型"),
+// PRODUCT_CATEGORY(1L, "产品类型"),
+// STORE_CATEGORY(2L, "客户门店类型"),
+// STAFF_CATEGORY(3L, "员工类型"),
+// BRAND_CATEGORY(4L, "品牌类型");
+
 const router = useRouter();
 const route = useRoute();
 const ruleFormRef = ref();
 const imageUrl = ref("");
+const dateKey = ref(Date.now())
+const fileResponse = ref({})
 
 const mapName = reactive({
   add: "新增",
@@ -61,8 +69,7 @@ const searchFields = reactive([
     placeholder: "请输入品牌名称",
     required: true,
     rules: [
-      { required: true, message: "请输入品牌名称", trigger: "blur" },
-      { required: true, message: "请输入品牌名称", trigger: "change" },
+      { required: true, message: "请输入品牌名称", trigger: ['blur', 'change'] },
     ],
   },
   {
@@ -71,12 +78,11 @@ const searchFields = reactive([
     field: "brandType",
     required: true,
     rules: [
-      { required: true, message: "请选择所属类型", trigger: "blur" },
-      { required: true, message: "请选择所属类型", trigger: "change" },
+      { required: true, message: "请选择所属类型", trigger: ['blur', 'change'] },
     ],
     optionList: [
-      { label: "高端养护", value: 1 },
-      { label: "青年养护", value: 2 },
+      { label: "高端养护", value: "1" },
+      { label: "青年养护", value: "2" },
     ],
   },
   {
@@ -98,8 +104,13 @@ onMounted(() => {
   const { type } = route.query || {}
   const { id } = route.params || {}
   if (['edit', 'view'].includes(type)) {
-    viewBrand(id).then(res => {
-      console.log(res)
+    viewBrand({ brandId: id }).then(res => {
+      searchFields.forEach(v => {
+        v.initValue = res[v.field]
+      })
+      // 更新
+      dateKey.value = Date.now()
+      imageUrl.value = res.imgPath
     })
   }
 })
@@ -111,13 +122,15 @@ const saveFormData = () => {
     console.log(values)
 
     if (route.params?.id) {
-      editBrand({ ...values, brandImg: imageUrl.value, id: route.params?.id }).then(res => {
+      editBrand({ ...values, brandId: route.params?.id }).then(res => {
         ElMessage.success('保存成功！')
+        fileResponse.value = {}
         router.back()
       })
     } else {
-      addBrand({ ...values, brandImg: imageUrl.value }).then(res => {
+      addBrand({ ...values, brandId: fileResponse.value.attachmentBizId || undefined }).then(res => {
         ElMessage.success('新增成功！')
+        fileResponse.value = {}
         router.back()
       })
     }
@@ -129,18 +142,18 @@ const handleAvatarSuccess = (response, uploadFile) => {
     ElMessage.error(response.msg)
   } else {
     imageUrl.value = URL.createObjectURL(uploadFile.raw);
+    fileResponse.value = response.data
   }
 };
 
 const beforeAvatarUpload = (rawFile) => {
   if (rawFile.type !== "image/png") {
-    ElMessage.error("Avatar picture must be PNG format!");
+    ElMessage.error("请上传 .png 格式的图片!");
     return false;
-  } else if (rawFile.size / 1024 / 1024 > 2) {
-    ElMessage.error("Avatar picture size can not exceed 2MB!");
+  } else if (rawFile.size / 1024 / 1024 > 5) {
+    ElMessage.error("图片大小不能超过 5MB!");
     return false;
   }
-  imageUrl.value = URL.createObjectURL(rawFile);
   return true;
 };
 </script>
