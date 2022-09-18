@@ -4,17 +4,22 @@
       <SearchComp :formItemList="searchFields" />
 
       <ul class="brand-list">
-        <li class="card" v-for="item in brandList" :key="item.id">
-          <el-card>
-            <div class="top"><img :src="item.logo" alt="" srcset=""></div>
-            <p>{{item.name}}</p>
-            <el-divider />
-            <div class="btn-list">
-              <el-button text type="primary" size="small" @click.prevent="viewRow(item, 'edit')">编辑</el-button>
-              <el-button text type="danger" size="small" @click.prevent="deleteRow(item)">删除</el-button>
-            </div>
-          </el-card>
-        </li>
+        <template v-if="brandList.length > 0">
+          <li class="card" v-for="item in brandList" :key="item.id">
+            <el-card>
+              <div class="top"><img :src="item.logo" alt="" srcset=""></div>
+              <p>{{item.name}}</p>
+              <el-divider />
+              <div class="btn-list">
+                <el-button text type="primary" size="small" @click.prevent="viewRow(item, 'edit')">编辑</el-button>
+                <el-button text type="danger" size="small" @click.prevent="deleteRow(item)">删除</el-button>
+              </div>
+            </el-card>
+          </li>
+        </template>
+        <template v-else>
+          <div class="empty-data">暂无数据</div>
+        </template>
       </ul>
     </template>
     <template v-else><router-view /></template>
@@ -49,11 +54,7 @@ const searchFields = reactive([
   },
 ]);
 
-const brandList = reactive([
-  { id: 2, logo: 'https://sinpm.oss-cn-beijing.aliyuncs.com/images/2021/12/06/16388042811804309.jpg', name: 'ODC' },
-  { id: 3, logo: 'https://sinpm.oss-cn-beijing.aliyuncs.com/images/2021/12/09/16390367140031159.jpg', name: '欧迪丝' },
-  { id: 15, logo: 'https://sinpm.oss-cn-beijing.aliyuncs.com/images/2022/07/01/16566443192109353.jpg', name: '莱特妮丝' },
-])
+const brandList = reactive([])
 
 const router = useRouter()
 
@@ -112,6 +113,15 @@ const deleteRow = row => {
   padding: 24px;
   box-sizing: border-box;
   overflow-y: auto;
+
+  .empty-data {
+    color: #909399;
+    font-size: 14px;
+    text-align: center;
+    height: 60px;
+    line-height: 60px;
+    border-bottom: 1px solid #E7EBF2;
+  }
 
   .brand-list {
     padding: 0;

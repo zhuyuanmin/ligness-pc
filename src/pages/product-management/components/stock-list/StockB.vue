@@ -105,7 +105,7 @@ const props = defineProps({
   },
 })
 
-const tableData = reactive([
+const tableData = ref([
   {
     productName: '按摩霜D套盒10次',
     productNum: 'P1538796514674085889',

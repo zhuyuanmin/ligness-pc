@@ -10,7 +10,8 @@
           <p>请上传图片</p>
           <el-upload
             class="avatar-uploader"
-            action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15"
+            :data="{ attachmentBizTypeEnum: 'BRAND_CATEGORY' }"
+            :action="api.upload"
             :show-file-list="false"
             :on-success="handleAvatarSuccess"
             :before-upload="beforeAvatarUpload"
@@ -39,6 +40,7 @@ import SearchComp from "@/components/SearchComp.vue";
 import { ref, reactive, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { addBrand, editBrand, viewBrand } from './request/brand'
+import api from '@/config/api'
 
 const router = useRouter();
 const route = useRoute();
@@ -73,8 +75,8 @@ const searchFields = reactive([
       { required: true, message: "请选择所属类型", trigger: "change" },
     ],
     optionList: [
-      { label: "高端养护", value: "1" },
-      { label: "青年养护", value: "2" },
+      { label: "高端养护", value: 1 },
+      { label: "青年养护", value: 2 },
     ],
   },
   {
@@ -86,6 +88,7 @@ const searchFields = reactive([
   {
     type: "textarea",
     label: "品牌描述",
+    maxLength: 500,
     field: "brandRemark",
     placeholder: "请输入描述信息",
   },
@@ -108,21 +111,25 @@ const saveFormData = () => {
     console.log(values)
 
     if (route.params?.id) {
-        addBrand({ ...values, brandImg: imageUrl, id: route.params?.id }).then(res => {
-          ElMessage.success('保存成功！')
-          router.back()
-        })
-      } else {
-        editBrand({ ...values, brandImg: imageUrl }).then(res => {
-          ElMessage.success('新增成功！')
-          router.back()
-        })
-      }
+      editBrand({ ...values, brandImg: imageUrl.value, id: route.params?.id }).then(res => {
+        ElMessage.success('保存成功！')
+        router.back()
+      })
+    } else {
+      addBrand({ ...values, brandImg: imageUrl.value }).then(res => {
+        ElMessage.success('新增成功！')
+        router.back()
+      })
+    }
   })
 }
 
 const handleAvatarSuccess = (response, uploadFile) => {
-  imageUrl.value = URL.createObjectURL(uploadFile.raw);
+  if (response.code !== 200) {
+    ElMessage.error(response.msg)
+  } else {
+    imageUrl.value = URL.createObjectURL(uploadFile.raw);
+  }
 };
 
 const beforeAvatarUpload = (rawFile) => {

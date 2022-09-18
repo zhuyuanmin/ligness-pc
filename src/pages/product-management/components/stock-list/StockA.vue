@@ -59,7 +59,7 @@ const props = defineProps({
   }
 })
 
-const tableData = reactive([
+const tableData = ref([
   {
     productName: '门店培训五次',
     productNum: 'P1538796514674085889',

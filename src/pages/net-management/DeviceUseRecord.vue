@@ -53,7 +53,7 @@ const showModalFn = () => {
   })
 }
 
-const tableData = reactive([
+const tableData = ref([
   {
     deviceOrderNo: '464',
     deviceTypeName: '欧洲之星:生命能量抗衰雕塑大师',

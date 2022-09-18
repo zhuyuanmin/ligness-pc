@@ -55,7 +55,7 @@ const showModalFn = () => {
   })
 }
 
-const tableData = reactive([
+const tableData = ref([
   {
     boxNo: '1AA9918823854A69AAFD1D4498B61DE2',
     productName: "D系列氢润妍体亮肤按摩霜",

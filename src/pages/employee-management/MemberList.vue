@@ -3,17 +3,21 @@
     <SearchComp :formItemList="searchFields" />
 
     <el-table :data="tableData" max-height="400" class="table-class" v-loading="loading">
-      <el-table-column prop="staffNo" label="编号" width="100" />
+      <el-table-column type="index" label="编号" width="100" />
       <el-table-column prop="staffAccount" label="账号" />
       <el-table-column prop="staffName" label="姓名" />
       <el-table-column prop="staffPermRole" label="权限角色">
         <template #default="scope">
-          <span v-if="scope.row.accountType === 1">系统管理员</span>
+          <span v-if="scope.row.staffPermRole === 1">系统管理员</span>
           <span v-else>普通账号</span>
         </template>
       </el-table-column>
       <el-table-column prop="staffLoginPhoneNum" label="登录手机号" />
-      <el-table-column prop="createTime" label="创建时间" />
+      <el-table-column prop="updateTime" label="创建时间">
+        <template #default="scope">
+          <span>{{dayjs(scope.row.updateTime).format('YYYY-MM-DD HH:mm:ss')}}</span>
+        </template>
+      </el-table-column>
       <el-table-column prop="staffStatus" label="启用状态">
         <template #default="scope">
           <el-switch :model-value="scope.row.staffStatus === 1" @change="handleUpdateStaffInfo(scope.row)"/>
@@ -133,25 +137,26 @@ import { ArrowDown } from '@element-plus/icons-vue'
 import { ref, reactive, onMounted } from "vue";
 import { useRoute } from "vue-router";
 import { getStaffList, deleteStaff, editStaff, addStaff } from './request/staff'
+import dayjs from 'dayjs'
+import api from '@/config/api'
 
 const vLoading = ElLoading.directive
 const route = useRoute();
 
-const tableData = reactive([
-  {
-    staffNo: 293,
-    staffAccount: "ltns001",
-    staffName: "chen",
-    staffPermRole: 0,
-    staffStatus: 1,
-    staffLoginPhoneNum: "15803594395",
-    createTime: '2022-08-12 21:02:42',
-  },
-]);
+const tableData = ref([]);
 
 const checkEmail = (rule, value, cb) => {
   const regEmail = /^([a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+(\.[a-zA-Z0-9_-])+/
-  if (!value || regEmail.test(value)) {
+  if (regEmail.test(value)) {
+    cb()
+  } else {
+    cb(new Error(rule.message))
+  }
+}
+
+const checkPhone = (rule, value, cb) => {
+  const regPhone = /^1[3-9]\d{9}$/
+  if (regPhone.test(value)) {
     cb()
   } else {
     cb(new Error(rule.message))
@@ -172,7 +177,6 @@ const searchFields = reactive([
         text: "查询",
         type: "submit",
         onClick: (values) => {
-          console.log(values);
           currentPage.value = 1
           fetchListData({ ...values, currentPage: 1, pageSize: pageSize.value })
         },
@@ -194,8 +198,7 @@ const dialogFieldsList = [
     placeholder: '请输入新密码',
     required: true,
     rules: [
-      { required: true, message: '请输入新密码', trigger: 'blur' },
-      { required: true, message: '请输入新密码', trigger: 'change' }
+      { required: true, message: '请输入新密码', trigger: ['blur', 'change'] },
     ]
   },
   {
@@ -205,8 +208,7 @@ const dialogFieldsList = [
     placeholder: '请输入新登录手机号',
     required: true,
     rules: [
-      { required: true, message: '请输入新登录手机号', trigger: 'blur' },
-      { required: true, message: '请输入新登录手机号', trigger: 'change' }
+      { required: true, message: '请输入新登录手机号', trigger: ['blur', 'change'] },
     ]
   },
 ]
@@ -219,8 +221,7 @@ const dialogFields2List = [
     placeholder: '请输入账号',
     required: true,
     rules: [
-      { required: true, message: '请输入账号', trigger: 'blur' },
-      { required: true, message: '请输入账号', trigger: 'change' }
+      { required: true, message: '请输入账号', trigger: ['blur', 'change'] },
     ]
   },
   {
@@ -230,8 +231,7 @@ const dialogFields2List = [
     placeholder: '请输入姓名',
     required: true,
     rules: [
-      { required: true, message: '请输入姓名', trigger: 'blur' },
-      { required: true, message: '请输入姓名', trigger: 'change' }
+      { required: true, message: '请输入姓名', trigger: ['blur', 'change'] },
     ]
   },
   {
@@ -241,8 +241,8 @@ const dialogFields2List = [
     placeholder: '请输入登录手机号',
     required: true,
     rules: [
-      { required: true, message: '请输入登录手机号', trigger: 'blur' },
-      { required: true, message: '请输入登录手机号', trigger: 'change' }
+      { required: true, message: '请输入登录手机号', trigger: ['blur', 'change'] },
+      { validator: checkPhone.toString(), message: '手机号格式不正确', trigger: 'blur' }
     ]
   },
   {
@@ -252,8 +252,7 @@ const dialogFields2List = [
     placeholder: '请输入密码',
     required: true,
     rules: [
-      { required: true, message: '请输入密码', trigger: 'blur' },
-      { required: true, message: '请输入密码', trigger: 'change' }
+      { required: true, message: '请输入密码', trigger: ['blur', 'change'] },
     ]
   },
   // {
@@ -263,8 +262,7 @@ const dialogFields2List = [
   //   placeholder: '请输入确认密码',
   //   required: true,
   //   rules: [
-  //     { required: true, message: '请输入确认密码', trigger: 'blur' },
-  //     { required: true, message: '请输入确认密码', trigger: 'change' }
+  //     { required: true, message: '请输入确认密码', trigger: ['blur', 'change'] },
   //   ]
   // },
   {
@@ -273,8 +271,7 @@ const dialogFields2List = [
     field: "staffEmail",
     placeholder: '请输入邮箱',
     rules: [
-      { validator: checkEmail, message: '请输入正确的邮箱格式', trigger: 'blur' },
-      { validator: checkEmail, message: '请输入正确的邮箱格式', trigger: 'change' }
+      { validator: checkEmail.toString(), message: '请输入正确的邮箱格式', trigger: ['blur', 'change'] },
     ],
   },
   {
@@ -283,24 +280,21 @@ const dialogFields2List = [
     field: "staffSex",
     required: true,
     rules: [
-      { required: true, message: '请选择性别', trigger: 'blur' },
-      { required: true, message: '请选择性别', trigger: 'change' }
+      { required: true, message: '请选择性别', trigger: ['blur', 'change'] },
     ],
     optionList: [
-      { label: "男", value: "1" },
-      { label: "女", value: "2" },
+      { label: "男", value: 1 },
+      { label: "女", value: 2 },
     ],
   },
   {
     type: "file",
     label: "头像",
     field: "staffImg",
-    initValue: [{
-      name: 'food.jpeg',
-      url: 'https://picsum.photos/200',
-    }],
+    initValue: [],
     limit: 1,
-    action: 'https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15',
+    data: { attachmentBizTypeEnum: 'STAFF_CATEGORY' },
+    action: api.upload,
   },
   {
     type: "radio",
@@ -308,8 +302,8 @@ const dialogFields2List = [
     field: "staffPermRole",
     initValue: '1',
     optionList: [
-      { label: "普通账号", value: "1" },
-      { label: "系统管理员", value: "2" },
+      { label: "普通账号", value: 0 },
+      { label: "系统管理员", value: 1 },
     ],
   },
 ]
@@ -327,6 +321,7 @@ const dialogRef2 = ref()
 const account = ref('')
 const dialogFields = ref([])
 const dialogFields2 = ref([])
+const currentRow = ref({})
 
 const handleSizeChange = (size) => {
   currentPage.value = 1
@@ -350,8 +345,8 @@ const fetchListData = params => {
 }
 
 const handleUpdateStaffInfo = params => {
-  if (title2.value === '编辑用户') {
-    editStaff(params).then(res => {
+  if (['编辑用户'].includes(title2.value) || ['修改登录手机号', '修改密码'].includes(title.value) || params.staffId) {
+    editStaff(params.staffId ? { staffStatus: 0, staffId: params.staffId} : { ...params, staffId: currentRow.value.staffId }).then(res => {
       ElMessage.success('操作成功！')
       currentPage.value = 1
       fetchListData({ currentPage: 1, pageSize: pageSize.value })
@@ -370,6 +365,7 @@ onMounted(() => {
 })
 
 const viewRow = (row, type) => {
+  currentRow.value = row
   title2.value = row ? '编辑用户' : '新增用户'
   const listArr = JSON.parse(JSON.stringify(dialogFields2List))
   if (row) {
@@ -390,7 +386,6 @@ const viewRow = (row, type) => {
 };
 
 const deleteRow = row => {
-  console.log(row);
   ElMessageBox.confirm(
     '删除后将无法登录系统，确认删除？',
     '提示',
@@ -402,7 +397,7 @@ const deleteRow = row => {
     }
   ).then(() => {
     // 删除操作
-    deleteStaff(row).then(res => {
+    deleteStaff({ staffId: row.staffId }).then(res => {
       ElMessage.success('操作成功！')
       currentPage.value = 1
       fetchListData({ currentPage: 1, pageSize: pageSize.value })
@@ -424,12 +419,14 @@ const handleSubmitInfo = () => {
   dialogRef2.value.validFields().then(values => {
     console.log(values);
     showUserInfoModal.value = false
-    handleUpdateStaffInfo(values)
+    const { staffImg } = values
+    const url = staffImg[0] ? (staffImg[0].response ? staffImg[0].response.data.attachmentPath : staffImg[0].url) : ''
+    handleUpdateStaffInfo({ ...values, staffImg: url })
   })
 }
 
 const handleModifyPassword = row => {
-  console.log(row);
+  currentRow.value = row
   showModal.value = true
   title.value = '修改密码'
   account.value = row.staffAccount
@@ -437,7 +434,7 @@ const handleModifyPassword = row => {
 };
 
 const handleModifyPhone = row => {
-  console.log(row);
+  currentRow.value = row
   showModal.value = true
   title.value = '修改登录手机号'
   account.value = row.staffAccount

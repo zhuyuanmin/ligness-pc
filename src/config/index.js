@@ -29,7 +29,10 @@ service.interceptors.response.use(
   function (config) {
     if (config.data.code !== 200) {
       ElMessage.error(config.data.msg)
-      return Promise.reject(error)
+      if (config.data.code === 401) {
+        window.location.replace('/login')
+      }
+      return Promise.reject(config.data.msg)
     }
     return config
   },

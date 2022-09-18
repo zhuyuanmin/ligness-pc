@@ -91,7 +91,9 @@
           :on-remove="handleRemove"
           :limit="item.limit"
           :on-preview="handleReview"
+          :data="item.data"
           :class="formValues[item.field].length === 1 ? 'hide-plus' : ''"
+          :on-success="handleSuccess"
         >
           <el-icon><Plus /></el-icon>
         </el-upload>
@@ -177,7 +179,8 @@ import {
   ElDatePicker,
   ElCascader,
   ElRadioGroup,
-  ElRadio
+  ElRadio,
+  ElMessage
 } from "element-plus";
 import { Plus } from "@element-plus/icons-vue";
 
@@ -217,7 +220,13 @@ const dataRef = props.formItemList
 const rulesRef = props.formItemList
   .filter((v) => v.field)
   .reduce((obj, cur) => {
-    obj[cur.field] = cur.rules || [];
+    const rules = (cur.rules || []).map(rule => {
+      if (rule.validator) {
+        rule.validator = eval(rule.validator)
+      }
+      return rule
+    })
+    obj[cur.field] = rules;
     return obj;
   }, {});
 
@@ -237,6 +246,12 @@ const handleReview = uploadFile => {
   const { url } = uploadFile;
   window.open(url)
 };
+
+const handleSuccess = response => {
+  if (response.code !== 200) {
+    ElMessage.error(response.msg)
+  }
+}
 
 watch(
   () => props.data,

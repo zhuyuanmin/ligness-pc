@@ -117,7 +117,7 @@ import { getShopList, editShop } from './request/shop'
 
 const vLoading = ElLoading.directive
 
-const tableData = reactive([
+const tableData = ref([
   {
     customAccount: "C0703501",
     customName: "C07035",
