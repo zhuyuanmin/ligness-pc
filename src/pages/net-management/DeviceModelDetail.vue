@@ -13,7 +13,7 @@
   </div>
 </template>
 <script setup>
-import { ElCard, ElButton, ElMessage } from 'element-plus'
+import { ElButton, ElMessage } from 'element-plus'
 import { ref, reactive, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import BasicInfoCard from './components/device-model-detail/BasicInfoCard.vue'
@@ -34,7 +34,7 @@ const mapName = reactive({
 
 onMounted(() => {
   if (route.params.id) {
-    viewDeviceType(route.params.id).then(res => {
+    viewDeviceType({ deviceTypeId: route.params.id }).then(res => {
       console.log(res)
       deviceTypeData.value = res
     })
@@ -48,15 +48,16 @@ const saveFormData = () => {
     console.log('values', values)
 
     const switchValue = unlockRef.value.getSwitchValue()
-    console.log(switchValue)
 
     if (route.params.id) {
       editDeviceType({ ...values, id: route.params.id, status: switchValue ? 1 : 0 }).then(() => {
         ElMessage.success('修改成功！')
+        router.back()
       })
     } else {
       addDeviceType({ ...values, status: switchValue ? 1 : 0 }).then(() => {
         ElMessage.success('新增成功！')
+        router.back()
       })
     }
   }).catch(fields => {

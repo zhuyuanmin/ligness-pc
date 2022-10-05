@@ -17,11 +17,11 @@
             <p>请上传一张透明背景图片</p>
             <el-upload
               class="avatar-uploader"
+              :data="{ attachmentBizTypeEnum: 'DEVICE_TYPE_CATEGORY', attachmentBizId: (route.params || {}).id}"
               :action="apis.upload"
               :show-file-list="false"
               :on-success="handleSuccess"
               :before-upload="beforeUpload"
-              :on-error="handleError"
               accept=".png"
               :disabled="route.query.type === 'view'"
             >
@@ -32,32 +32,63 @@
         </el-card>
       </div>
       <div class="right">
-        <SearchComp :formItemList="searchFields" ref="searchRef" />
+        <SearchComp :formItemList="searchFields" ref="searchRef" :key="dateNow" />
       </div>
     </div>
   </el-card>
 </template>
 <script setup>
-import { ref, reactive, watch } from "vue";
+import { ref, watch, onMounted } from "vue";
 import SearchComp from "@/components/SearchComp.vue";
 import { ElCard, ElUpload, ElIcon, ElMessage, ElMessageBox } from "element-plus";
 import { Plus } from "@element-plus/icons-vue";
-import { useRoute, useRouter } from "vue-router";
+import { useRoute } from "vue-router";
 import apis from "@/config/api";
+import useBrandStore from '@/store/brandStore'
+
+const brandStore = useBrandStore()
 
 const route = useRoute();
 const imageUrl = ref("");
 const searchRef = ref();
+const dateNow = ref(Date.now())
 
 const props = defineProps({
-  deviceTypeData: {
+  data: {
     type: Object,
     default: {}
   }
 })
 
-watch(() => props.deviceTypeData, newVal => {
-  imageUrl.value = newVal.deviceTypeImg
+onMounted(() => {
+  const fieldList = fieldsFn(route)
+  const result = fieldList.find(v => v.field === 'brandId')
+  if (brandStore.brandList.length > 0) {
+    result.optionList = brandStore.brandList.map(v => ({
+      label: v.brandName,
+      value:v.brandId
+    }))
+    searchFields.value = fieldList
+  } else {
+    brandStore.fetchBrandList(list => {
+      result.optionList = list.map(v => ({
+        label: v.brandName,
+        value:v.brandId
+      }))
+      searchFields.value = fieldList
+    })
+  }
+})
+
+watch(() => props.data, newVal => {
+  imageUrl.value = newVal.imgPath
+  const fieldList = searchFields.value
+  fieldList.forEach(item => {
+    item.initValue = newVal[item.field]
+  })
+
+  searchFields.value = fieldList
+  dateNow.value = Date.now()
 })
 
 const fieldsFn = route => {
@@ -65,9 +96,9 @@ const fieldsFn = route => {
   const arrList = [
     {
       type: "input",
-      label: "序号",
+      label: "编码",
       placeholder: "",
-      field: "deviceTypeOrderNo",
+      field: "deviceTypeId",
       initValue: params.id,
       disabled: true,
     },
@@ -86,10 +117,7 @@ const fieldsFn = route => {
       label: "品牌",
       placeholder: "请选择",
       field: "brandId",
-      optionList: [
-        { label: "ODC", value: "1" },
-        { label: "DTM", value: "2" },
-      ],
+      optionList: [],
       required: true,
       rules: [
         { required: true, message: '请选择品牌', trigger: ['blur', 'change'] },
@@ -101,10 +129,6 @@ const fieldsFn = route => {
       placeholder: "请输入描述信息",
       field: "deviceTypeRemark",
       maxLength: 200,
-      optionList: [
-        { label: "ODC", value: "1" },
-        { label: "DTM", value: "2" },
-      ],
     },
   ];
   if (!query.type || query.type === 'add') {
@@ -119,38 +143,36 @@ const fieldsFn = route => {
 const getSearchFormValue = () => {
   if (!searchRef.value) return
   return new Promise((resolve, reject) => {
-    searchRef.value.validFields().then(resolve).catch(reject)
+    searchRef.value.validFields().then(values => {
+      if (values.brandId) {
+        const result = brandStore.brandList.find(v => v.brandId === values.brandId)
+        if (result) {
+          values.brandName = result.brandName
+        }
+      }
+      resolve(values)
+    }).catch(reject)
   })
 }
 
-const searchFields = reactive(fieldsFn(route));
+const searchFields = ref(fieldsFn(route));
 
 const handleSuccess = (response, uploadFile) => {
-  imageUrl.value = URL.createObjectURL(uploadFile.raw);
-};
-
-const handleError = (error, uploadFile) => {
-  ElMessageBox.confirm(
-    error ? error.status === 404 ? '接口不存在！' : error.message : '响应超时！',
-    '提示',
-    {
-      showCancelButton: false,
-      showConfirmButton: false,
-      draggable: true,
-      type: 'error',
-    }
-  )
+  if (response.code !== 200) {
+    ElMessage.error(response.msg)
+  } else {
+    imageUrl.value = URL.createObjectURL(uploadFile.raw);
+  }
 };
 
 const beforeUpload = (rawFile) => {
   if (rawFile.type !== "image/png") {
-    ElMessage.error("Avatar picture must be PNG format!");
+    ElMessage.error("请上传 .png 格式的图片!");
     return false;
-  } else if (rawFile.size / 1024 / 1024 > 2) {
-    ElMessage.error("Avatar picture size can not exceed 2MB!");
+  } else if (rawFile.size / 1024 / 1024 > 5) {
+    ElMessage.error("图片大小不能超过 5MB!");
     return false;
   }
-
   return true;
 };
 

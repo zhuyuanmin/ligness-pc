@@ -1,6 +1,6 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
-import VitePluginElementPlus from 'vite-plugin-element-plus'
+import ElementPlus from 'unplugin-element-plus/vite'
 import viteSvgIcons from 'vite-plugin-svg-icons'
 
 const { resolve } = require('path')
@@ -10,7 +10,7 @@ export default defineConfig({
   base: '/',
   plugins: [
     vue(),
-    VitePluginElementPlus(),
+    ElementPlus(),
     viteSvgIcons({
       // 配置路径在你的src里的svg存放文件
       iconDirs: [resolve(process.cwd(), 'src/assets/icons')],

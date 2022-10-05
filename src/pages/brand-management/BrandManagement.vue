@@ -31,6 +31,9 @@ import { ElCard, ElDivider, ElButton, ElMessageBox, ElMessage } from 'element-pl
 import { ref, reactive, watch, onMounted } from "vue";
 import { useRouter } from 'vue-router'
 import { getBrandList, deleteBrand } from './request/brand'
+import useBrandStore from '@/store/brandStore'
+
+const brandStore = useBrandStore()
 
 const searchFields = reactive([
   {
@@ -63,6 +66,7 @@ const currentRoute = ref(curRoute)
 const fetchListData = params => {
   getBrandList(params).then(res => {
     brandList.value = res
+    brandStore.updateBrandList(res || [])
   })
 }
 

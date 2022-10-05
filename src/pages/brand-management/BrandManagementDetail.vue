@@ -15,7 +15,7 @@
             :show-file-list="false"
             :on-success="handleAvatarSuccess"
             :before-upload="beforeAvatarUpload"
-            accept="image/*"
+            accept=".png"
             :disabled="route.query.type === 'view'"
           >
             <img v-if="imageUrl" :src="imageUrl" class="avatar" />

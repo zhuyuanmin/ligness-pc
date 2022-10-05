@@ -4,12 +4,16 @@
       <SearchComp :formItemList="searchFields" />
 
       <el-table :data="tableData" max-height="400" class="table-class" v-loading="loading">
-        <el-table-column prop="deviceTypeOrderNo" label="序号" width="100" />
+        <el-table-column type="index" label="序号" width="100" />
         <el-table-column prop="deviceTypeName" label="型号名称" />
-        <el-table-column prop="factoryName" label="生产厂家" />
+        <!-- <el-table-column prop="factoryName" label="生产厂家" /> -->
         <el-table-column prop="brandName" label="品牌商" />
         <el-table-column prop="deviceCount" label="设备数量" width="100" />
-        <el-table-column prop="createTime" label="创建时间" width="180" />
+        <el-table-column prop="createTime" label="创建时间" width="180">
+          <template #default="scope">
+            <span>{{dayjs(scope.row.createTime).format('YYYY-MM-DD HH:mm:ss')}}</span>
+          </template>
+        </el-table-column>
         <el-table-column fixed="right" label="操作" width="150">
           <template #default="scope">
             <el-button text type="primary" size="small" @click.prevent="viewRow(scope.row, 'edit')">编辑</el-button>
@@ -33,24 +37,16 @@
   </div>
 </template>
 <script setup>
-import SearchComp from "@/components/SearchComp.vue";
+import SearchComp from "@/components/SearchComp.vue"
 import { ref, reactive, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElTable, ElTableColumn, ElButton, ElPagination, ElMessageBox, ElMessage, ElLoading } from 'element-plus'
 import { getDeviceTypeList, deleteDeviceType } from './request/deviceType'
+import dayjs from 'dayjs'
 
 const vLoading = ElLoading.directive
 
-const tableData = ref([
-  {
-    brandName: "深圳市欧迪丝生物科技有限公司",
-    createTime: "2022-03-14 02:03:32",
-    factoryName: "深圳市欧迪丝生物科技有限公司",
-    deviceTypeOrderNo: 81,
-    deviceTypeName: "MEI XIU SI",
-    deviceCount: 0,
-  },
-])
+const tableData = ref([])
 
 const searchFields = reactive([
   {
@@ -87,6 +83,9 @@ const currentRoute = ref(curRoute)
 
 watch(() => router.currentRoute.value, (newVal) => {
   currentRoute.value = newVal
+  if (newVal.fullPath === '/net-management/device-model-list') {
+    fetchListData({})
+  }
 })
 
 const fetchListData = params => {
@@ -117,9 +116,8 @@ const handleCurrentChange = page => {
 }
 
 const viewRow = (row, type) => {
-  console.log(row);
   if (row) {
-    router.push(`/net-management/device-model-list/detail/${row.deviceTypeOrderNo}?type=${type}`)
+    router.push(`/net-management/device-model-list/detail/${row.deviceTypeId}?type=${type}`)
   } else {
     router.push('/net-management/device-model-list/detail')
   }
@@ -149,7 +147,7 @@ const deleteRow = row => {
     ).then(({ value }) =>  {
       console.log(value);
       if (value === '@ligness@#?!8888') {
-        deleteDeviceType(row.deviceTypeOrderNo).then(() => {
+        deleteDeviceType({ deviceTypeId: row.deviceTypeId }).then(() => {
           ElMessage.success('操作成功！')
           currentPage.value = 1
           fetchListData({ currentPage: 1, pageSize: pageSize.value })
