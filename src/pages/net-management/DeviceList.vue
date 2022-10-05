@@ -186,7 +186,7 @@ const deleteRow = row => {
     }
   ).then(() => {
     // 删除操作
-    deleteDevice(row.deviceNo).then(() => {
+    deleteDevice({deviceId: row.deviceId}).then(() => {
       ElMessage.success('操作成功！')
       currentPage.value = 1
       fetchListData({ currentPage: 1, pageSize: pageSize.value })
