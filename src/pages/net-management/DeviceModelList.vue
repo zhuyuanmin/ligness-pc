@@ -43,6 +43,9 @@ import { useRouter } from 'vue-router'
 import { ElTable, ElTableColumn, ElButton, ElPagination, ElMessageBox, ElMessage, ElLoading } from 'element-plus'
 import { getDeviceTypeList, deleteDeviceType } from './request/deviceType'
 import dayjs from 'dayjs'
+import useDeviceTypeStore from '@/store/deviceTypeStore'
+
+const deviceTypeStore = useDeviceTypeStore()
 
 const vLoading = ElLoading.directive
 
@@ -94,6 +97,7 @@ const fetchListData = params => {
     const { currentPage, pageSize, pageCount, totalCount, pageList } = res || {}
     tableData.value = pageList
     total.value = totalCount
+    deviceTypeStore.updateDeviceTypeList(pageList || [])
   }).finally(() => {
     loading.value = false
   })

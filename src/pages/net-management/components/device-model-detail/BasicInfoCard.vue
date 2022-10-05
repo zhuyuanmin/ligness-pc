@@ -96,7 +96,7 @@ const fieldsFn = route => {
   const arrList = [
     {
       type: "input",
-      label: "编码",
+      label: "型号编码",
       placeholder: "",
       field: "deviceTypeId",
       initValue: params.id,

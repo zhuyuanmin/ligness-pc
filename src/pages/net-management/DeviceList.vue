@@ -5,7 +5,7 @@
       <ModalSelect v-model:showModal="showModal" :getStoreList="getStoreList" :value="selectValue" />
 
       <el-table :data="tableData" max-height="400" class="table-class" v-loading="loading">
-        <el-table-column prop="deviceOrderNo" label="序号" width="100" />
+        <el-table-column type="index" label="序号" width="100" />
         <el-table-column prop="deviceTypeName" label="设备型号" />
         <el-table-column prop="deviceNo" label="设备编号" />
         <el-table-column prop="brandName" label="品牌商" width="100" />
@@ -18,8 +18,16 @@
             <el-button v-else type="danger" plain size="small">离线</el-button>
           </template>
         </el-table-column>
-        <el-table-column prop="createTime" label="出厂时间" width="180" />
-        <el-table-column prop="closeLockTime" label="下线时间" width="180" />
+        <el-table-column prop="createTime" label="出厂时间" width="180">
+          <template #default="scope">
+            <span>{{dayjs(scope.row.createTime).format('YYYY-MM-DD HH:mm:ss')}}</span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="closeLockTime" label="下线时间" width="180">
+          <template #default="scope">
+            <span>{{scope.row.closeLockTime && dayjs(scope.row.closeLockTime).format('YYYY-MM-DD HH:mm:ss')}}</span>
+          </template>
+        </el-table-column>
         <el-table-column fixed="right" label="操作" width="150">
           <template #default="scope">
             <el-button text type="primary" size="small" @click.prevent="viewRow(scope.row, 'edit')">编辑</el-button>
@@ -48,7 +56,11 @@ import ModalSelect from "./components/device-list/ModalSelect.vue";
 import { ElTable, ElTableColumn, ElButton, ElPagination, ElMessageBox, ElMessage, ElLoading } from 'element-plus'
 import { ref, reactive, watch, onMounted } from "vue";
 import { useRouter } from 'vue-router'
+import dayjs from 'dayjs'
 import { getDeviceList, deleteDevice } from './request/device'
+import useDeviceTypeStore from '@/store/deviceTypeStore'
+
+const deviceTypeStore = useDeviceTypeStore()
 
 const vLoading = ElLoading.directive
 
@@ -60,33 +72,19 @@ const showModalFn = () => {
   })
 }
 
-const tableData = ref([
-  {
-    deviceOrderNo: '464',
-    deviceTypeName: '欧洲之星:生命能量抗衰雕塑大师plus',
-    deviceNo: 'odc213668558077953',
-    brandName: "深圳市欧迪丝生物科技有限公司",
-    storeName: 'c88888',
-    deviceStatus: 1,
-    createTime: "2022-03-14 02:03:32",
-    closeLockTime: "2022-08-14 02:03:32",
-  },
-])
+const tableData = ref([])
 
 const searchFields = reactive([
   {
     type: "input",
     label: "设备编号",
-    field: "deviceNo",
+    field: "deviceId",
   },
   {
     type: "select",
     label: "设备型号",
-    field: "deviceTypeName",
-    optionList: [
-      { label: "MEI XIU SI", value: "81" },
-      { label: "欧洲之星", value: "80" },
-    ],
+    field: "deviceTypeId",
+    optionList: [],
   },
   {
     type: "select-custom",
@@ -101,7 +99,7 @@ const searchFields = reactive([
       { text: "查询", type: "submit", onClick: values => {
         console.log(values)
         currentPage.value = 1
-        fetchListData({ ...values, currentPage: 1, pageSize: pageSize.value })
+        fetchListData({ ...values, storeId: values.storeId?.[0]?.value, currentPage: 1, pageSize: pageSize.value })
       } },
       { text: "重置", type: "reset", onClick: () => {
         currentPage.value = 1
@@ -138,11 +136,40 @@ const fetchListData = params => {
 
 watch(() => router.currentRoute.value, (newVal) => {
   currentRoute.value = newVal
+
+  if (newVal.fullPath === '/net-management/device-list') {
+    fetchListData({})
+
+    const result = searchFields.find(v => v.field === 'deviceTypeId')
+    if (deviceTypeStore.deviceTypeList.length > 0) {
+      result.optionList = deviceTypeStore.deviceTypeList.map(v => ({
+        label: v.deviceTypeName,
+        value:v.deviceTypeId
+      }))
+    }
+  }
 })
 
 onMounted(() => {
   if (currentRoute.value.fullPath === '/net-management/device-list') {
     fetchListData({})
+
+    const result = searchFields.find(v => v.field === 'deviceTypeId')
+    if (deviceTypeStore.deviceTypeList.length > 0) {
+      result.optionList = deviceTypeStore.deviceTypeList.map(v => ({
+        label: v.deviceTypeName,
+        value:v.deviceTypeId
+      }))
+    } else {
+      deviceTypeStore.fetchDeviceTypeList(list => {
+        result.optionList = list.map(v => ({
+          label: v.deviceTypeName,
+          value:v.deviceTypeId
+        }))
+      })
+    }
+  } else {
+    deviceTypeStore.fetchDeviceTypeList()
   }
 })
 
@@ -167,7 +194,7 @@ const getStoreList = list => {
 const viewRow = (row, type) => {
   console.log(row);
   if (row) {
-    router.push(`/net-management/device-list/detail/${row.deviceNo}?type=${type}`)
+    router.push(`/net-management/device-list/detail/${row.deviceId}?type=${type}`)
   } else {
     router.push('/net-management/device-list/detail')
   }

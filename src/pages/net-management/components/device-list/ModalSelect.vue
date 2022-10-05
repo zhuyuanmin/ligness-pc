@@ -15,6 +15,7 @@
         class="table-class"
         ref="myTable"
         @select="handleSelect"
+        v-loading="loading"
       >
         <el-table-column type="selection" width="55" />
         <el-table-column
@@ -31,7 +32,7 @@
         v-model:page-size="pageSize"
         :page-sizes="[5, 10, 15, 20]"
         layout="total, sizes, prev, pager, next, jumper"
-        :total="100"
+        :total="total"
         small
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
@@ -46,8 +47,11 @@
   </el-dialog>
 </template>
 <script setup>
-import { ElTable, ElTableColumn, ElButton, ElDialog, ElPagination } from "element-plus";
-import { ref, reactive, watch, nextTick } from 'vue'
+import { ElTable, ElTableColumn, ElButton, ElDialog, ElPagination, ElLoading } from "element-plus";
+import { ref, watch, nextTick } from 'vue'
+import { getShopList } from '@/pages/customer-management/request/shop'
+
+const vLoading = ElLoading.directive
 
 const props = defineProps({
   showModal: {
@@ -64,14 +68,13 @@ const props = defineProps({
 })
 
 const myTable = ref()
+const loading = ref(false)
 const emits = defineEmits(['update:showModal'])
 
-const tableData = reactive([
-  { storeId: '213423', storeName: 'S3245234' },
-  { storeId: '213453', storeName: 'S7995234' }
-])
+const tableData = ref([])
 const currentPage = ref(1)
 const pageSize = ref(10)
+const total = ref(100)
 let dataList = []
 
 const handleSelect = (section, row) => {
@@ -88,10 +91,28 @@ const handleSelect = (section, row) => {
   }
 }
 
-watch(() => props.showModal, () => {
+const fetchShopList = params => {
+  loading.value = true
+  getShopList(params).then(res => {
+    const { currentPage, pageSize, pageCount, totalCount, pageList } = res || {}
+    tableData.value = pageList.map(v => {
+      v.storeName = v.customName
+      return v
+    })
+    total.value = totalCount
+  }).finally(() => {
+    loading.value = false
+  })
+}
+
+watch(() => props.showModal, flag => {
   nextTick(() => {
+    if (flag) {
+      fetchShopList({})
+    }
+
     if (props.value) {
-      const result = tableData.find(v => v.storeId === props.value[0].value)
+      const result = tableData.value.find(v => v.storeId === props.value[0].value)
       if (result && myTable.value) {
         myTable.value.clearSelection()
         myTable.value.toggleRowSelection(result, true)
@@ -111,8 +132,16 @@ const handleSelectList = () => {
   emits('update:showModal', false)
   props.getStoreList(dataList)
 }
-const handleCurrentChange = page => {}
-const handleSizeChange = size => {}
+
+const handleSizeChange = size => {
+  currentPage.value = 1
+  pageSize.value = size
+  fetchShopList({ currentPage: 1, pageSize: size })
+}
+const handleCurrentChange = page => {
+  currentPage.value = page
+  fetchShopList({ currentPage: page, pageSize: pageSize.value })
+}
 
 </script>
 <style lang="scss" scoped>
