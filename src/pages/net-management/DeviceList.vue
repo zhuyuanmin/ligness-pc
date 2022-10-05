@@ -167,7 +167,7 @@ const getStoreList = list => {
 const viewRow = (row, type) => {
   console.log(row);
   if (row) {
-    router.push(`/net-management/device-list/detail/${row.deviceNo}?type=${type}`)
+    router.push(`/net-management/device-list/detail/${row.deviceId}?type=${type}`)
   } else {
     router.push('/net-management/device-list/detail')
   }

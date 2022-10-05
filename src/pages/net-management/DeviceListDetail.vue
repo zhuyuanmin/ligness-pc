@@ -90,7 +90,7 @@ const rules = reactive({
 
 onMounted(() => {
   if (route.params.id) {
-    viewDevice(route.params.id).then(res => {
+    viewDevice({ deviceId: route.params.id }).then(res => {
       console.log(res)
       // deviceData.value = res
     })
