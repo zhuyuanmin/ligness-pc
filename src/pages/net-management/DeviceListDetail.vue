@@ -19,9 +19,9 @@
           label="序号"
           >{{ route.params.id }}</el-form-item
         > -->
-        <el-form-item label="设备编号" required prop="deviceId">
+        <el-form-item label="设备编号" required prop="deviceNo">
           <el-input
-            v-model="formValues.deviceId"
+            v-model="formValues.deviceNo"
             class="my-input"
             :maxlength="200"
             placeholder="请输入设备编号"
@@ -102,28 +102,20 @@
           />
         </el-form-item>
       </el-form>
-      <el-divider />
-      <el-form
-        :inline="true"
-        class="demo-form-inline"
-        label-width="auto"
-        label-suffix="："
-      >
-        <el-form-item label="生产厂家">{{
-          "深圳市欧迪丝生物科技有限公司"
-        }}</el-form-item>
-        <el-form-item label="归属品牌商">{{
-          "深圳市欧迪丝生物科技有限公司"
-        }}</el-form-item>
-        <el-form-item label="所属品牌">{{ "" }}</el-form-item>
-        <el-form-item label="出厂时间">{{
-          "2022-08-06 16:33:23"
-        }}</el-form-item>
-        <el-form-item label="激活时间">{{
-          "2022-08-08 14:21:15"
-        }}</el-form-item>
-        <el-form-item label="下线时间">{{ "-" }}</el-form-item>
-      </el-form>
+      <template v-if="!!formValues.deviceTypeId">
+        <el-divider />
+        <el-form
+          :inline="true"
+          class="demo-form-inline"
+          label-width="auto"
+          label-suffix="："
+        >
+          <el-form-item label="所属品牌">{{ brandName }}</el-form-item>
+          <el-form-item label="出厂时间">{{formValues.createTime && dayjs(formValues.createTime).format('YYYY-MM-DD HH:mm:ss')}}</el-form-item>
+          <el-form-item label="激活时间">{{formValues.unlockTime && dayjs(formValues.unlockTime).format('YYYY-MM-DD HH:mm:ss')}}</el-form-item>
+          <el-form-item label="下线时间">{{formValues.closeLockTime && dayjs(formValues.closeLockTime).format('YYYY-MM-DD HH:mm:ss')}}</el-form-item>
+        </el-form>
+      </template>
     </el-card>
     <div class="btn-bottom-list" v-if="route.query.type !== 'view'">
       <el-button type="primary" @click.prevent="saveFormData()">保存</el-button>
@@ -149,9 +141,10 @@ import {
   ElMessage,
 } from "element-plus";
 import ModalSelect from "./components/device-list/ModalSelect.vue";
-import { ref, reactive, onMounted, computed } from "vue";
+import { ref, reactive, onMounted, computed, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { addDevice, editDevice, viewDevice } from "./request/device";
+import dayjs from 'dayjs'
 import useDeviceTypeStore from '@/store/deviceTypeStore'
 
 const deviceTypeStore = useDeviceTypeStore()
@@ -166,6 +159,7 @@ const mapName = reactive({
   edit: "修改",
   view: "查看",
 });
+const brandName = ref('');
 const rules = reactive({
   deviceNo: [
     { required: true, message: "请输入设备编号", trigger: ["blur", "change"] },
@@ -182,7 +176,12 @@ onMounted(() => {
       formValues.value = res;
     });
   }
-});
+})
+
+watch(() => formValues.value.deviceTypeId, newVal => {
+  const result = deviceTypeStore.deviceTypeList.find(v => v.deviceTypeId === newVal)
+  brandName.value = (result || {}).brandName
+})
 
 const optionList = computed(() => {
   if (deviceTypeStore.deviceTypeList.length > 0) {
@@ -217,10 +216,12 @@ const saveFormData = () => {
       if (route.params.id) {
         editDevice({ ...formValues.value, deviceId: route.params.id }).then(() => {
           ElMessage.success("修改成功！");
+          router.back();
         });
       } else {
         addDevice({ ...formValues.value }).then(() => {
           ElMessage.success("新增成功！");
+          router.back();
         });
       }
     }

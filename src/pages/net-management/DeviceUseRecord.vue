@@ -1,38 +1,35 @@
 <template>
   <div class="container">
-    <template v-if="currentRoute.fullPath === '/net-management/device-use-record'">
-      <SearchComp :formItemList="searchFields" :data="valueObj" ref="searchRef" />
-      <ModalSelect v-model:showModal="showModal" :getStoreList="getStoreList" :value="selectValue" />
+    <SearchComp :formItemList="searchFields" :data="valueObj" ref="searchRef" />
+    <ModalSelect v-model:showModal="showModal" :getStoreList="getStoreList" :value="selectValue" />
 
-      <el-table :data="tableData" max-height="400" class="table-class" v-loading="loading">
-        <el-table-column prop="deviceOrderNo" label="序号" width="100" />
-        <el-table-column prop="deviceTypeName" label="设备型号" />
-        <el-table-column prop="deviceNo" label="设备编号" />
-        <el-table-column prop="storeName" label="绑定门店" />
-        <el-table-column prop="unlockTime" label="解锁时间" />
-        <el-table-column prop="durationTime" label="使用时长/解锁时长(分钟)">
-          <template #default="scope">
-            <span>{{scope.row.duration}}</span>/<span>{{scope.row.theoryDuration}}</span>
-          </template>
-        </el-table-column>
-        <el-table-column prop="unlockType" label="解锁方式" width="150">
-          <template #default>
-            <el-button plain size="small" type="primary">产品套盒解锁</el-button>
-          </template>
-        </el-table-column>
-      </el-table>
-      <el-pagination
-        class="class-pagination"
-        v-model:currentPage="currentPage"
-        v-model:page-size="pageSize"
-        :page-sizes="[5, 10, 15, 20]"
-        layout="total, sizes, prev, pager, next, jumper"
-        :total="total"
-        @size-change="handleSizeChange"
-        @current-change="handleCurrentChange"
-      />
-    </template>
-    <template v-else><router-view /></template>
+    <el-table :data="tableData" max-height="400" class="table-class" v-loading="loading">
+      <el-table-column prop="deviceOrderNo" label="序号" width="100" />
+      <el-table-column prop="deviceTypeName" label="设备型号" />
+      <el-table-column prop="deviceNo" label="设备编号" />
+      <el-table-column prop="storeName" label="绑定门店" />
+      <el-table-column prop="unlockTime" label="解锁时间" />
+      <el-table-column prop="durationTime" label="使用时长/解锁时长(分钟)">
+        <template #default="scope">
+          <span>{{scope.row.duration}}</span>/<span>{{scope.row.theoryDuration}}</span>
+        </template>
+      </el-table-column>
+      <el-table-column prop="unlockType" label="解锁方式" width="150">
+        <template #default>
+          <el-button plain size="small" type="primary">产品套盒解锁</el-button>
+        </template>
+      </el-table-column>
+    </el-table>
+    <el-pagination
+      class="class-pagination"
+      v-model:currentPage="currentPage"
+      v-model:page-size="pageSize"
+      :page-sizes="[5, 10, 15, 20]"
+      layout="total, sizes, prev, pager, next, jumper"
+      :total="total"
+      @size-change="handleSizeChange"
+      @current-change="handleCurrentChange"
+    />
   </div>
 </template>
 <script setup>
@@ -42,6 +39,9 @@ import { ElTable, ElTableColumn, ElButton, ElPagination, ElMessage, ElLoading } 
 import { ref, reactive, watch, onMounted } from "vue";
 import { useRouter } from 'vue-router'
 import { usageDevice } from './request/device'
+import useDeviceTypeStore from '@/store/deviceTypeStore'
+
+const deviceTypeStore = useDeviceTypeStore()
 
 const vLoading = ElLoading.directive
 
@@ -53,19 +53,7 @@ const showModalFn = () => {
   })
 }
 
-const tableData = ref([
-  {
-    deviceOrderNo: '464',
-    deviceTypeName: '欧洲之星:生命能量抗衰雕塑大师',
-    deviceNo: 'odc213668558077953',
-    storeName: "s00442",
-    unlockTime: "2022-03-14 02:03:32",
-    closeLockTime: "2022-03-14 02:03:32",
-    unlockType: 1,
-    duration: 45,
-    theoryDuration: 45,
-  },
-])
+const tableData = ref([])
 
 const searchFields = reactive([
   {
@@ -77,10 +65,7 @@ const searchFields = reactive([
     type: "select",
     label: "设备型号",
     field: "deviceTypeId",
-    optionList: [
-      { label: "MEI XIU SI", value: "81" },
-      { label: "欧洲之星", value: "80" },
-    ],
+    optionList: [],
   },
   {
     type: "select-custom",
@@ -95,7 +80,7 @@ const searchFields = reactive([
       { text: "查询", type: "submit", onClick: values => {
         console.log(values)
         currentPage.value = 1
-        fetchListData({ ...values, currentPage: 1, pageSize: pageSize.value })
+        fetchListData({ ...values, storeId: values.storeId?.[0]?.value, currentPage: 1, pageSize: pageSize.value })
       } },
       { text: "重置", type: "reset", onClick: () => {
         currentPage.value = 1
@@ -130,8 +115,21 @@ const fetchListData = params => {
 }
 
 onMounted(() => {
-  if (currentRoute.value.fullPath === '/net-management/device-use-record') {
-    fetchListData({})
+  fetchListData({})
+
+  const result = searchFields.find(v => v.field === 'deviceTypeId')
+  if (deviceTypeStore.deviceTypeList.length > 0) {
+    result.optionList = deviceTypeStore.deviceTypeList.map(v => ({
+      label: v.deviceTypeName,
+      value:v.deviceTypeId
+    }))
+  } else {
+    deviceTypeStore.fetchDeviceTypeList(list => {
+      result.optionList = list.map(v => ({
+        label: v.deviceTypeName,
+        value:v.deviceTypeId
+      }))
+    })
   }
 })
 
