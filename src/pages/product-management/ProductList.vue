@@ -43,17 +43,7 @@ import { getProductList, deleteProduct, editProduct } from './request/product'
 
 const vLoading = ElLoading.directive
 
-const tableData = ref([
-  // {
-  //   productNo: '1321',
-  //   productName: '门店培训五次',
-  //   productNum: 'P1538796514674085889',
-  //   productShortForm: '门店培训五次',
-  //   brandName: "深圳市欧迪丝生物科技有限公司",
-  //   productInventory: '12',
-  //   productType: 1,
-  // },
-])
+const tableData = ref([])
 
 const searchFields = reactive([
   {

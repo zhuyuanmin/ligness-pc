@@ -4,12 +4,16 @@
   <el-table :data="tableData" max-height="400" class="table-class" v-loading="loading">
     <el-table-column type="index" label="序号" width="100" />
     <el-table-column prop="productName" label="产品名称" />
-    <el-table-column prop="brandName" label="产品编号" />
+    <el-table-column prop="productNum" label="产品编号" />
     <el-table-column prop="batchNo" label="批次" />
     <el-table-column prop="brandName" label="所属品牌" />
     <el-table-column prop="batchInventory" label="产品数量" />
-    <el-table-column prop="operateTime" label="入库时间" />
-    <el-table-column prop="modifierName" label="操作人" />
+    <el-table-column prop="createTime" label="入库时间">
+      <template #default="scope">
+        <span>{{scope.row.createTime && dayjs(scope.row.createTime).format('YYYY-MM-DD HH:mm:ss')}}</span>
+      </template>
+    </el-table-column>
+    <el-table-column prop="creator" label="操作人" />
     <el-table-column fixed="right" label="操作" width="80">
       <template #default="scope">
         <el-button text type="primary" size="small" @click.prevent="handleShowModal(scope.row)">查看</el-button>
@@ -93,6 +97,7 @@ import { ref, reactive, watch, h, onMounted } from 'vue'
 import ModalSelect from '@/pages/net-management/components/device-list/ModalSelect.vue'
 import QRCode from 'qrcode'
 import { entryProductStoreRecord } from '../../request/product'
+import dayjs from 'dayjs'
 
 const vLoading = ElLoading.directive
 
