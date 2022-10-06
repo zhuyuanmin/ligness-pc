@@ -214,9 +214,8 @@ const handleSubmit = () => {
       productConsumeTimes: currentRow.value.productConsumeTimes,
     }).then(() => {
       ElMessage.success("操作成功！");
-      currentPage.value = 1;
       currentRow.value = {};
-      fetchListData({ currentPage: 1, pageSize: pageSize.value });
+      fetchListData({ currentPage: currentPage.value, pageSize: pageSize.value });
     });
   });
 };

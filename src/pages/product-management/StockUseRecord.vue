@@ -55,20 +55,7 @@ const showModalFn = () => {
   })
 }
 
-const tableData = ref([
-  {
-    boxNo: '1AA9918823854A69AAFD1D4498B61DE2',
-    productName: "D系列氢润妍体亮肤按摩霜",
-    productNum: "P14684158926720901131638932605318",
-    brandName: "ODC",
-    batchNo: "B1639535834806",
-    createTime: "2022-08-28 02:35:51",
-    consumeRemainTimes: "4",
-    storeName: "c06998",
-    deviceNo: "odc195335374831617",
-    updater: "成小梅",
-  },
-])
+const tableData = ref([])
 
 const searchFields = reactive([
   {

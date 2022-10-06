@@ -50,7 +50,7 @@
 
       <el-table :data="tableData2" max-height="400" class="table-class">
         <el-table-column type="index" label="序号" width="100" />
-        <el-table-column prop="boxNo" label="产品编号" />
+        <el-table-column prop="boxNo" label="商品编号" />
         <el-table-column prop="productSign" label="产品二维码">
           <template #default="scope">
             <el-button text type="primary" @click="handViewQRCode(scope.row)">查看</el-button>
@@ -98,6 +98,9 @@ import ModalSelect from '@/pages/net-management/components/device-list/ModalSele
 import QRCode from 'qrcode'
 import { entryProductStoreRecord } from '../../request/product'
 import dayjs from 'dayjs'
+import useBrandStore from '@/store/brandStore'
+
+const brandStore = useBrandStore()
 
 const vLoading = ElLoading.directive
 
@@ -113,13 +116,13 @@ const props = defineProps({
 const tableData = ref([])
 
 const tableData2 = reactive([
-  {
-    boxNo: 'A7BA9D3C459F46278208E2A28F1C5144',
-    boxUsedTimes: '0',
-    boxAvailableTimes: '500',
-    storeId: '11232',
-    storeName: 'S24324'
-  },
+  // {
+  //   boxNo: 'A7BA9D3C459F46278208E2A28F1C5144',
+  //   boxUsedTimes: '0',
+  //   boxAvailableTimes: '500',
+  //   storeId: '11232',
+  //   storeName: 'S24324'
+  // },
 ])
 
 const dialogFields = reactive([
@@ -150,10 +153,7 @@ const searchFields = reactive([
     type: "select",
     label: "品牌",
     field: "brandId",
-    optionList: [
-      { label: "莱特妮丝", value: "80" },
-      { label: "ODC", value: "81" },
-    ],
+    optionList: [],
   },
   {
     type: "date-range",
@@ -209,6 +209,21 @@ const fetchListData = params => {
 
 onMounted(() => {
   fetchListData({})
+
+  const result = searchFields.find(v => v.field === 'brandId')
+  if (brandStore.brandList.length > 0) {
+    result.optionList = brandStore.brandList.map(v => ({
+      label: v.brandName,
+      value:v.brandId
+    }))
+  } else {
+    brandStore.fetchBrandList(list => {
+      result.optionList = list.map(v => ({
+        label: v.brandName,
+        value:v.brandId
+      }))
+    })
+  }
 })
 
 const handleSizeChange = (type, size) => {
