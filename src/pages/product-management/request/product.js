@@ -64,6 +64,15 @@ export const entryProductStoreRecord = async params => {
   })
 }
 
+// 批次下套盒列表
+export const getProductBatchBox = async params => {
+  return await request({
+    url: api.product.batchBox,
+    method: 'post',
+    data: params
+  })
+}
+
 // 套盒消耗列表
 export const consumeProduct = async params => {
   return await request({

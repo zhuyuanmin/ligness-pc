@@ -36,6 +36,7 @@ const product = {
 
   entryStore: baseUrl + "/product/enterStorehouse", // 产品入库
   entryStoreRecord: baseUrl + "/batch/selectByProductInfoPage", // 入库记录
+  batchBox: baseUrl + "/box/selectByConditionPage", // 批次套盒列表
   consume: baseUrl + "/boxconsume/selectByProductInfoPage", // 套盒消耗列表
 };
 

@@ -48,7 +48,7 @@
         </el-col>
       </el-row>
 
-      <el-table :data="tableData2" max-height="400" class="table-class">
+      <el-table :data="tableData2" max-height="400" class="table-class" v-loading="loading2">
         <el-table-column type="index" label="序号" width="100" />
         <el-table-column prop="boxNo" label="商品编号" />
         <el-table-column prop="productSign" label="产品二维码">
@@ -96,7 +96,7 @@ import { ElTable, ElTableColumn, ElButton, ElPagination, ElDialog, ElRow, ElCol,
 import { ref, reactive, watch, h, onMounted } from 'vue'
 import ModalSelect from '@/pages/net-management/components/device-list/ModalSelect.vue'
 import QRCode from 'qrcode'
-import { entryProductStoreRecord } from '../../request/product'
+import { entryProductStoreRecord, getProductBatchBox } from '../../request/product'
 import dayjs from 'dayjs'
 import useBrandStore from '@/store/brandStore'
 
@@ -115,7 +115,7 @@ const props = defineProps({
 
 const tableData = ref([])
 
-const tableData2 = reactive([
+const tableData2 = ref([
   // {
   //   boxNo: 'A7BA9D3C459F46278208E2A28F1C5144',
   //   boxUsedTimes: '0',
@@ -186,9 +186,11 @@ const pageSize2 = ref(10)
 const total = ref(100)
 const total2 = ref(100)
 const loading = ref(false)
+const loading2 = ref(false)
 const showModal = ref(false)
 const showStoreModal = ref(false)
 const selectValue = ref('')
+const currentRow = ref({})
 const dateRef = ref(Date.now())
 
 watch(() => props.searchData, () => {
@@ -204,6 +206,17 @@ const fetchListData = params => {
     total.value = totalCount
   }).finally(() => {
     loading.value = false
+  })
+}
+
+const fetchProductBatchBox = params => {
+  loading2.value = true
+  getProductBatchBox(params).then(res => {
+    const { currentPage, pageSize, pageCount, totalCount, pageList } = res || {}
+    tableData2.value = pageList
+    total2.value = totalCount
+  }).finally(() => {
+    loading2.value = false
   })
 }
 
@@ -227,7 +240,6 @@ onMounted(() => {
 })
 
 const handleSizeChange = (type, size) => {
-  console.log(size);
   if (type === 'first') {
     currentPage.value = 1
     pageSize.value = size
@@ -235,17 +247,16 @@ const handleSizeChange = (type, size) => {
   } else {
     currentPage2.value = 1
     pageSize2.value = size
-    fetchListData({ currentPage: 1, pageSize2: size })
+    fetchProductBatchBox({ batchId: currentRow.value.batchId, currentPage: 1, pageSize2: size })
   }
 }
 const handleCurrentChange = (type, page) => {
-  console.log(page);
   if (type === 'first') {
     currentPage.value = page
     fetchListData({ currentPage: page, pageSize: pageSize.value })
   } else {
     currentPage2.value = page
-    fetchListData({ currentPage: page, pageSize2: pageSize2.value })
+    fetchProductBatchBox({ batchId: currentRow.value.batchId, currentPage: page, pageSize2: pageSize2.value })
   }
 }
 
@@ -254,6 +265,8 @@ const handleShowModal = row => {
   dialogFields.forEach(v => {
     v.value = row[v.field]
   })
+  currentRow.value = row
+  fetchProductBatchBox({ batchId: row.batchId })
 }
 
 const handViewQRCode = row => {
