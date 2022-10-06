@@ -163,7 +163,7 @@ const title = ref("");
 const dialogRef = ref();
 const loading = ref(false);
 const total = ref(100);
-const currentRow = ref({})
+const currentRow = ref({});
 
 const handleSizeChange = (size) => {
   currentPage.value = 1;
@@ -200,7 +200,7 @@ const handleSwitchTab = (row) => {
 const handleShowModal = (row) => {
   showModal.value = true;
   title.value = row.productName;
-  currentRow.value = row
+  currentRow.value = row;
 };
 
 const handleSubmit = () => {
@@ -208,10 +208,14 @@ const handleSubmit = () => {
   dialogRef.value.validFields().then((values) => {
     console.log(values);
     showModal.value = false;
-    entryProductStore({ productId: currentRow.value.productId,  batchInventory: values.storeNum }).then(() => {
+    entryProductStore({
+      productId: currentRow.value.productId,
+      batchInventory: values.storeNum,
+      productConsumeTimes: currentRow.value.productConsumeTimes,
+    }).then(() => {
       ElMessage.success("操作成功！");
       currentPage.value = 1;
-      currentRow.value = {}
+      currentRow.value = {};
       fetchListData({ currentPage: 1, pageSize: pageSize.value });
     });
   });

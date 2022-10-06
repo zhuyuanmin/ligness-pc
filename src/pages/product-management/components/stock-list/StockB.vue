@@ -110,17 +110,7 @@ const props = defineProps({
   },
 })
 
-const tableData = ref([
-  {
-    productName: '按摩霜D套盒10次',
-    productNum: 'P1538796514674085889',
-    batchNo: 'B1660470391251',
-    brandName: '莱特妮丝',
-    batchInventory: "11",
-    operateTime: '2022-08-14 17:46:31',
-    modifierName: '吴总',
-  },
-])
+const tableData = ref([])
 
 const tableData2 = reactive([
   {
