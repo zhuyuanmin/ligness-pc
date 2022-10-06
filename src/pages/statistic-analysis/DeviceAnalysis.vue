@@ -8,13 +8,14 @@
       class="table-class"
       v-loading="loading"
     >
+      <el-table-column prop="deviceTypeId" label="设备编号" />
       <el-table-column prop="deviceTypeName" label="设备型号" />
       <el-table-column prop="online" label="在线设备" />
       <el-table-column prop="offline" label="离线设备" />
       <el-table-column prop="fault" label="异常设备" />
       <el-table-column prop="total" label="设备总数" width="150">
         <template #default="scope">
-          <span>{{ scope.row.deviceNum }}</span>
+          <span>{{ scope.row.deviceCount }}</span>
         </template>
       </el-table-column>
     </el-table>
@@ -32,7 +33,7 @@ const loading = ref(false)
 const tableData = ref([
   {
     deviceTypeName: "欧洲之星:时尚塑形大师",
-    deviceNo: "68",
+    deviceTypeId: "68",
     deviceCount: 101,
     online: 0,
     offline: 101,
@@ -40,7 +41,7 @@ const tableData = ref([
   },
   {
     deviceTypeName: "欧洲之星:生命能量抗衰雕塑大师",
-    deviceNo: "69",
+    deviceTypeId: "69",
     deviceCount: 52,
     online: 1,
     offline: 51,
@@ -48,7 +49,7 @@ const tableData = ref([
   },
   {
     deviceTypeName: "欧洲之星:生命能量抗衰雕塑大师plus",
-    deviceNo: "80",
+    deviceTypeId: "80",
     deviceCount: 29,
     online: 1,
     offline: 28,
@@ -56,7 +57,7 @@ const tableData = ref([
   },
   {
     deviceTypeName: "MEI XIU SI",
-    deviceNo: "81",
+    deviceTypeId: "81",
     deviceCount: 0,
     online: 0,
     offline: 0,
@@ -74,7 +75,7 @@ const getSummaryFn = (param) => {
     }
 
     let values = []
-    if (index === 4) {
+    if (index === 5) {
       values = data.map((item) => Number(item.deviceCount))
     } else {
       values = data.map((item) => Number(item[column.property]))
@@ -90,7 +91,7 @@ const getSummaryFn = (param) => {
         }
       }, 0)
     } else {
-      sums[index] = 'N/A'
+      sums[index] = ''
     }
   })
 
