@@ -13,8 +13,8 @@
         <!-- <el-table-column prop="natureTypeName" label="卖品/非卖品" /> -->
         <el-table-column fixed="right" label="操作" width="150">
           <template #default="scope">
-            <el-button v-if="scope.row.status === 1" text type="danger" size="small" @click.prevent="handleStoreStatus(0)">下架</el-button>
-            <el-button v-else text type="primary" size="small" @click.prevent="handleStoreStatus(1)">上架</el-button>
+            <el-button v-if="scope.row.status === 1" text type="danger" size="small" @click.prevent="handleStoreStatus(0, scope.row.productId)">下架</el-button>
+            <el-button v-else text type="primary" size="small" @click.prevent="handleStoreStatus(1, scope.row.productId)">上架</el-button>
             <el-button text type="primary" size="small" @click.prevent="viewRow(scope.row, 'edit')">编辑</el-button>
             <el-button text type="danger" size="small" @click.prevent="deleteRow(scope.row)">删除</el-button>
           </template>
@@ -139,8 +139,8 @@ const viewRow = (row, type) => {
   }
 }
 
-const handleStoreStatus = state => {
-  editProduct(state).then(() => {
+const handleStoreStatus = (state, productId) => {
+  editProduct({productStatus: state, productId: productId}).then(() => {
     ElMessage.success('操作成功！')
     fetchListData({ currentPage: page, pageSize: pageSize.value })
   })
