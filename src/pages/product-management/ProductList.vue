@@ -133,7 +133,7 @@ const handleCurrentChange = page => {
 const viewRow = (row, type) => {
   console.log(row);
   if (row) {
-    router.push(`/product-management/product-list/detail/${row.productNum}?type=${type}`)
+    router.push(`/product-management/product-list/detail/${row.productId}?type=${type}`)
   } else {
     router.push('/product-management/product-list/detail')
   }
@@ -159,7 +159,7 @@ const deleteRow = row => {
     }
   ).then(() => {
     // 删除操作
-    deleteProduct(row.deviceNo).then(() => {
+    deleteProduct({productId: row.productId}).then(() => {
       ElMessage.success('操作成功！')
       currentPage.value = 1
       fetchListData({ currentPage: 1, pageSize: pageSize.value })

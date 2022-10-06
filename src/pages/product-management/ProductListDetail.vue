@@ -112,7 +112,7 @@ const searchFields = reactive([
 
 onMounted(() => {
   if (route.params.id) {
-    viewProduct(route.params.id).then(res => {
+    viewProduct({productId: route.params.id}).then(res => {
       console.log(res)
       productData.value = res
     })
