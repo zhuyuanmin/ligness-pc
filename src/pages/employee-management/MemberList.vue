@@ -147,7 +147,7 @@ const tableData = ref([]);
 
 const checkEmail = (rule, value, cb) => {
   const regEmail = /^([a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+(\.[a-zA-Z0-9_-])+/
-  if (regEmail.test(value)) {
+  if (!value || regEmail.test(value)) {
     cb()
   } else {
     cb(new Error(rule.message))
@@ -301,7 +301,7 @@ const dialogFields2List = [
     type: "radio",
     label: "权限角色",
     field: "staffPermRole",
-    initValue: '1',
+    initValue: 0,
     optionList: [
       { label: "普通账号", value: 0 },
       { label: "系统管理员", value: 1 },
@@ -365,7 +365,8 @@ const handleUpdateStaffInfo = params => {
       fetchListData({ currentPage: 1, pageSize: pageSize.value })
     })
   } else {
-    addStaff(params).then(res => {
+    const { staffImg, ...rest }  = params
+    addStaff({ ...rest, staffId: staffImg[0]?.response?.data?.attachmentBizId || undefined }).then(res => {
       ElMessage.success('操作成功！')
       currentPage.value = 1
       fetchListData({ currentPage: 1, pageSize: pageSize.value })
@@ -391,6 +392,9 @@ const viewRow = (row, type) => {
         list[i].initValue = row[v.field]
       }
     })
+    const result = list.find(v => v.field === 'staffImg')
+    result.initValue = [{ url: row.imgPath }]
+    result.data.attachmentBizId = row.staffId
     dialogFields2.value = list
   } else {
     dialogFields2.value = listArr
@@ -432,9 +436,7 @@ const handleSubmitInfo = () => {
   dialogRef2.value.validFields().then(values => {
     console.log(values);
     showUserInfoModal.value = false
-    const { staffImg } = values
-    const url = staffImg[0] ? (staffImg[0].response ? staffImg[0].response.data.attachmentPath : staffImg[0].url) : ''
-    handleUpdateStaffInfo({ ...values, staffImg: url })
+    handleUpdateStaffInfo({ ...values })
   })
 }
 

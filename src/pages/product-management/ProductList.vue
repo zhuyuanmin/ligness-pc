@@ -4,17 +4,17 @@
       <SearchComp :formItemList="searchFields" />
 
       <el-table :data="tableData" max-height="400" class="table-class" v-loading="loading">
-        <el-table-column prop="productNo" label="序号" width="100" />
+        <el-table-column type="index" label="序号" width="100" />
         <el-table-column prop="productName" label="产品名称" />
         <el-table-column prop="productNum" label="产品编号" />
         <el-table-column prop="productShortForm" label="简称" />
         <el-table-column prop="brandName" label="品牌" />
-        <el-table-column prop="productInventory" label="消耗次数" />
+        <el-table-column prop="productConsumeTimes" label="消耗次数" />
         <!-- <el-table-column prop="natureTypeName" label="卖品/非卖品" /> -->
         <el-table-column fixed="right" label="操作" width="150">
           <template #default="scope">
-            <el-button v-if="scope.row.status === 1" text type="danger" size="small" @click.prevent="handleStoreStatus(0)">下架</el-button>
-            <el-button v-else text type="primary" size="small" @click.prevent="handleStoreStatus(1)">上架</el-button>
+            <el-button v-if="scope.row.productStatus === 1" text type="danger" size="small" @click.prevent="handleStoreStatus(scope.row, 0)">下架</el-button>
+            <el-button v-else text type="primary" size="small" @click.prevent="handleStoreStatus(scope.row, 1)">上架</el-button>
             <el-button text type="primary" size="small" @click.prevent="viewRow(scope.row, 'edit')">编辑</el-button>
             <el-button text type="danger" size="small" @click.prevent="deleteRow(scope.row)">删除</el-button>
           </template>
@@ -44,15 +44,15 @@ import { getProductList, deleteProduct, editProduct } from './request/product'
 const vLoading = ElLoading.directive
 
 const tableData = ref([
-  {
-    productNo: '1321',
-    productName: '门店培训五次',
-    productNum: 'P1538796514674085889',
-    productShortForm: '门店培训五次',
-    brandName: "深圳市欧迪丝生物科技有限公司",
-    productInventory: '12',
-    productType: 1,
-  },
+  // {
+  //   productNo: '1321',
+  //   productName: '门店培训五次',
+  //   productNum: 'P1538796514674085889',
+  //   productShortForm: '门店培训五次',
+  //   brandName: "深圳市欧迪丝生物科技有限公司",
+  //   productInventory: '12',
+  //   productType: 1,
+  // },
 ])
 
 const searchFields = reactive([
@@ -65,12 +65,12 @@ const searchFields = reactive([
   {
     type: "select",
     label: "产品类型",
-    field: "productCategory",
+    field: "productClassify",
     optionList: [
-      { label: "普通产品", value: "1" },
-      { label: "服务耗材", value: "2" },
-      { label: "院装产品", value: "3" },
-      { label: "套盒产品", value: "4" },
+      { label: "普通产品", value: 1 },
+      { label: "服务耗材", value: 2 },
+      { label: "院装产品", value: 3 },
+      { label: "套盒产品", value: 4 },
     ],
   },
   {
@@ -112,6 +112,10 @@ const fetchListData = params => {
 
 watch(() => router.currentRoute.value, (newVal) => {
   currentRoute.value = newVal
+
+  if (newVal.fullPath === '/product-management/product-list') {
+    fetchListData({})
+  }
 })
 
 onMounted(() => {
@@ -133,17 +137,28 @@ const handleCurrentChange = page => {
 const viewRow = (row, type) => {
   console.log(row);
   if (row) {
-    router.push(`/product-management/product-list/detail/${row.productNum}?type=${type}`)
+    router.push(`/product-management/product-list/detail/${row.productId}?type=${type}`)
   } else {
     router.push('/product-management/product-list/detail')
   }
 }
 
-const handleStoreStatus = state => {
-  editProduct(state).then(() => {
-    ElMessage.success('操作成功！')
-    fetchListData({ currentPage: page, pageSize: pageSize.value })
-  })
+const handleStoreStatus = (row, state) => {
+  ElMessageBox.confirm(
+    '确认要下架吗？',
+    '提示',
+    {
+      cancelButtonText: '取消',
+      confirmButtonText: '确定',
+      draggable: true,
+      type: 'warning',
+    }
+  ).then(() => {
+    editProduct({ productId: row.productId, productStatus: state }).then(() => {
+      ElMessage.success('操作成功！')
+      fetchListData({ currentPage: currentPage.value, pageSize: pageSize.value })
+    })
+  }, () => {})
 }
 
 const deleteRow = row => {
@@ -159,7 +174,7 @@ const deleteRow = row => {
     }
   ).then(() => {
     // 删除操作
-    deleteProduct(row.deviceNo).then(() => {
+    deleteProduct({ productId: row.productId }).then(() => {
       ElMessage.success('操作成功！')
       currentPage.value = 1
       fetchListData({ currentPage: 1, pageSize: pageSize.value })

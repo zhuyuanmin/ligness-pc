@@ -49,13 +49,15 @@ const saveFormData = () => {
 
     const switchValue = unlockRef.value.getSwitchValue()
 
+    const { attachmentBizId, ...rest } = values
+
     if (route.params.id) {
-      editDeviceType({ ...values, id: route.params.id, status: switchValue ? 1 : 0 }).then(() => {
+      editDeviceType({ ...rest, deviceTypeId: route.params.id, status: switchValue ? 1 : 0 }).then(() => {
         ElMessage.success('修改成功！')
         router.back()
       })
     } else {
-      addDeviceType({ ...values, status: switchValue ? 1 : 0 }).then(() => {
+      addDeviceType({ ...rest, status: switchValue ? 1 : 0, deviceTypeId: attachmentBizId || undefined }).then(() => {
         ElMessage.success('新增成功！')
         router.back()
       })

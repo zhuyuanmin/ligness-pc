@@ -96,7 +96,7 @@
             show-word-limit
             :maxlength="500"
             :autosize="{ minRows: 3, maxRows: 5 }"
-            v-model="formValues.deviceRemark"
+            v-model="formValues.deviceExplain"
             placeholder="请输入"
             clearable
           />

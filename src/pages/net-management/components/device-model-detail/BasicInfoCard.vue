@@ -17,7 +17,7 @@
             <p>请上传一张透明背景图片</p>
             <el-upload
               class="avatar-uploader"
-              :data="{ attachmentBizTypeEnum: 'DEVICE_TYPE_CATEGORY', attachmentBizId: (route.params || {}).id}"
+              :data="{ attachmentBizTypeEnum: 'DEVICE_TYPE_CATEGORY', attachmentBizId: (route.params || {}).id }"
               :action="apis.upload"
               :show-file-list="false"
               :on-success="handleSuccess"
@@ -52,6 +52,7 @@ const route = useRoute();
 const imageUrl = ref("");
 const searchRef = ref();
 const dateNow = ref(Date.now())
+const attachmentBizId = ref('')
 
 const props = defineProps({
   data: {
@@ -150,7 +151,7 @@ const getSearchFormValue = () => {
           values.brandName = result.brandName
         }
       }
-      resolve(values)
+      resolve({ ...values, attachmentBizId: attachmentBizId.value })
     }).catch(reject)
   })
 }
@@ -162,6 +163,7 @@ const handleSuccess = (response, uploadFile) => {
     ElMessage.error(response.msg)
   } else {
     imageUrl.value = URL.createObjectURL(uploadFile.raw);
+    attachmentBizId.value = response.data.attachmentBizId
   }
 };
 
