@@ -64,10 +64,19 @@ export const entryProductStoreRecord = async params => {
   })
 }
 
-// 批次下套盒列表
+// 查询批次下套盒列表
 export const getProductBatchBox = async params => {
   return await request({
     url: api.product.batchBox,
+    method: 'post',
+    data: params
+  })
+}
+
+// 更新套盒信息
+export const updateProductBatchBox = async params => {
+  return await request({
+    url: api.product.updBatchBox,
     method: 'post',
     data: params
   })

@@ -248,6 +248,10 @@ const handleUpdateShopInfo = params => {
 
 watch(() => router.currentRoute.value, (newVal) => {
   currentRoute.value = newVal
+
+  if (newVal.fullPath === '/customer-management/shop-list') {
+    fetchListData({})
+  }
 })
 
 onMounted(() => {
