@@ -19,7 +19,7 @@
         max-height="400"
         class="table-class"
       >
-        <el-table-column prop="productId" label="产品ID" width="200" />
+        <el-table-column prop="productId" label="产品编码" />
         <el-table-column prop="productName" label="产品名称" />
         <el-table-column
           v-if="route.query.type === 'edit'"
@@ -27,7 +27,7 @@
           width="200"
         >
           <template #header>
-            <el-icon color="#409EFC" :size="20" @click="showModal = true">
+            <el-icon color="#409EFC" :size="20" @click="handleShowModal">
               <FolderAdd />
             </el-icon>
           </template>
@@ -75,6 +75,7 @@
           max-height="400"
           class="table-class"
           @selection-change="handleSelectionChange"
+          v-loading="loading"
         >
           <el-table-column type="selection" width="55" />
           <el-table-column
@@ -82,7 +83,7 @@
             label="序号"
             width="100"
           ></el-table-column>
-          <el-table-column prop="productId" label="产品ID" width="200" />
+          <el-table-column prop="productId" label="产品编码" width="200" />
           <el-table-column prop="productName" label="产品名称" />
           <el-table-column
             prop="theoryDuration"
@@ -104,7 +105,7 @@
           v-model:page-size="pageSize"
           :page-sizes="[5, 10, 15, 20]"
           layout="total, sizes, prev, pager, next, jumper"
-          :total="100"
+          :total="total"
           small
           @size-change="handleSizeChange"
           @current-change="handleCurrentChange"
@@ -132,18 +133,22 @@ import {
   ElPagination,
   ElTag,
   ElMessageBox,
+  ElLoading,
 } from "element-plus";
-import { ref, reactive, onMounted } from "vue";
+import { ref, reactive, onMounted, computed } from "vue";
 import { useRoute } from "vue-router";
 import { FolderAdd } from "@element-plus/icons-vue";
 import { getProductList } from "@/pages/product-management/request/product";
 
+const vLoading = ElLoading.directive
+
 const route = useRoute();
 const switchValue = ref(true);
 const showModal = ref(false);
+const loading = ref(false)
 const multipleSelection = ref([]);
 const tableData = ref([]);
-const tableData2 = reactive([
+const tableData2 = ref([
   { productId: 13, productName: "B系列氢润女性胸部凝胶" },
   { productId: 14, productName: "B系列氢润女性胸部凝胶" },
   { productId: 15, productName: "B系列氢润女性胸部凝胶" },
@@ -161,15 +166,29 @@ const props = defineProps({
   },
 });
 
-const tags = tableData.value.map((v) => ({ name: v.productName }));
+const tags = computed(() => {
+  return multipleSelection.value.map((v) => ({ name: v.productName }));
+})
 
 const currentPage = ref(1);
 const pageSize = ref(10);
+const total = ref(50);
 
 const fetchProductList = (params) => {
   getProductList(params).then((res) => {
     const {  pageList } = res || {}
     tableData.value = pageList;
+  });
+};
+
+const fetchProductList2 = (params) => {
+  loading.value = true
+  getProductList(params).then((res) => {
+    const {  totalCount, pageList } = res || {}
+    tableData2.value = pageList;
+    total.value = totalCount
+  }).finally(() => {
+    loading.value = false
   });
 };
 
@@ -179,19 +198,27 @@ onMounted(() => {
   }
 });
 
-const handleChange = () => {};
+const handleChange = () => {
+  fetchProductList2({ });
+};
 const handleSelectionChange = (val) => {
   multipleSelection.value = val;
 };
 
-const handleSizeChange = (size) => {
-  console.log(size);
-  pageSize.value = size;
-};
-const handleCurrentChange = (page) => {
-  console.log(page);
-  currentPage.value = page;
-};
+const handleShowModal = () => {
+  showModal.value = true
+  fetchProductList2({ });
+}
+
+const handleSizeChange = size => {
+  currentPage.value = 1
+  pageSize.value = size
+  fetchProductList2({ currentPage: 1, pageSize: size })
+}
+const handleCurrentChange = page => {
+  currentPage.value = page
+  fetchProductList2({ currentPage: page, pageSize: pageSize.value })
+}
 
 const getSwitchValue = () => switchValue.value;
 
