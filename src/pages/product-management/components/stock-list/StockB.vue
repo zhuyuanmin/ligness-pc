@@ -90,7 +90,7 @@
         </el-table-column>
         <el-table-column prop="storeName" label="门店">
           <template #default="scope">
-            {{ scope.row.storeName }}
+            {{ scope.row.customName }}
             <el-button
               v-if="scope.row.storeId"
               plain
@@ -383,7 +383,7 @@ const handBindStore = (row) => {
   showStoreModal.value = true;
   batchBoxRow.value = row
   selectValue.value = row.storeId
-    ? [{ label: row.storeName, value: row.storeId }]
+    ? [{ label: row.customName, value: row.storeId }]
     : "";
 };
 

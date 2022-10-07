@@ -10,9 +10,8 @@
     >
       <el-table-column prop="deviceTypeId" label="设备编号" />
       <el-table-column prop="deviceTypeName" label="设备型号" />
-      <el-table-column prop="online" label="在线设备" />
-      <el-table-column prop="offline" label="离线设备" />
-      <el-table-column prop="fault" label="异常设备" />
+      <el-table-column prop="onLineDeviceCount" label="在线设备" />
+      <el-table-column prop="offLineDeviceCount" label="离线设备" />
       <el-table-column prop="total" label="设备总数" width="150">
         <template #default="scope">
           <span>{{ scope.row.deviceCount }}</span>
@@ -75,7 +74,7 @@ const getSummaryFn = (param) => {
     }
 
     let values = []
-    if (index === 5) {
+    if (index === columns.length - 1) {
       values = data.map((item) => Number(item.deviceCount))
     } else {
       values = data.map((item) => Number(item[column.property]))
@@ -101,8 +100,7 @@ const getSummaryFn = (param) => {
 const fetchListData = params => {
   loading.value = true
   getDeviceAnalysis(params).then(res => {
-    const { pageList } = res || {}
-    tableData.value = pageList
+    tableData.value = res || []
   }).finally(() => {
     loading.value = false
   })

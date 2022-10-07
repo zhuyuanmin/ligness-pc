@@ -110,22 +110,28 @@ watch(() => props.showModal, flag => {
     if (flag) {
       fetchShopList({})
     }
+  })
+})
 
-    if (props.value) {
-      const result = tableData.value.find(v => v.storeId === props.value[0].value)
-      if (result && myTable.value) {
+watch(() => tableData.value, newVal => {
+  if (props.value) {
+    const result = newVal.find(v => v.storeId === props.value[0].value)
+    if (result && myTable.value) {
+      nextTick(() => {
         myTable.value.clearSelection()
         myTable.value.toggleRowSelection(result, true)
         dataList = []
         dataList.push(result)
-      }
-    } else {
-      if (myTable.value) {
+      })
+    }
+  } else {
+    if (myTable.value) {
+      nextTick(() => {
         myTable.value.clearSelection()
         dataList = []
-      }
+      })
     }
-  })
+  }
 })
 
 const handleSelectList = () => {
