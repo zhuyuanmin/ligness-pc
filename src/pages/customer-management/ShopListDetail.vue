@@ -243,8 +243,8 @@ const getFieldsList = route => {
     },
   ]
 
-  if (type === 'edit') {
-    list = list.filter(v => v.field !== 'password')
+  if (type === 'view') {
+    list = list.filter(v => v.field !== 'customLoginPwd')
   }
 
   return list

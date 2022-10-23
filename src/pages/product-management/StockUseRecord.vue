@@ -103,7 +103,7 @@ const searchFields = reactive([
       { text: "查询", type: "submit", onClick: values => {
         console.log(values)
         currentPage.value = 1
-        fetchListData({ ...values, currentPage: 1, pageSize: pageSize.value })
+        fetchListData({ ...values, storeId: values.storeId?.[0]?.value, currentPage: 1, pageSize: pageSize.value })
       } },
       { text: "重置", type: "reset", onClick: () => {
         currentPage.value = 1

@@ -173,7 +173,8 @@ onMounted(() => {
   if (route.params.id) {
     viewDevice({ deviceId: route.params.id }).then((res) => {
       console.log(res);
-      formValues.value = res;
+      const { storeId, customName, ...rest } = res
+      formValues.value = { ...rest, storeId: [{ label: customName, value: storeId }] };
     });
   }
 })
@@ -212,9 +213,10 @@ const saveFormData = () => {
   ruleFormRef.value.validate((valid) => {
     if (valid) {
       console.log(formValues.value);
+      const { storeId } = formValues.value
 
       if (route.params.id) {
-        editDevice({ ...formValues.value, deviceId: route.params.id }).then(() => {
+        editDevice({ ...formValues.value, deviceId: route.params.id, storeId: storeId[0].value }).then(() => {
           ElMessage.success("修改成功！");
           router.back();
         });

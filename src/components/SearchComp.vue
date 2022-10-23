@@ -298,6 +298,9 @@ defineExpose({ validFields });
         background-color: #fff;
       }
     }
+    .el-input {
+      width: 190px;
+    }
   }
   .my-file {
     :deep(.el-form-item__content) {

@@ -10,7 +10,7 @@
         <el-table-column prop="deviceNo" label="设备编号" />
         <el-table-column prop="brandName" label="品牌商" width="100" />
         <!-- <el-table-column prop="brandMerchantName" label="品牌" /> -->
-        <el-table-column prop="storeName" label="绑定门店" />
+        <el-table-column prop="customName" label="绑定门店" />
         <!-- <el-table-column prop="factoryName" label="厂家" /> -->
         <el-table-column prop="deviceStatus" label="状态">
           <template #default="scope">
