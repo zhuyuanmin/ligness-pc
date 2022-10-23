@@ -124,7 +124,7 @@
     <ModalSelect
       v-model:showModal="showModal"
       :getStoreList="getStoreList"
-      :value="(formValues.storeId || []).map((v) => v.value).join(';')"
+      :value="formValues.storeId || []"
     />
   </div>
 </template>

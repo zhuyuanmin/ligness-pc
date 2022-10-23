@@ -45,3 +45,30 @@ export const viewDeviceType = async params => {
     data: params
   })
 }
+
+// 查询设备型号下的产品列表
+export const deviceTypeProductList = async params => {
+  return await request({
+    url: api.deviceType.bindProductList,
+    method: 'post',
+    data: params
+  })
+}
+
+// 解绑设备型号下的产品
+export const unBindDeviceTypeProduct = async params => {
+  return await request({
+    url: api.deviceType.unBindProduct,
+    method: 'post',
+    data: params
+  })
+}
+
+// 设备型号批量绑定产品
+export const deviceTypeBindProduct = async params => {
+  return await request({
+    url: api.deviceType.bindProduct,
+    method: 'post',
+    data: params
+  })
+}

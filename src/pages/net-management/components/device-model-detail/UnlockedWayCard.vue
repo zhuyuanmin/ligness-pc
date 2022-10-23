@@ -18,6 +18,7 @@
         :data="tableData"
         max-height="400"
         class="table-class"
+        v-loading="listLoading"
       >
         <el-table-column prop="productId" label="产品编码" />
         <el-table-column prop="productName" label="产品名称" />
@@ -42,6 +43,16 @@
           </template>
         </el-table-column>
       </el-table>
+      <el-pagination
+        class="class-pagination2"
+        v-model:currentPage="currentPage2"
+        v-model:page-size="pageSize2"
+        :page-sizes="[5, 10, 15, 20]"
+        layout="total, sizes, prev, pager, next, jumper"
+        :total="total2"
+        @size-change="(size) => handleSizeChange('list', size)"
+        @current-change="(page) => handleCurrentChange('list', page)"
+      />
     </div>
     <el-dialog
       v-model="showModal"
@@ -76,6 +87,8 @@
           class="table-class"
           @selection-change="handleSelectionChange"
           v-loading="loading"
+          ref="myTable"
+          :key="dateRef"
         >
           <el-table-column type="selection" width="55" />
           <el-table-column
@@ -93,8 +106,9 @@
             <template #default="scope">
               <el-input
                 type="number"
-                :value="scope.row"
-                @change="handleChange()"
+                :value="scope.row.theoryDuration"
+                @input="val => handleChange(val, scope.row)"
+                @blur="handleBlur(scope.row)"
               ></el-input>
             </template>
           </el-table-column>
@@ -107,14 +121,19 @@
           layout="total, sizes, prev, pager, next, jumper"
           :total="total"
           small
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
+          @size-change="(size) => handleSizeChange('modal', size)"
+          @current-change="(page) => handleCurrentChange('modal', page)"
         />
       </div>
       <template #footer>
         <span class="dialog-footer">
           <el-button @click="showModal = false">取消</el-button>
-          <el-button type="primary" @click="showModal = false">确定</el-button>
+          <el-button
+            type="primary"
+            @click="handleBindProduct"
+            :loading="bindLoading"
+            >确定</el-button
+          >
         </span>
       </template>
     </el-dialog>
@@ -134,30 +153,34 @@ import {
   ElTag,
   ElMessageBox,
   ElLoading,
+  ElMessage,
 } from "element-plus";
-import { ref, reactive, onMounted, computed } from "vue";
+import { ref, nextTick, onMounted, computed } from "vue";
 import { useRoute } from "vue-router";
 import { FolderAdd } from "@element-plus/icons-vue";
-import { getProductList } from "@/pages/product-management/request/product";
+import {
+  getProductList,
+  editProduct,
+} from "@/pages/product-management/request/product";
+import {
+  deviceTypeProductList,
+  unBindDeviceTypeProduct,
+  deviceTypeBindProduct,
+} from "../../request/deviceType";
 
-const vLoading = ElLoading.directive
+const vLoading = ElLoading.directive;
 
 const route = useRoute();
 const switchValue = ref(true);
 const showModal = ref(false);
-const loading = ref(false)
+const loading = ref(false);
+const listLoading = ref(false);
+const bindLoading = ref(false);
 const multipleSelection = ref([]);
 const tableData = ref([]);
-const tableData2 = ref([
-  { productId: 13, productName: "B系列氢润女性胸部凝胶" },
-  { productId: 14, productName: "B系列氢润女性胸部凝胶" },
-  { productId: 15, productName: "B系列氢润女性胸部凝胶" },
-  { productId: 16, productName: "B系列氢润女性胸部凝胶" },
-  { productId: 17, productName: "B系列氢润女性胸部凝胶" },
-  { productId: 18, productName: "B系列氢润女性胸部凝胶" },
-  { productId: 19, productName: "B系列氢润女性胸部凝胶" },
-  { productId: 20, productName: "B系列氢润女性胸部凝胶" },
-]);
+const tableData2 = ref([]);
+const myTable = ref()
+const dateRef = ref(Date.now())
 
 const props = defineProps({
   data: {
@@ -168,28 +191,43 @@ const props = defineProps({
 
 const tags = computed(() => {
   return multipleSelection.value.map((v) => ({ name: v.productName }));
-})
+});
 
 const currentPage = ref(1);
 const pageSize = ref(10);
 const total = ref(50);
+const currentPage2 = ref(1);
+const pageSize2 = ref(10);
+const total2 = ref(50);
+// 记录原始值
+let originList = ''
 
 const fetchProductList = (params) => {
-  getProductList(params).then((res) => {
-    const {  pageList } = res || {}
-    tableData.value = pageList;
-  });
+  listLoading.value = true;
+  deviceTypeProductList(params)
+    .then((res) => {
+      const { totalCount, pageList } = res || {};
+      tableData.value = pageList;
+      total2.value = totalCount;
+    })
+    .finally(() => {
+      listLoading.value = false;
+    });
 };
 
-const fetchProductList2 = (params) => {
-  loading.value = true
-  getProductList(params).then((res) => {
-    const {  totalCount, pageList } = res || {}
-    tableData2.value = pageList;
-    total.value = totalCount
-  }).finally(() => {
-    loading.value = false
-  });
+const fetchProductList2 = (params, cb) => {
+  loading.value = true;
+  getProductList(params)
+    .then((res) => {
+      const { totalCount, pageList } = res || {};
+      tableData2.value = pageList;
+      originList = JSON.stringify(pageList)
+      cb && cb(pageList);
+      total.value = totalCount;
+    })
+    .finally(() => {
+      loading.value = false;
+    });
 };
 
 onMounted(() => {
@@ -198,40 +236,117 @@ onMounted(() => {
   }
 });
 
-const handleChange = () => {
-  fetchProductList2({ });
+const handleBlur = row => {
+  const jsonList = JSON.parse(originList)
+  const result = jsonList.find(v => v.productId === row.productId)
+  if (result.theoryDuration !== row.theoryDuration) {
+    editProduct(row).then(() => {
+      ElMessage.success('操作成功！')
+      fetchProductList2({});
+    })
+  }
 };
+
+const handleChange = (val, row) => {
+  row.theoryDuration = Number(val)
+  dateRef.value = Date.now()
+};
+
 const handleSelectionChange = (val) => {
   multipleSelection.value = val;
 };
 
 const handleShowModal = () => {
-  showModal.value = true
-  fetchProductList2({ });
-}
+  showModal.value = true;
+  fetchProductList2({}, (dataList) => {
+    const idList = dataList.map((item) =>
+      item.deviceTypeProducts.map((v) => v.deviceTypeId)
+    );
+    const indexList = idList
+      .map((ids, i) => {
+        if (ids.includes(route.params.id)) {
+          return i;
+        }
+      })
+      .filter((v) => v !== undefined);
+    nextTick(() => {
+      indexList.forEach(i => {
+        // myTable.value.clearSelection()
+        myTable.value.toggleRowSelection(dataList[i], true);
+      })
+    });
+  });
+};
 
-const handleSizeChange = size => {
-  currentPage.value = 1
-  pageSize.value = size
-  fetchProductList2({ currentPage: 1, pageSize: size })
-}
-const handleCurrentChange = page => {
-  currentPage.value = page
-  fetchProductList2({ currentPage: page, pageSize: pageSize.value })
-}
+const handleSizeChange = (type, size) => {
+  if (type === "modal") {
+    currentPage.value = 1;
+    pageSize.value = size;
+    fetchProductList2({ currentPage: 1, pageSize: size });
+  } else {
+    currentPage2.value = 1;
+    pageSize2.value = size;
+    fetchProductList({
+      currentPage: 1,
+      pageSize: size,
+      deviceTypeId: route.params.id,
+    });
+  }
+};
+const handleCurrentChange = (type, page) => {
+  if (type === "modal") {
+    currentPage.value = page;
+    fetchProductList2({ currentPage: page, pageSize: pageSize.value });
+  } else {
+    currentPage2.value = page;
+    fetchProductList({
+      currentPage: page,
+      pageSize: pageSize.value,
+      deviceTypeId: route.params.id,
+    });
+  }
+};
+
+const handleBindProduct = () => {
+  bindLoading.value = true;
+  const list = multipleSelection.value.map((item) => {
+    item.deviceTypeId = route.params.id;
+    return item;
+  });
+  // 绑定产品
+  deviceTypeBindProduct(list)
+    .then(() => {
+      ElMessage.success('操作成功！')
+      showModal.value = false;
+      if (route.params.id) {
+        fetchProductList({ deviceTypeId: route.params.id });
+      }
+    })
+    .finally(() => {
+      bindLoading.value = false;
+    });
+};
 
 const getSwitchValue = () => switchValue.value;
 
 const deleteRow = (row) => {
   console.log(row);
-  ElMessageBox.confirm("此操作将永久删除该项，是否继续？", "提示", {
+  ElMessageBox.confirm("确定解绑该产品吗？", "提示", {
     cancelButtonText: "取消",
     confirmButtonText: "确定",
     draggable: true,
     type: "warning",
   }).then(
     () => {
-      // 删除操作
+      // 解绑操作
+      unBindDeviceTypeProduct({
+        deviceTypeProductId: row.deviceTypeProductId,
+      }).then(() => {
+        ElMessage.success('操作成功！')
+        if (route.params.id) {
+          fetchProductList({ deviceTypeId: route.params.id });
+        }
+      });
     },
     () => {}
   );
@@ -253,12 +368,17 @@ defineExpose({ getSwitchValue });
   }
 
   .content-box {
+    overflow: hidden;
     .table-class {
       margin-top: 16px;
 
       :deep(th.el-table__cell) {
         background-color: #fafafa;
       }
+    }
+
+    .class-pagination2 {
+      float: right;
     }
   }
 }

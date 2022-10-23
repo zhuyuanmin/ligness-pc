@@ -29,40 +29,7 @@ const vLoading = ElLoading.directive
 
 const loading = ref(false)
 
-const tableData = ref([
-  {
-    deviceTypeName: "欧洲之星:时尚塑形大师",
-    deviceTypeId: "68",
-    deviceCount: 101,
-    online: 0,
-    offline: 101,
-    fault: 0,
-  },
-  {
-    deviceTypeName: "欧洲之星:生命能量抗衰雕塑大师",
-    deviceTypeId: "69",
-    deviceCount: 52,
-    online: 1,
-    offline: 51,
-    fault: 0,
-  },
-  {
-    deviceTypeName: "欧洲之星:生命能量抗衰雕塑大师plus",
-    deviceTypeId: "80",
-    deviceCount: 29,
-    online: 1,
-    offline: 28,
-    fault: 0,
-  },
-  {
-    deviceTypeName: "MEI XIU SI",
-    deviceTypeId: "81",
-    deviceCount: 0,
-    online: 0,
-    offline: 0,
-    fault: 0,
-  },
-]);
+const tableData = ref([]);
 
 const getSummaryFn = (param) => {
   const { columns, data } = param

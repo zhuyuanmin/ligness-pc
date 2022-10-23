@@ -13,6 +13,10 @@ const deviceType = {
   edit: baseUrl + "/devicetype/updateByPrimaryKeySelective", // 编辑设备型号
   delete: baseUrl + "/devicetype/deleteByPrimaryKey", // 删除设备型号
   view: baseUrl + "/devicetype/selectByPrimaryKey", // 查看设备型号
+
+  bindProductList: baseUrl + "/devicetypeproduct/selectByProductInfoPage", // 查询设备型号下的产品列表
+  unBindProduct: baseUrl + "/devicetypeproduct/deleteByPrimaryKey", // 解绑设备型号下的产品
+  bindProduct: baseUrl + "/devicetypeproduct/batchBind", // 设备型号批量绑定产品
 };
 
 // 2. 设备管理
