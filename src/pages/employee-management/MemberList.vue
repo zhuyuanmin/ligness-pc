@@ -294,6 +294,7 @@ const dialogFields2List = [
     field: "staffImg",
     initValue: [],
     limit: 1,
+    accept: 'image/*',
     data: { attachmentBizTypeEnum: 'STAFF_CATEGORY' },
     action: api.upload,
   },

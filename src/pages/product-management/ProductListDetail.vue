@@ -113,6 +113,7 @@ const searchFields = ref([
     label: "图片",
     initValue: [],
     limit: 1,
+    accept: 'image/*',
     action: apis.upload,
     data: {
       attachmentBizTypeEnum: "PRODUCT_CATEGORY",

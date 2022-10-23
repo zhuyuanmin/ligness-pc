@@ -15,7 +15,7 @@
             :show-file-list="false"
             :on-success="handleAvatarSuccess"
             :before-upload="beforeAvatarUpload"
-            accept=".png"
+            accept="image/*"
             :disabled="route.query.type === 'view'"
           >
             <img v-if="imageUrl" :src="imageUrl" class="avatar" />
@@ -147,8 +147,8 @@ const handleAvatarSuccess = (response, uploadFile) => {
 };
 
 const beforeAvatarUpload = (rawFile) => {
-  if (rawFile.type !== "image/png") {
-    ElMessage.error("请上传 .png 格式的图片!");
+  if (!rawFile.type.startsWith('image/')) {
+    ElMessage.error("请上传图片!");
     return false;
   } else if (rawFile.size / 1024 / 1024 > 5) {
     ElMessage.error("图片大小不能超过 5MB!");

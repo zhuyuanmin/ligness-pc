@@ -14,7 +14,7 @@
             </div>
           </template>
           <div class="upload-box">
-            <p>请上传一张透明背景图片</p>
+            <p>请上传图片</p>
             <el-upload
               class="avatar-uploader"
               :data="{ attachmentBizTypeEnum: 'DEVICE_TYPE_CATEGORY', attachmentBizId: (route.params || {}).id }"
@@ -22,7 +22,7 @@
               :show-file-list="false"
               :on-success="handleSuccess"
               :before-upload="beforeUpload"
-              accept=".png"
+              accept="image/*"
               :disabled="route.query.type === 'view'"
             >
               <img v-if="imageUrl" :src="imageUrl" class="avatar" />
@@ -168,8 +168,8 @@ const handleSuccess = (response, uploadFile) => {
 };
 
 const beforeUpload = (rawFile) => {
-  if (rawFile.type !== "image/png") {
-    ElMessage.error("请上传 .png 格式的图片!");
+  if (!rawFile.type.startsWith('image/')) {
+    ElMessage.error("请上传图片!");
     return false;
   } else if (rawFile.size / 1024 / 1024 > 5) {
     ElMessage.error("图片大小不能超过 5MB!");

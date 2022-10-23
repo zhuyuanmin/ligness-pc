@@ -94,6 +94,8 @@
           :data="item.data"
           :class="formValues[item.field].length === 1 ? 'hide-plus' : ''"
           :on-success="handleSuccess"
+          :accept="item.accept"
+          :before-upload="beforeUpload"
         >
           <el-icon><Plus /></el-icon>
         </el-upload>
@@ -245,6 +247,17 @@ const disabledDate = time => {
 const handleReview = uploadFile => {
   const { url } = uploadFile;
   window.open(url)
+};
+
+const beforeUpload = (rawFile) => {
+  if (!rawFile.type.startsWith('image/')) {
+    ElMessage.error("请上传图片!");
+    return false;
+  } else if (rawFile.size / 1024 / 1024 > 5) {
+    ElMessage.error("图片大小不能超过 5MB!");
+    return false;
+  }
+  return true;
 };
 
 const handleSuccess = response => {
