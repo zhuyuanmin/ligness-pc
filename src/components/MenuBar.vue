@@ -79,6 +79,7 @@ const userInfo = ref({})
 
 const handleLogout = () => {
   // 清理 token 信息
+  window.localStorage.removeItem('userInfo')
   router.replace('/login')
 }
 

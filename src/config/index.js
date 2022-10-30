@@ -38,6 +38,7 @@ service.interceptors.response.use(
     if (config.data.code !== 200) {
       ElMessage.error(config.data.msg)
       if (config.data.code === 401) {
+        window.localStorage.removeItem('userInfo')
         if (window.location.pathname !== '/login') {
           window.location.replace('/login')
         }

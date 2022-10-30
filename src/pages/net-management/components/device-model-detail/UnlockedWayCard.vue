@@ -71,16 +71,6 @@
             clearable
           />
         </div>
-        <div class="select-list-block">
-          <el-tag
-            v-for="tag in tags"
-            :key="tag.name"
-            class="tag-class"
-            closable
-          >
-            {{ tag.name }}
-          </el-tag>
-        </div>
         <el-table
           :data="tableData2"
           max-height="400"
@@ -187,10 +177,6 @@ const props = defineProps({
     type: Object,
     default: {},
   },
-});
-
-const tags = computed(() => {
-  return multipleSelection.value.map((v) => ({ name: v.productName }));
 });
 
 const currentPage = ref(1);
