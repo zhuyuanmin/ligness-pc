@@ -119,8 +119,6 @@ const saveFormData = () => {
   // 保存数据
   if (!ruleFormRef.value) return
   ruleFormRef.value.validFields().then(values => {
-    console.log(values)
-
     if (route.params?.id) {
       editBrand({ ...values, brandId: route.params?.id }).then(res => {
         ElMessage.success('保存成功！')

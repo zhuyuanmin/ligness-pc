@@ -291,9 +291,7 @@ const saveFormData = () => {
   if (!ruleFormRef.value) return
   if (!ruleFormRef2.value) return
   ruleFormRef.value.validFields().then(values => {
-    console.log(values)
     ruleFormRef2.value.validFields().then(result => {
-      console.log(result)
       const { customArea, ...rest } = result
 
       if (route.params?.id) {

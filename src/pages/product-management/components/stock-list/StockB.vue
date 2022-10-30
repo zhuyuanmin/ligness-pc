@@ -209,7 +209,7 @@ const searchFields = reactive([
   {
     type: "date-range",
     label: "入库时间",
-    field: "operateTime",
+    field: "createTime",
   },
   {
     type: "btnList",
@@ -218,11 +218,19 @@ const searchFields = reactive([
         text: "查询",
         type: "submit",
         onClick: (values) => {
-          console.log(values);
           currentPage.value = 1;
+          const { createTime, ...rest } = values
+          let obj = {}
+          if (createTime) {
+            obj = {
+              startTime: dayjs(createTime[0]).valueOf(),
+              endTime: dayjs(createTime[1]).valueOf()
+            }
+          }
           fetchListData({
-            ...values,
+            ...rest,
             currentPage: 1,
+            ...obj,
             pageSize: pageSize.value,
           });
         },
@@ -388,7 +396,6 @@ const handBindStore = (row) => {
 };
 
 const getStoreList = (values) => {
-  console.log(values);
   // 绑定门店
   updateProductBatchBox({ boxId: batchBoxRow.value.boxId, storeId: values[0].storeId }).then(() => {
     ElMessage.success("操作成功！");

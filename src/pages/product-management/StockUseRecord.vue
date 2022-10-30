@@ -43,6 +43,7 @@ import ModalSelect from "../net-management/components/device-list/ModalSelect.vu
 import { ElTable, ElTableColumn, ElButton, ElPagination, ElMessageBox, ElMessage, ElLoading } from 'element-plus'
 import { ref, reactive, watch, onMounted } from "vue";
 import { useRouter } from 'vue-router'
+import dayjs from 'dayjs'
 import { consumeProduct } from './request/product'
 
 const vLoading = ElLoading.directive
@@ -88,7 +89,7 @@ const searchFields = reactive([
     type: "input",
     label: "设备编号",
     placeholder: '请输入设备编号',
-    field: "deviceNo",
+    field: "deviceId",
   },
   {
     type: "select-custom",
@@ -101,9 +102,17 @@ const searchFields = reactive([
     type: "btnList",
     children: [
       { text: "查询", type: "submit", onClick: values => {
-        console.log(values)
         currentPage.value = 1
-        fetchListData({ ...values, storeId: values.storeId?.[0]?.value, currentPage: 1, pageSize: pageSize.value })
+        const { consumeTime, ...rest } = values
+        let obj = {}
+        if (consumeTime) {
+          obj = {
+            startTime: dayjs(consumeTime[0]).valueOf(),
+            endTime: dayjs(consumeTime[1]).valueOf()
+          }
+        }
+
+        fetchListData({ ...rest, ...obj, storeId: values.storeId?.[0]?.value, currentPage: 1, pageSize: pageSize.value })
       } },
       { text: "重置", type: "reset", onClick: () => {
         currentPage.value = 1

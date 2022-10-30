@@ -50,7 +50,7 @@ const searchFields = reactive([
     type: "input",
     label: "产品名称",
     placeholder: '产品名称/产品编码/简称',
-    field: "productName",
+    field: "keyword",
   },
   {
     type: "select",
@@ -67,7 +67,6 @@ const searchFields = reactive([
     type: "btnList",
     children: [
       { text: "查询", type: "submit", onClick: values => {
-        console.log(values)
         currentPage.value = 1
         fetchListData({ ...values, currentPage: 1, pageSize: pageSize.value })
       } },
@@ -125,7 +124,6 @@ const handleCurrentChange = page => {
 }
 
 const viewRow = (row, type) => {
-  console.log(row);
   if (row) {
     router.push(`/product-management/product-list/detail/${row.productId}?type=${type}`)
   } else {
@@ -152,7 +150,6 @@ const handleStoreStatus = (row, state) => {
 }
 
 const deleteRow = row => {
-  console.log(row);
   ElMessageBox.confirm(
     '此操作将永久删除该项，是否继续？',
     '提示',

@@ -168,7 +168,7 @@ const searchFields = reactive([
     type: "input",
     label: "用户信息",
     placeholder: "用户名/手机号/姓名",
-    field: "userInfo",
+    field: "keyword",
   },
   {
     type: "btnList",
@@ -426,7 +426,6 @@ const deleteRow = row => {
 const handleSubmit = () => {
   if (!dialogRef.value) return
   dialogRef.value.validFields().then(values => {
-    console.log(values);
     showModal.value = false
     handleUpdateStaffInfo(values)
   })
@@ -435,7 +434,6 @@ const handleSubmit = () => {
 const handleSubmitInfo = () => {
   if (!dialogRef2.value) return
   dialogRef2.value.validFields().then(values => {
-    console.log(values);
     showUserInfoModal.value = false
     handleUpdateStaffInfo({ ...values })
   })

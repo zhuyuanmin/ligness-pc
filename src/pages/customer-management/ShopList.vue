@@ -155,7 +155,7 @@ const searchFields = reactive([
     type: "input",
     label: "账号/手机号",
     placeholder: "请输入账号/手机号",
-    field: "customAccount",
+    field: "keyword",
   },
   {
     type: "btnList",
@@ -164,7 +164,6 @@ const searchFields = reactive([
         text: "查询",
         type: "submit",
         onClick: (values) => {
-          console.log(values);
           currentPage.value = 1
           fetchListData({ ...values, currentPage: 1, pageSize: pageSize.value })
         },
@@ -281,7 +280,6 @@ const handleCurrentChange = (page) => {
 };
 
 const viewRow = (row, type) => {
-  console.log(row);
   if (row) {
     router.push(`/customer-management/shop-list/detail/${row.storeId}?type=${type}`);
   } else {
@@ -292,7 +290,6 @@ const viewRow = (row, type) => {
 const handleSubmit = () => {
   if (!dialogRef.value) return
   dialogRef.value.validFields().then(values => {
-    console.log(values);
     showModal.value = false
 
     handleUpdateShopInfo(values)
@@ -308,7 +305,6 @@ const handleModifyPassword = row => {
 };
 
 const handleUnBindPhone = row => {
-  console.log(row);
   ElMessageBox.confirm(
     '解绑后将无法使用手机号登录，确认解绑？',
     '提示',

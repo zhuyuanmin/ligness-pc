@@ -172,7 +172,6 @@ const rules = reactive({
 onMounted(() => {
   if (route.params.id) {
     viewDevice({ deviceId: route.params.id }).then((res) => {
-      console.log(res);
       const { storeId, customName, ...rest } = res
       formValues.value = { ...rest, storeId: [{ label: customName, value: storeId }] };
     });
@@ -199,7 +198,6 @@ const showStoreModal = () => {
 };
 
 const getStoreList = (list) => {
-  console.log(list);
   const result = list.map((item) => {
     const { storeId: value, storeName: label } = item;
     return { label, value };
@@ -212,7 +210,6 @@ const saveFormData = () => {
   if (!ruleFormRef.value) return;
   ruleFormRef.value.validate((valid) => {
     if (valid) {
-      console.log(formValues.value);
       const { storeId } = formValues.value
 
       if (route.params.id) {

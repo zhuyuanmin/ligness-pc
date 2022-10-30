@@ -59,7 +59,7 @@ const searchFields = reactive([
   {
     type: "input",
     label: "设备编号",
-    field: "deviceNo",
+    field: "deviceId",
   },
   {
     type: "select",
@@ -78,7 +78,6 @@ const searchFields = reactive([
     type: "btnList",
     children: [
       { text: "查询", type: "submit", onClick: values => {
-        console.log(values)
         currentPage.value = 1
         fetchListData({ ...values, storeId: values.storeId?.[0]?.value, currentPage: 1, pageSize: pageSize.value })
       } },

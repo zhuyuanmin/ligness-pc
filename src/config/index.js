@@ -1,9 +1,6 @@
 import axios from 'axios'
 import { ElMessageBox, ElMessage } from 'element-plus'
 
-const userInfo = window.localStorage.getItem('userInfo')
-const { token } = userInfo ? JSON.parse(userInfo) : {}
-
 const service = axios.create({
   baseURL: '/',
   timeout: 10000,
@@ -11,6 +8,9 @@ const service = axios.create({
 
 service.interceptors.request.use(
   function (config) {
+    const userInfo = window.localStorage.getItem('userInfo')
+    const { token } = userInfo ? JSON.parse(userInfo) : {}
+
     config.headers = {
       ...config.headers,
       endType: 0,

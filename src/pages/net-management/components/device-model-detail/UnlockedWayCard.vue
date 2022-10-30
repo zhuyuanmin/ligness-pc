@@ -69,6 +69,7 @@
             v-model="inputValue"
             placeholder="请输入关键词回车搜索"
             clearable
+            @keydown.enter="handleSearch"
           />
         </div>
         <el-table
@@ -166,6 +167,7 @@ const showModal = ref(false);
 const loading = ref(false);
 const listLoading = ref(false);
 const bindLoading = ref(false);
+const inputValue = ref('')
 const multipleSelection = ref([]);
 const tableData = ref([]);
 const tableData2 = ref([]);
@@ -187,6 +189,10 @@ const pageSize2 = ref(10);
 const total2 = ref(50);
 // 记录原始值
 let originList = ''
+
+const handleSearch = () => {
+  fetchProductList2({ keyword: inputValue.value })
+}
 
 const fetchProductList = (params) => {
   listLoading.value = true;
@@ -316,7 +322,6 @@ const handleBindProduct = () => {
 const getSwitchValue = () => switchValue.value;
 
 const deleteRow = (row) => {
-  console.log(row);
   ElMessageBox.confirm("确定解绑该产品吗？", "提示", {
     cancelButtonText: "取消",
     confirmButtonText: "确定",

@@ -35,7 +35,6 @@ const mapName = reactive({
 onMounted(() => {
   if (route.params.id) {
     viewDeviceType({ deviceTypeId: route.params.id }).then(res => {
-      console.log(res)
       deviceTypeData.value = res
     })
   }
@@ -45,7 +44,6 @@ const saveFormData = () => {
   // 保存数据
   if (!basicRef.value && !unlockRef.value) return
   basicRef.value.getSearchFormValue().then(values => {
-    console.log('values', values)
 
     const switchValue = unlockRef.value.getSwitchValue()
 

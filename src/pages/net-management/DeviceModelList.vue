@@ -62,7 +62,6 @@ const searchFields = reactive([
     type: "btnList",
     children: [
       { text: "查询", type: "submit", onClick: values => {
-        console.log(values)
         currentPage.value = 1
         fetchListData({ ...values, currentPage: 1, pageSize: pageSize.value })
       } },
@@ -128,7 +127,6 @@ const viewRow = (row, type) => {
 }
 
 const deleteRow = row => {
-  console.log(row);
   ElMessageBox.confirm(
     '此操作将永久删除该项，是否继续？',
     '提示',
@@ -149,7 +147,6 @@ const deleteRow = row => {
         type: 'info',
       }
     ).then(({ value }) =>  {
-      console.log(value);
       if (value === '@ligness@#?!8888') {
         deleteDeviceType({ deviceTypeId: row.deviceTypeId }).then(() => {
           ElMessage.success('操作成功！')

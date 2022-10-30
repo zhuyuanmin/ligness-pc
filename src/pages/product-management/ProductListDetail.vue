@@ -126,8 +126,6 @@ const searchFields = ref([
 onMounted(() => {
   if (route.params.id) {
     viewProduct({ productId: route.params.id }).then((res) => {
-      console.log(res);
-
       searchFields.value.forEach(v => {
         if (res[v.field]) {
           v.initValue = res[v.field]
@@ -162,7 +160,6 @@ const saveFormData = () => {
   // 保存数据
   if (!ruleFormRef.value) return;
   ruleFormRef.value.validFields().then((values) => {
-    console.log(values);
     const { productImg, ...rest } = values;
 
     if (route.params.id) {

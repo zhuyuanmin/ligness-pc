@@ -115,7 +115,6 @@ const searchFields = reactive([
         text: "查询",
         type: "submit",
         onClick: (values) => {
-          console.log(values);
           currentPage.value = 1;
           fetchListData({
             ...values,
@@ -206,7 +205,6 @@ const handleShowModal = (row) => {
 const handleSubmit = () => {
   if (!dialogRef.value) return;
   dialogRef.value.validFields().then((values) => {
-    console.log(values);
     showModal.value = false;
     entryProductStore({
       productId: currentRow.value.productId,

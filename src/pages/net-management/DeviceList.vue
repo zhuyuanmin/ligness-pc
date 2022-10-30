@@ -97,7 +97,6 @@ const searchFields = reactive([
     type: "btnList",
     children: [
       { text: "查询", type: "submit", onClick: values => {
-        console.log(values)
         currentPage.value = 1
         fetchListData({ ...values, storeId: values.storeId?.[0]?.value, currentPage: 1, pageSize: pageSize.value })
       } },
@@ -192,7 +191,6 @@ const getStoreList = list => {
 }
 
 const viewRow = (row, type) => {
-  console.log(row);
   if (row) {
     router.push(`/net-management/device-list/detail/${row.deviceId}?type=${type}`)
   } else {
@@ -201,7 +199,6 @@ const viewRow = (row, type) => {
 }
 
 const deleteRow = row => {
-  console.log(row);
   ElMessageBox.confirm(
     '此操作将永久删除该项，是否继续？',
     '提示',
