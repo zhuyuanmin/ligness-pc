@@ -11,6 +11,9 @@ service.interceptors.request.use(
     const userInfo = window.localStorage.getItem('userInfo')
     const { token } = userInfo ? JSON.parse(userInfo) : {}
 
+    console.log('userInfo', userInfo)
+    console.log('token', token)
+
     config.headers = {
       ...config.headers,
       endType: 0,
