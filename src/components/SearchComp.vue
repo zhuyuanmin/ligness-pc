@@ -314,6 +314,9 @@ defineExpose({ validFields });
     .el-input {
       width: 190px;
     }
+    .el-input-number {
+      width: 190px;
+    }
   }
   .my-file {
     :deep(.el-form-item__content) {

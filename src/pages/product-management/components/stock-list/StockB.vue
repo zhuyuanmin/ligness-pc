@@ -359,7 +359,8 @@ const handleShowModal = (row) => {
 };
 
 const handViewQRCode = (row) => {
-  QRCode.toDataURL(row.boxNo, { errorCorrectionLevel: "H" })
+  const enCode = window.btoa(`${row.duration || ''}@${row.boxNo}@${row.boxAvailableTimes || ''}`)
+  QRCode.toDataURL(enCode, { errorCorrectionLevel: "H" })
     .then((url) => {
       ElMessageBox({
         title: "查看二维码",

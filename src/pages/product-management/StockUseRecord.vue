@@ -168,7 +168,7 @@ const handleCurrentChange = page => {
 
 const viewRow = (row, type) => {
   if (row) {
-    router.push(`/product-management/stock-use-record/detail/${row.boxNo}`)
+    router.push(`/product-management/stock-use-record/detail/${row.batchId}`)
   }
 }
 

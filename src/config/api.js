@@ -43,6 +43,7 @@ const product = {
   batchBox: baseUrl + "/box/selectByConditionPage", // 查询批次下套盒列表
   updBatchBox: baseUrl + "/box/updateByPrimaryKeySelective", // 更新套盒信息
   consume: baseUrl + "/boxconsume/selectByProductInfoPage", // 套盒消耗列表
+  consumeDetail: baseUrl + "/boxconsume/selectByProductInfo", // 查询套盒消耗明细
 };
 
 // 门店管理

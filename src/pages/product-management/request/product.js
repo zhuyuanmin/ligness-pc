@@ -90,3 +90,12 @@ export const consumeProduct = async params => {
     data: params
   })
 }
+
+// 套盒消耗详情
+export const consumeProductDetail = async params => {
+  return await request({
+    url: api.product.consumeDetail,
+    method: 'post',
+    data: params
+  })
+}

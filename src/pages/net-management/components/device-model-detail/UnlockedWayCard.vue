@@ -90,14 +90,14 @@
           <el-table-column prop="productId" label="产品编码" width="200" />
           <el-table-column prop="productName" label="产品名称" />
           <el-table-column
-            prop="theoryDuration"
+            prop="duration"
             label="时长（分钟）"
             width="200"
           >
             <template #default="scope">
               <el-input
                 type="number"
-                :value="scope.row.theoryDuration"
+                :value="scope.row.duration"
                 @input="val => handleChange(val, scope.row)"
                 @blur="handleBlur(scope.row)"
               ></el-input>
@@ -231,7 +231,7 @@ onMounted(() => {
 const handleBlur = row => {
   const jsonList = JSON.parse(originList)
   const result = jsonList.find(v => v.productId === row.productId)
-  if (result.theoryDuration !== row.theoryDuration) {
+  if (result.duration !== row.duration) {
     editProduct(row).then(() => {
       ElMessage.success('操作成功！')
       fetchProductList2({});
@@ -240,7 +240,7 @@ const handleBlur = row => {
 };
 
 const handleChange = (val, row) => {
-  row.theoryDuration = Number(val)
+  row.duration = Number(val)
   dateRef.value = Date.now()
 };
 

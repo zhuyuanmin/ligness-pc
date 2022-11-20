@@ -6,26 +6,26 @@
     </div>
     <el-card class="my-card">
       <div class="box">
-        <div class="left"><img src="https://picsum.photos/300/200" alt="" srcset="" /></div>
+        <div class="left"><img :src="detailData.imgPath" alt="" srcset="" /></div>
         <div class="right">
           <table>
             <tr>
               <td class="props">商品编码：</td>
-              <td>{{'1AA9918823854A69AAFD1D4498B61DE2'}}</td>
+              <td>{{detailData.batchNo}}</td>
               <td class="props">产品编码：</td>
-              <td>{{'P14684158926720901131638932605318'}}</td>
+              <td>{{detailData.productNum}}</td>
             </tr>
             <tr>
               <td class="props">产品名称：</td>
-              <td>{{'D系列氢润妍体亮肤按摩霜'}}</td>
+              <td>{{detailData.productName}}</td>
               <td class="props">产品品牌：</td>
-              <td>{{'ODC'}}</td>
+              <td>{{detailData.brandName}}</td>
             </tr>
             <tr>
               <td class="props">批次：</td>
-              <td>{{'B1639535834806'}}</td>
+              <td>{{detailData.batchNo}}</td>
               <td class="props">数字签名：</td>
-              <td>{{'01TnpnME@&az!}'}}</td>
+              <td>{{enCode}}</td>
             </tr>
           </table>
         </div>
@@ -40,7 +40,7 @@
         <el-table-column prop="createTime" label="消耗时间" />
         <el-table-column prop="deviceNo" label="操作设备" />
         <el-table-column prop="updater" label="操作人" />
-        <el-table-column prop="storeName" label="操作门店" />
+        <el-table-column prop="customName" label="操作门店" />
         <el-table-column prop="consumeRemainTimes" label="剩余次数" />
       </el-table>
     </el-card>
@@ -48,34 +48,30 @@
 </template>
 <script setup>
 import { ElButton, ElCard, ElTable, ElTableColumn } from "element-plus";
-import { ref, reactive, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 import { useRoute, useRouter } from 'vue-router'
-import { viewProduct, consumeProduct } from './request/product'
+import { consumeProductDetail } from './request/product'
 
 const router = useRouter()
 const route = useRoute()
+const detailData = ref({})
 
-const tableData = reactive([
-  {
-    createTime: "2022-08-28 02:35:51",
-    consumeRemainTimes: "4",
-    storeName: "c06998",
-    deviceNo: "odc195335374831617",
-    updater: "成小梅",
-  },
-]);
+const tableData = ref([]);
 
 onMounted(() => {
   if (route.params.id) {
-    viewProduct(route.params.id).then(res => {
-      console.log(res)
-    })
-
-    consumeProduct(route.params.id).then(res => {
-      console.log(res)
+    consumeProductDetail({ batchId: route.params.id }).then(res => {
+      detailData.value = res
+      tableData.value = res.boxConsumes
     })
   }
 })
+
+const enCode = computed(() => {
+  const { duration, boxNo, boxAvailableTimes } = detailData.value
+  return window.btoa(`${duration || ''}@${boxNo || ''}@${boxAvailableTimes || ''}`)
+})
+
 </script>
 <style lang="scss" scoped>
 .card-header {
