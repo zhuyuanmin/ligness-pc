@@ -1,5 +1,6 @@
 <template>
   <div class="container">
+    <div id="main"></div>
     <el-table
       :data="tableData"
       show-summary
@@ -23,6 +24,7 @@
 <script setup>
 import { ElTable, ElTableColumn, ElLoading } from "element-plus";
 import { ref, onMounted } from "vue";
+import * as echarts from 'echarts';
 import { getDeviceAnalysis } from './request/analysis'
 
 const vLoading = ElLoading.directive
@@ -64,17 +66,70 @@ const getSummaryFn = (param) => {
   return sums
 }
 
-const fetchListData = params => {
+const fetchListData = (params, cb) => {
   loading.value = true
   getDeviceAnalysis(params).then(res => {
     tableData.value = res || []
+    cb && cb(res || [])
   }).finally(() => {
     loading.value = false
   })
 }
 
 onMounted(() => {
-  fetchListData({})
+  fetchListData({}, list => {
+    const myChart = echarts.init(document.getElementById('main'));
+    console.log(list);
+    const deviceName = list.map(v => v.deviceTypeName)
+    const onLine = list.map(v => v.onLineDeviceCount)
+    const offLine = list.map(v => v.offLineDeviceCount)
+
+    myChart.setOption({
+      tooltip: {
+        trigger: 'axis',
+      },
+      grid: {
+        left: '3%',
+        right: '4%',
+        bottom: '3%',
+        containLabel: true
+      },
+      xAxis: [
+        {
+          type: 'category',
+          data: deviceName
+        }
+      ],
+      yAxis: [
+        {
+          type: 'value'
+        }
+      ],
+      series: [
+        {
+          name: '在线设备',
+          type: 'bar',
+          stack: 'count',
+          barWidth: 30,
+          emphasis: {
+            focus: 'series'
+          },
+          data: onLine
+        },
+        {
+          name: '离线设备',
+          type: 'bar',
+          stack: 'count',
+          barWidth: 30,
+          emphasis: {
+            focus: 'series'
+          },
+          data: offLine
+        },
+      ]
+    });
+  })
+
 })
 </script>
 <style lang="scss" scoped>
@@ -84,6 +139,11 @@ onMounted(() => {
   padding: 24px;
   box-sizing: border-box;
   overflow-y: auto;
+  #main {
+    width: 600px;
+    height: 350px;
+    margin: 0 auto;
+  }
 
   .table-class {
     margin-top: 16px;

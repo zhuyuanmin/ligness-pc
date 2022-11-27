@@ -359,7 +359,7 @@ const handleShowModal = (row) => {
 };
 
 const handViewQRCode = (row) => {
-  const enCode = window.btoa(`${row.duration || ''}@${row.boxNo}@${row.boxAvailableTimes || ''}`)
+  const enCode = window.btoa(`${currentRow.value.duration || ''}@${row.boxNo}@${row.boxAvailableTimes || ''}`)
   QRCode.toDataURL(enCode, { errorCorrectionLevel: "H" })
     .then((url) => {
       ElMessageBox({
