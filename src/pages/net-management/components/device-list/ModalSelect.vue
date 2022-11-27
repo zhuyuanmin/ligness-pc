@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    :v-model="showModal"
+    :model-value="showModal"
     title="选择门店"
     width="50%"
     custom-class="modal-class-store"
