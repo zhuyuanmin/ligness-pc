@@ -11,7 +11,7 @@
       <el-table-column prop="unlockTime" label="解锁时间" />
       <el-table-column prop="durationTime" label="使用时长/解锁时长(分钟)">
         <template #default="scope">
-          <span>{{scope.row.duration}}</span>/<span>{{scope.row.theoryDuration}}</span>
+          <span>{{scope.row.theoryDuration}}</span>/<span>{{scope.row.duration}}</span>
         </template>
       </el-table-column>
       <el-table-column prop="unlockType" label="解锁方式" width="150">
