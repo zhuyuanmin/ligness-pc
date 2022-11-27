@@ -37,19 +37,6 @@ const mapName = reactive({
 });
 
 const searchFields = ref([
-  // {
-  //   type: "select",
-  //   label: "产品性质",
-  //   field: "productType",
-  //   required: true,
-  //   rules: [
-  //     { required: true, message: '请选择产品性质', trigger: ['blur', 'change'] },
-  //   ],
-  //   optionList: [
-  //     { label: "卖品", value: "1" },
-  //     { label: "非卖品", value: "2" },
-  //   ],
-  // },
   {
     type: "select",
     label: "产品类型",
