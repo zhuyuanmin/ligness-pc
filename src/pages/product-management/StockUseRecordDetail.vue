@@ -11,7 +11,7 @@
           <table>
             <tr>
               <td class="props">商品编码：</td>
-              <td>{{detailData.batchNo}}</td>
+              <td>{{detailData.boxNo}}</td>
               <td class="props">产品编码：</td>
               <td>{{detailData.productNum}}</td>
             </tr>
@@ -37,7 +37,11 @@
       </template>
       <el-table :data="tableData" max-height="400" class="table-class">
         <el-table-column type="index" label="序号" width="100" />
-        <el-table-column prop="createTime" label="消耗时间" />
+        <el-table-column prop="createTime" label="消耗时间">
+          <template #default="scope">
+            <span>{{scope.row.createTime && dayjs(scope.row.createTime).format('YYYY-MM-DD HH:mm:ss')}}</span>
+          </template>
+        </el-table-column>
         <el-table-column prop="deviceNo" label="操作设备" />
         <el-table-column prop="updater" label="操作人" />
         <el-table-column prop="customName" label="操作门店" />
@@ -50,6 +54,7 @@
 import { ElButton, ElCard, ElTable, ElTableColumn } from "element-plus";
 import { ref, onMounted, computed } from "vue";
 import { useRoute, useRouter } from 'vue-router'
+import dayjs from 'dayjs'
 import { consumeProductDetail } from './request/product'
 
 const router = useRouter()
