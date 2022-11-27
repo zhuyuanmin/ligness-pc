@@ -23,7 +23,7 @@
 </template>
 <script setup>
 import { ElTable, ElTableColumn, ElLoading } from "element-plus";
-import { ref, onMounted } from "vue";
+import { ref, onMounted, nextTick } from "vue";
 import * as echarts from 'echarts';
 import { getDeviceAnalysis } from './request/analysis'
 
@@ -69,6 +69,7 @@ const getSummaryFn = (param) => {
 const fetchListData = (params, cb) => {
   loading.value = true
   getDeviceAnalysis(params).then(res => {
+    console.log(res)
     tableData.value = res || []
     cb && cb(res || [])
   }).finally(() => {
@@ -78,57 +79,62 @@ const fetchListData = (params, cb) => {
 
 onMounted(() => {
   fetchListData({}, list => {
-    const myChart = echarts.init(document.getElementById('main'));
-    const deviceName = list.map(v => v.deviceTypeName)
-    const onLine = list.map(v => v.onLineDeviceCount)
-    const offLine = list.map(v => v.offLineDeviceCount)
+    nextTick(() => {
+      const myChart = echarts.init(document.getElementById('main'));
+      const deviceName = list.map(v => v.deviceTypeName)
+      const onLine = list.map(v => v.onLineDeviceCount)
+      const offLine = list.map(v => v.offLineDeviceCount)
 
-    myChart.setOption({
-      tooltip: {
-        trigger: 'axis',
-      },
-      grid: {
-        left: '3%',
-        right: '4%',
-        bottom: '3%',
-        containLabel: true
-      },
-      xAxis: [
-        {
-          type: 'category',
-          data: deviceName
-        }
-      ],
-      yAxis: [
-        {
-          type: 'value'
-        }
-      ],
-      series: [
-        {
-          name: '在线设备',
-          type: 'bar',
-          stack: 'count',
-          barWidth: 30,
-          emphasis: {
-            focus: 'series'
-          },
-          data: onLine
+      myChart.setOption({
+        title: {
+          text: '设备分析',
+          left: 'center',
         },
-        {
-          name: '离线设备',
-          type: 'bar',
-          stack: 'count',
-          barWidth: 30,
-          emphasis: {
-            focus: 'series'
-          },
-          data: offLine
+        tooltip: {
+          trigger: 'axis',
         },
-      ]
-    });
+        grid: {
+          left: '3%',
+          right: '4%',
+          bottom: '3%',
+          containLabel: true
+        },
+        xAxis: [
+          {
+            type: 'category',
+            data: deviceName
+          }
+        ],
+        yAxis: [
+          {
+            type: 'value'
+          }
+        ],
+        series: [
+          {
+            name: '在线设备',
+            type: 'bar',
+            stack: 'count',
+            barWidth: 30,
+            emphasis: {
+              focus: 'series'
+            },
+            data: onLine
+          },
+          {
+            name: '离线设备',
+            type: 'bar',
+            stack: 'count',
+            barWidth: 30,
+            emphasis: {
+              focus: 'series'
+            },
+            data: offLine
+          },
+        ]
+      });
+    })
   })
-
 })
 </script>
 <style lang="scss" scoped>
