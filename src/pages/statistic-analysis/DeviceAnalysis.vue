@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <div id="main"></div>
+    <div v-if="tableData.length > 0" id="main"></div>
     <el-table
       :data="tableData"
       show-summary
@@ -79,7 +79,6 @@ const fetchListData = (params, cb) => {
 onMounted(() => {
   fetchListData({}, list => {
     const myChart = echarts.init(document.getElementById('main'));
-    console.log(list);
     const deviceName = list.map(v => v.deviceTypeName)
     const onLine = list.map(v => v.onLineDeviceCount)
     const offLine = list.map(v => v.offLineDeviceCount)
