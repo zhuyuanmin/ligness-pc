@@ -43,7 +43,7 @@
           </template>
         </el-table-column>
         <el-table-column prop="deviceNo" label="操作设备" />
-        <el-table-column prop="updater" label="操作人" />
+        <el-table-column prop="updator" label="操作人" />
         <el-table-column prop="customName" label="操作门店" />
         <el-table-column prop="consumeRemainTimes" label="剩余次数" />
       </el-table>
@@ -104,6 +104,9 @@ const enCode = computed(() => {
   display: flex;
   .left {
     width: 300px;
+    img {
+      width: 100%;
+    }
   }
   .right {
     flex: 1;

@@ -97,8 +97,7 @@
             <template #default="scope">
               <el-input
                 type="number"
-                :value="scope.row.duration"
-                @input="val => handleChange(val, scope.row)"
+                v-model="scope.row.duration"
                 @blur="handleBlur(scope.row)"
               ></el-input>
             </template>
@@ -172,7 +171,6 @@ const multipleSelection = ref([]);
 const tableData = ref([]);
 const tableData2 = ref([]);
 const myTable = ref()
-const dateRef = ref(Date.now())
 
 const props = defineProps({
   data: {
@@ -237,11 +235,6 @@ const handleBlur = row => {
       fetchProductList2({});
     })
   }
-};
-
-const handleChange = (val, row) => {
-  row.duration = Number(val)
-  dateRef.value = Date.now()
 };
 
 const handleSelectionChange = (val) => {

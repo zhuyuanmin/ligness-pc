@@ -69,7 +69,6 @@ const getSummaryFn = (param) => {
 const fetchListData = (params, cb) => {
   loading.value = true
   getDeviceAnalysis(params).then(res => {
-    console.log(res)
     tableData.value = res || []
     cb && cb(res || [])
   }).finally(() => {
