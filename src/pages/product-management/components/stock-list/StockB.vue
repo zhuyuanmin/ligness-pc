@@ -88,7 +88,7 @@
             >/<span>{{ scope.row.boxAvailableTimes }}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="storeName" label="门店">
+        <el-table-column prop="customName" label="门店">
           <template #default="scope">
             {{ scope.row.customName }}
             <el-button

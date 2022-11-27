@@ -14,7 +14,7 @@
         <el-table-column prop="createTime" label="消耗时间" />
         <!-- <el-table-column prop="totalNumber" label="使用次数" /> -->
         <el-table-column prop="consumeRemainTimes" label="剩余次数" />
-        <el-table-column prop="storeName" label="消耗门店" />
+        <el-table-column prop="customName" label="消耗门店" />
         <el-table-column prop="deviceNo" label="设备编号" />
         <el-table-column prop="updater" label="操作人" />
         <el-table-column fixed="right" label="操作" width="100">

@@ -4,10 +4,10 @@
     <ModalSelect v-model:showModal="showModal" :getStoreList="getStoreList" :value="selectValue" />
 
     <el-table :data="tableData" max-height="400" class="table-class" v-loading="loading">
-      <el-table-column prop="deviceOrderNo" label="序号" width="100" />
+      <el-table-column type="index" label="序号" width="100" />
       <el-table-column prop="deviceTypeName" label="设备型号" />
       <el-table-column prop="deviceNo" label="设备编号" />
-      <el-table-column prop="storeName" label="绑定门店" />
+      <el-table-column prop="customName" label="绑定门店" />
       <el-table-column prop="unlockTime" label="解锁时间" />
       <el-table-column prop="durationTime" label="使用时长/解锁时长(分钟)">
         <template #default="scope">
