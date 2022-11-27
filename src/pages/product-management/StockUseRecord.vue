@@ -11,7 +11,11 @@
         <el-table-column prop="productNum" label="产品编码" />
         <el-table-column prop="brandName" label="品牌" />
         <el-table-column prop="batchNo" label="批次" />
-        <el-table-column prop="createTime" label="消耗时间" />
+        <el-table-column prop="createTime" label="消耗时间">
+          <template #default="scope">
+            <span>{{scope.row.createTime && dayjs(scope.row.createTime).format('YYYY-MM-DD HH:mm:ss')}}</span>
+          </template>
+        </el-table-column>
         <!-- <el-table-column prop="totalNumber" label="使用次数" /> -->
         <el-table-column prop="consumeRemainTimes" label="剩余次数" />
         <el-table-column prop="customName" label="消耗门店" />
@@ -107,8 +111,8 @@ const searchFields = reactive([
         let obj = {}
         if (consumeTime) {
           obj = {
-            startTime: dayjs(consumeTime[0]).valueOf(),
-            endTime: dayjs(consumeTime[1]).valueOf()
+            startTime: dayjs(consumeTime[0]).startOf('day').format('YYYY-MM-DD HH:mm:ss'),
+            endTime: dayjs(consumeTime[1]).endOf('day').format('YYYY-MM-DD HH:mm:ss')
           }
         }
 

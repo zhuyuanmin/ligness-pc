@@ -8,7 +8,11 @@
       <el-table-column prop="deviceTypeName" label="设备型号" />
       <el-table-column prop="deviceNo" label="设备编号" />
       <el-table-column prop="customName" label="绑定门店" />
-      <el-table-column prop="unlockTime" label="解锁时间" />
+      <el-table-column prop="unlockTime" label="解锁时间">
+        <template #default="scope">
+          <span>{{scope.row.unlockTime && dayjs(scope.row.unlockTime).format('YYYY-MM-DD HH:mm:ss')}}</span>
+        </template>
+      </el-table-column>
       <el-table-column prop="durationTime" label="使用时长/解锁时长(分钟)">
         <template #default="scope">
           <span>{{scope.row.theoryDuration}}</span>/<span>{{scope.row.duration}}</span>
@@ -38,6 +42,7 @@ import ModalSelect from "./components/device-list/ModalSelect.vue";
 import { ElTable, ElTableColumn, ElButton, ElPagination, ElMessage, ElLoading } from 'element-plus'
 import { ref, reactive, watch, onMounted } from "vue";
 import { useRouter } from 'vue-router'
+import dayjs from 'dayjs'
 import { usageDevice } from './request/device'
 import useDeviceTypeStore from '@/store/deviceTypeStore'
 

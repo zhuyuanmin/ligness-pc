@@ -13,11 +13,11 @@
     <el-table-column prop="batchNo" label="批次" />
     <el-table-column prop="brandName" label="所属品牌" />
     <el-table-column prop="batchInventory" label="产品数量" />
-    <el-table-column prop="createTime" label="入库时间">
+    <el-table-column prop="updateTime" label="入库时间">
       <template #default="scope">
         <span>{{
-          scope.row.createTime &&
-          dayjs(scope.row.createTime).format("YYYY-MM-DD HH:mm:ss")
+          scope.row.updateTime &&
+          dayjs(scope.row.updateTime).format("YYYY-MM-DD HH:mm:ss")
         }}</span>
       </template>
     </el-table-column>
@@ -223,8 +223,8 @@ const searchFields = reactive([
           let obj = {}
           if (createTime) {
             obj = {
-              startTime: dayjs(createTime[0]).valueOf(),
-              endTime: dayjs(createTime[1]).valueOf()
+              startTime: dayjs(createTime[0]).startOf('day').format('YYYY-MM-DD HH:mm:ss'),
+              endTime: dayjs(createTime[1]).endOf('day').format('YYYY-MM-DD HH:mm:ss')
             }
           }
           fetchListData({

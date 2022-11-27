@@ -113,7 +113,7 @@
           <el-form-item label="所属品牌">{{ brandName }}</el-form-item>
           <el-form-item label="出厂时间">{{formValues.createTime && dayjs(formValues.createTime).format('YYYY-MM-DD HH:mm:ss')}}</el-form-item>
           <el-form-item label="激活时间">{{formValues.unlockTime && dayjs(formValues.unlockTime).format('YYYY-MM-DD HH:mm:ss')}}</el-form-item>
-          <el-form-item label="下线时间">{{formValues.closeLockTime && dayjs(formValues.closeLockTime).format('YYYY-MM-DD HH:mm:ss')}}</el-form-item>
+          <el-form-item label="下线时间">{{formValues.updateTime && dayjs(formValues.updateTime).format('YYYY-MM-DD HH:mm:ss')}}</el-form-item>
         </el-form>
       </template>
     </el-card>

@@ -23,9 +23,9 @@
             <span>{{scope.row.createTime && dayjs(scope.row.createTime).format('YYYY-MM-DD HH:mm:ss')}}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="closeLockTime" label="下线时间" width="180">
+        <el-table-column prop="updateTime" label="下线时间" width="180">
           <template #default="scope">
-            <span>{{scope.row.closeLockTime && dayjs(scope.row.closeLockTime).format('YYYY-MM-DD HH:mm:ss')}}</span>
+            <span>{{scope.row.updateTime && dayjs(scope.row.updateTime).format('YYYY-MM-DD HH:mm:ss')}}</span>
           </template>
         </el-table-column>
         <el-table-column fixed="right" label="操作" width="150">

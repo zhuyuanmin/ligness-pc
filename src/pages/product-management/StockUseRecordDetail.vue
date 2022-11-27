@@ -130,6 +130,9 @@ const enCode = computed(() => {
         td.props {
           text-align: right;
           background-color: #fafafa;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
         }
         &:not(:last-child) {
           td {
