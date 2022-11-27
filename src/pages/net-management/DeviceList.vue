@@ -20,7 +20,7 @@
         </el-table-column>
         <el-table-column prop="createTime" label="出厂时间" width="180">
           <template #default="scope">
-            <span>{{dayjs(scope.row.createTime).format('YYYY-MM-DD HH:mm:ss')}}</span>
+            <span>{{scope.row.createTime && dayjs(scope.row.createTime).format('YYYY-MM-DD HH:mm:ss')}}</span>
           </template>
         </el-table-column>
         <el-table-column prop="closeLockTime" label="下线时间" width="180">

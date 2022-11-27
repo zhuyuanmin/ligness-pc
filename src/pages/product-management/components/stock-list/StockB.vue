@@ -1,5 +1,5 @@
 <template>
-  <SearchComp :key="dateRef" :formItemList="searchFields" />
+  <SearchComp :key="dateRef" :formItemList="searchFields" ref="searchFieldRef" />
 
   <el-table
     :data="tableData"
@@ -21,7 +21,7 @@
         }}</span>
       </template>
     </el-table-column>
-    <el-table-column prop="creator" label="操作人" />
+    <el-table-column prop="updator" label="操作人" />
     <el-table-column fixed="right" label="操作" width="80">
       <template #default="scope">
         <el-button
@@ -148,7 +148,7 @@ import {
   ElLoading,
   ElMessage,
 } from "element-plus";
-import { ref, reactive, watch, h, onMounted } from "vue";
+import { ref, reactive, watch, h, onMounted, nextTick } from "vue";
 import ModalSelect from "@/pages/net-management/components/device-list/ModalSelect.vue";
 import QRCode from "qrcode";
 import {
@@ -264,12 +264,20 @@ const selectValue = ref("");
 const currentRow = ref({});
 const dateRef = ref(Date.now());
 const batchBoxRow = ref({})
+const searchFieldRef = ref(null)
 
 watch(
   () => props.searchData,
-  () => {
-    searchFields[1].initValue = props.searchData?.productNum;
+  newVal => {
+    searchFields[1].initValue = newVal?.productNum;
     dateRef.value = Date.now();
+
+    nextTick(() => {
+      const btnList = searchFields.find(v => v.type === 'btnList')
+      searchFieldRef.value.validFields().then((values) => {
+        btnList.children[0].onClick(values)
+      })
+    })
   }
 );
 
