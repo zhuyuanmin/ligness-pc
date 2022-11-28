@@ -15,7 +15,8 @@
         <el-table-column prop="deviceStatus" label="状态">
           <template #default="scope">
             <el-button v-if="scope.row.deviceStatus === 1" type="success" plain size="small">在线</el-button>
-            <el-button v-else type="danger" plain size="small">离线</el-button>
+            <el-button v-else-if="scope.row.deviceStatus === 0" type="danger" plain size="small">离线</el-button>
+            <el-button v-else type="info" plain size="small">异常</el-button>
           </template>
         </el-table-column>
         <el-table-column prop="createTime" label="出厂时间" width="180">

@@ -40,7 +40,8 @@
             size="small"
             >在线</el-button
           >
-          <el-button v-else type="danger" plain size="small">离线</el-button>
+          <el-button v-else-if="formValues.deviceStatus === 0" type="danger" plain size="small">离线</el-button>
+          <el-button v-else type="info" plain size="small">异常</el-button>
         </el-form-item>
         <!-- <el-form-item
           v-if="['edit', 'view'].includes(route.query.type)"
@@ -58,7 +59,7 @@
         <el-form-item label="设备型号" required prop="deviceTypeId">
           <el-select
             v-model="formValues.deviceTypeId"
-            :disabled="['edit', 'view'].includes(route.query.type)"
+            :disabled="['view'].includes(route.query.type)"
             clearable
           >
             <el-option

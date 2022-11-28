@@ -9,10 +9,10 @@
       class="table-class"
       v-loading="loading"
     >
-      <el-table-column prop="deviceTypeId" label="设备编号" />
       <el-table-column prop="deviceTypeName" label="设备型号" />
       <el-table-column prop="onLineDeviceCount" label="在线设备" />
       <el-table-column prop="offLineDeviceCount" label="离线设备" />
+      <el-table-column prop="exDeviceCount" label="异常设备" />
       <el-table-column prop="total" label="设备总数" width="150">
         <template #default="scope">
           <span>{{ scope.row.deviceCount }}</span>
@@ -83,14 +83,14 @@ onMounted(() => {
       const deviceName = list.map(v => v.deviceTypeName)
       const onLine = list.map(v => v.onLineDeviceCount)
       const offLine = list.map(v => v.offLineDeviceCount)
+      const exLine = list.map(v => v.exDeviceCount)
 
       myChart.setOption({
-        title: {
-          text: '设备分析',
-          left: 'center',
-        },
         tooltip: {
           trigger: 'axis',
+        },
+        legend: {
+          data: ['在线设备', '离线设备', '异常设备']
         },
         grid: {
           left: '3%',
@@ -106,29 +106,51 @@ onMounted(() => {
         ],
         yAxis: [
           {
-            type: 'value'
+            type: 'value',
+            name: '设备数（个）',
+            min: 0,
+            interval: 1,
           }
         ],
         series: [
           {
             name: '在线设备',
             type: 'bar',
-            stack: 'count',
+            stack: 'online',
             barWidth: 30,
             emphasis: {
               focus: 'series'
+            },
+            itemStyle: {
+              color: '#5CBA33'
             },
             data: onLine
           },
           {
             name: '离线设备',
             type: 'bar',
-            stack: 'count',
+            stack: 'offline',
             barWidth: 30,
+            itemStyle: {
+              color: '#F36161'
+            },
             emphasis: {
               focus: 'series'
             },
             data: offLine
+          },
+          {
+            name: '异常设备',
+            type: 'bar',
+            stack: 'fail',
+            barWidth: 30,
+            itemStyle: {
+              color: '#85888E'
+            },
+            emphasis: {
+              focus: 'series'
+            },
+            data: exLine
           },
         ]
       });
