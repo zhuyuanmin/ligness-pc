@@ -93,7 +93,7 @@ const searchFields = reactive([
     type: "input",
     label: "设备编号",
     placeholder: '请输入设备编号',
-    field: "deviceId",
+    field: "deviceNo",
   },
   {
     type: "select-custom",
