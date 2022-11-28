@@ -108,8 +108,7 @@ onMounted(() => {
           {
             type: 'value',
             name: '设备数（个）',
-            min: 0,
-            interval: 1,
+            minInterval: 1,
           }
         ],
         series: [
