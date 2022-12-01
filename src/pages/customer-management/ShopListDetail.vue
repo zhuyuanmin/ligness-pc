@@ -19,7 +19,14 @@
           <p>请上传图片</p>
           <el-upload
             class="avatar-uploader"
-            :data="{ attachmentBizTypeEnum: 'STORE_CATEGORY', attachmentBizId: (route.params || {}).id}"
+            :data="{
+              attachmentBizTypeEnum: 'STORE_CATEGORY',
+              attachmentBizId: (route.params || {}).id,
+            }"
+            :headers="{
+              endType: 0,
+              ligness_token: tokenRef || ''
+            }"
             :action="api.upload"
             :show-file-list="false"
             :on-success="handleAvatarSuccess"
@@ -62,6 +69,7 @@ const route = useRoute()
 const ruleFormRef = ref()
 const ruleFormRef2 = ref()
 const imageUrl = ref("");
+const tokenRef = ref("");
 const dateKey = ref(Date.now());
 const dateKey2 = ref(Date.now());
 const fileResponse = ref({})
@@ -108,6 +116,10 @@ const checkPhone = (rule, value, cb) => {
 onMounted(() => {
   const { type } = route.query || {}
   const { id } = route.params || {}
+  const userInfo = window.localStorage.getItem('userInfo')
+  const { token } = userInfo ? JSON.parse(userInfo) : {}
+  tokenRef.value = token
+
   if (['edit', 'view'].includes(type)) {
     viewShop({ storeId: id }).then(res => {
       searchFields.forEach(v => {

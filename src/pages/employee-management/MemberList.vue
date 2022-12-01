@@ -317,6 +317,7 @@ const loading = ref(false)
 const showModal = ref(false)
 const showUserInfoModal = ref(false)
 const title = ref('')
+const tokenRef = ref('')
 const dialogRef = ref()
 const title2 = ref('')
 const dialogRef2 = ref()
@@ -351,7 +352,7 @@ const handleUpdateStaffInfo = params => {
     editStaff(
       params.staffId
         ? {
-          staffStatus: params.staffStatus === 0 ? 1 : 0,
+          staffStatus: params.staffStatus === 1 ? 0 : 1,
           staffId: params.staffId,
           refreshFlag: false
         }
@@ -377,12 +378,23 @@ const handleUpdateStaffInfo = params => {
 
 onMounted(() => {
   fetchListData({})
+
+  const userInfo = window.localStorage.getItem('userInfo')
+  const { token } = userInfo ? JSON.parse(userInfo) : {}
+  tokenRef.value = token
 })
 
 const viewRow = (row, type) => {
   currentRow.value = row
   title2.value = row ? '编辑用户' : '新增用户'
   const listArr = JSON.parse(JSON.stringify(dialogFields2List))
+
+  const result = listArr.find(v => v.field === 'staffImg')
+  result.headers = {
+    endType: 0,
+    ligness_token: tokenRef.value || ''
+  }
+
   if (row) {
     const list = listArr.slice(0, 2).concat(listArr.slice(5))
     list.forEach((v, i) => {

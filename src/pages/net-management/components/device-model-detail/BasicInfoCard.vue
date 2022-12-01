@@ -17,7 +17,14 @@
             <p>请上传图片</p>
             <el-upload
               class="avatar-uploader"
-              :data="{ attachmentBizTypeEnum: 'DEVICE_TYPE_CATEGORY', attachmentBizId: (route.params || {}).id }"
+              :data="{
+                attachmentBizTypeEnum: 'DEVICE_TYPE_CATEGORY',
+                attachmentBizId: (route.params || {}).id,
+              }"
+              :headers="{
+                endType: 0,
+                ligness_token: tokenRef || ''
+              }"
               :action="apis.upload"
               :show-file-list="false"
               :on-success="handleSuccess"
@@ -50,6 +57,7 @@ const brandStore = useBrandStore()
 
 const route = useRoute();
 const imageUrl = ref("");
+const tokenRef = ref("");
 const searchRef = ref();
 const dateNow = ref(Date.now())
 const attachmentBizId = ref('')
@@ -62,6 +70,10 @@ const props = defineProps({
 })
 
 onMounted(() => {
+  const userInfo = window.localStorage.getItem('userInfo')
+  const { token } = userInfo ? JSON.parse(userInfo) : {}
+  tokenRef.value = token
+
   const fieldList = fieldsFn(route)
   const result = fieldList.find(v => v.field === 'brandId')
   if (brandStore.brandList.length > 0) {

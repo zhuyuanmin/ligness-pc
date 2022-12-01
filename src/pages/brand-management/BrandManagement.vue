@@ -134,7 +134,7 @@ const deleteRow = row => {
     margin-top: 24px;
     overflow: hidden;
     .card {
-      width: 350px;
+      max-width: 350px;
       list-style: none;
       margin-right: 24px;
       margin-bottom: 24px;

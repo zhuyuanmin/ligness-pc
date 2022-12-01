@@ -27,7 +27,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/ligness-img': {
-        target: 'http://121.12.78.36:8888',
+        target: 'https://yq.lightness.com.hk:8888',
         changeOrigin: true,
         // rewrite: (path) => path.replace(/^\/ligness-img/, '')
       },

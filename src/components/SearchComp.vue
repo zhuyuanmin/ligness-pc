@@ -92,6 +92,7 @@
           :limit="item.limit"
           :on-preview="handleReview"
           :data="item.data"
+          :headers="item.headers || {}"
           :class="formValues[item.field].length === 1 ? 'hide-plus' : ''"
           :on-success="handleSuccess"
           :accept="item.accept"

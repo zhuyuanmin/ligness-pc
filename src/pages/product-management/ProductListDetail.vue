@@ -111,6 +111,15 @@ const searchFields = ref([
 ]);
 
 onMounted(() => {
+  const userInfo = window.localStorage.getItem('userInfo')
+  const { token } = userInfo ? JSON.parse(userInfo) : {}
+
+  const productImg = searchFields.value.find(v => v.field === 'productImg')
+  productImg.headers = {
+    endType: 0,
+    ligness_token: token || ''
+  }
+
   if (route.params.id) {
     viewProduct({ productId: route.params.id }).then((res) => {
       searchFields.value.forEach(v => {

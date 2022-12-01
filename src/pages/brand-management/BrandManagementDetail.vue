@@ -10,7 +10,14 @@
           <p>请上传图片</p>
           <el-upload
             class="avatar-uploader"
-            :data="{ attachmentBizTypeEnum: 'BRAND_CATEGORY', attachmentBizId: (route.params || {}).id}"
+            :data="{
+              attachmentBizTypeEnum: 'BRAND_CATEGORY',
+              attachmentBizId: (route.params || {}).id,
+            }"
+            :headers="{
+              endType: 0,
+              ligness_token: tokenRef || ''
+            }"
             :action="api.upload"
             :show-file-list="false"
             :on-success="handleAvatarSuccess"
@@ -52,6 +59,7 @@ const router = useRouter();
 const route = useRoute();
 const ruleFormRef = ref();
 const imageUrl = ref("");
+const tokenRef = ref("");
 const dateKey = ref(Date.now())
 const fileResponse = ref({})
 
@@ -103,6 +111,10 @@ const searchFields = reactive([
 onMounted(() => {
   const { type } = route.query || {}
   const { id } = route.params || {}
+  const userInfo = window.localStorage.getItem('userInfo')
+  const { token } = userInfo ? JSON.parse(userInfo) : {}
+  tokenRef.value = token
+
   if (['edit', 'view'].includes(type)) {
     viewBrand({ brandId: id }).then(res => {
       searchFields.forEach(v => {

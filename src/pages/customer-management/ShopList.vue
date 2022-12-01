@@ -231,7 +231,7 @@ const handleUpdateShopInfo = params => {
   editShop(
     params.storeId ? {
       storeId: params.storeId ,
-      storeStatus: params.storeStatus === 0 ? 1 : 0,
+      storeStatus: params.storeStatus === 1 ? 0 : 1,
       refreshFlag: false
     } : {
       ...params,

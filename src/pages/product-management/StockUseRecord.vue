@@ -20,7 +20,7 @@
         <el-table-column prop="consumeRemainTimes" label="剩余次数" />
         <el-table-column prop="customName" label="消耗门店" />
         <el-table-column prop="deviceNo" label="设备编号" />
-        <el-table-column prop="updater" label="操作人" />
+        <el-table-column prop="creator" label="操作人" />
         <el-table-column fixed="right" label="操作" width="100">
           <template #default="scope">
             <el-button text type="primary" size="small" @click.prevent="viewRow(scope.row)">查看</el-button>
