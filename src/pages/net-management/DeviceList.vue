@@ -4,7 +4,7 @@
       <SearchComp :formItemList="searchFields" :data="valueObj" ref="searchRef" />
       <ModalSelect v-model:showModal="showModal" :getStoreList="getStoreList" :value="selectValue" />
 
-      <el-table :data="tableData" max-height="400" class="table-class" v-loading="loading">
+      <el-table :data="tableData" max-height="460" class="table-class" v-loading="loading">
         <el-table-column type="index" label="序号" width="100" />
         <el-table-column prop="deviceTypeName" label="设备型号" />
         <el-table-column prop="deviceNo" label="设备编号" />

@@ -3,7 +3,7 @@
     <template v-if="currentRoute.fullPath === '/net-management/device-model-list'">
       <SearchComp :formItemList="searchFields" />
 
-      <el-table :data="tableData" max-height="400" class="table-class" v-loading="loading">
+      <el-table :data="tableData" max-height="460" class="table-class" v-loading="loading">
         <el-table-column type="index" label="序号" width="100" />
         <el-table-column prop="deviceTypeName" label="型号名称" />
         <!-- <el-table-column prop="factoryName" label="生产厂家" /> -->

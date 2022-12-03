@@ -3,7 +3,7 @@
 
   <el-table
     :data="tableData"
-    max-height="400"
+    max-height="460"
     class="table-class"
     v-loading="loading"
   >
@@ -69,7 +69,7 @@
 
       <el-table
         :data="tableData2"
-        max-height="400"
+        max-height="460"
         class="table-class"
         v-loading="loading2"
       >

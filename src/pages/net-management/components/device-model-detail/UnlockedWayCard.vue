@@ -16,7 +16,7 @@
       <el-table
         v-if="['edit', 'view'].includes(route.query.type)"
         :data="tableData"
-        max-height="400"
+        max-height="460"
         class="table-class"
         v-loading="listLoading"
       >
@@ -74,7 +74,7 @@
         </div>
         <el-table
           :data="tableData2"
-          max-height="400"
+          max-height="460"
           class="table-class"
           @selection-change="handleSelectionChange"
           v-loading="loading"

@@ -5,7 +5,7 @@
       :data="tableData"
       show-summary
       :summary-method="getSummaryFn"
-      max-height="400"
+      max-height="460"
       class="table-class"
       v-loading="loading"
     >

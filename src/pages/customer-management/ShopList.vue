@@ -3,7 +3,7 @@
     <template v-if="currentRoute.fullPath === '/customer-management/shop-list'">
       <SearchComp :formItemList="searchFields" />
 
-      <el-table :data="tableData" max-height="400" class="table-class" v-loading="loading">
+      <el-table :data="tableData" max-height="460" class="table-class" v-loading="loading">
         <el-table-column type="index" label="编号" width="100" />
         <el-table-column prop="customAccount" label="账号" />
         <el-table-column prop="customName" label="门店名称" />

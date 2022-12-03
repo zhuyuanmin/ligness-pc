@@ -11,7 +11,7 @@
     <div class="content">
       <el-table
         :data="tableData"
-        max-height="400"
+        max-height="460"
         class="table-class"
         ref="myTable"
         @select="handleSelect"

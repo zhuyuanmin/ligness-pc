@@ -2,7 +2,7 @@
   <div class="container">
     <SearchComp :formItemList="searchFields" />
 
-    <el-table :data="tableData" max-height="400" class="table-class" v-loading="loading">
+    <el-table :data="tableData" max-height="460" class="table-class" v-loading="loading">
       <el-table-column type="index" label="编号" width="100" />
       <el-table-column prop="staffAccount" label="账号" />
       <el-table-column prop="staffName" label="姓名" />

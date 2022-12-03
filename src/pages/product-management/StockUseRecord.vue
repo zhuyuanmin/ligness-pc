@@ -4,7 +4,7 @@
       <SearchComp :formItemList="searchFields" :data="valueObj" ref="searchRef" />
       <ModalSelect v-model:showModal="showModal" :getStoreList="getStoreList" :value="selectValue" />
 
-      <el-table :data="tableData" max-height="400" class="table-class" v-loading="loading">
+      <el-table :data="tableData" max-height="460" class="table-class" v-loading="loading">
         <el-table-column type="index" label="序号" width="100" />
         <el-table-column prop="boxNo" label="商品编码" />
         <el-table-column prop="productName" label="产品名称" />
@@ -20,7 +20,7 @@
         <el-table-column prop="consumeRemainTimes" label="剩余次数" />
         <el-table-column prop="customName" label="消耗门店" />
         <el-table-column prop="deviceNo" label="设备编号" />
-        <el-table-column prop="creator" label="操作人" />
+        <el-table-column prop="updator" label="操作人" />
         <el-table-column fixed="right" label="操作" width="100">
           <template #default="scope">
             <el-button text type="primary" size="small" @click.prevent="viewRow(scope.row)">查看</el-button>

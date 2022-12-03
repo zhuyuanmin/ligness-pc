@@ -35,7 +35,7 @@
       <template #header>
         <div><span>消耗情况</span></div>
       </template>
-      <el-table :data="tableData" max-height="400" class="table-class">
+      <el-table :data="tableData" max-height="460" class="table-class">
         <el-table-column type="index" label="序号" width="100" />
         <el-table-column prop="createTime" label="消耗时间">
           <template #default="scope">
