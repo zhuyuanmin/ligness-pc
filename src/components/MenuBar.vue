@@ -94,10 +94,10 @@ watch(() => router.currentRoute.value, (newVal) => {
 })
 
 const avatar = computed(() => {
-  if (userInfo.staffImg) {
-    return userInfo.staffImg
+  if (userInfo.value.imgPath) {
+    return userInfo.value.imgPath
   }
-  if (!userInfo.staffSex || userInfo.staffSex === '男') {
+  if (!userInfo.value.staffSex || userInfo.value.staffSex === '男') {
     return BoyImg
   }
   return GirlImg
