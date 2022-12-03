@@ -97,10 +97,10 @@ const avatar = computed(() => {
   if (userInfo.value.imgPath) {
     return userInfo.value.imgPath
   }
-  if (!userInfo.value.staffSex || userInfo.value.staffSex === '男') {
-    return BoyImg
+  if (userInfo.value.staffSex === 2) {
+    return GirlImg
   }
-  return GirlImg
+  return BoyImg
 })
 </script>
 
