@@ -183,8 +183,8 @@ const beforeUpload = (rawFile) => {
   if (!rawFile.type.startsWith('image/')) {
     ElMessage.error("请上传图片!");
     return false;
-  } else if (rawFile.size / 1024 / 1024 > 5) {
-    ElMessage.error("图片大小不能超过 5MB!");
+  } else if (rawFile.size / 1024 / 1024 > 2) {
+    ElMessage.error("图片大小不能超过 2MB!");
     return false;
   }
   return true;

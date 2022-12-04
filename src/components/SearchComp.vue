@@ -94,7 +94,7 @@
           :data="item.data"
           :headers="item.headers || {}"
           :class="formValues[item.field].length === 1 ? 'hide-plus' : ''"
-          :on-success="handleSuccess"
+          :on-success="response => handleSuccess(response, item.field)"
           :accept="item.accept"
           :before-upload="beforeUpload"
         >
@@ -254,16 +254,17 @@ const beforeUpload = (rawFile) => {
   if (!rawFile.type.startsWith('image/')) {
     ElMessage.error("请上传图片!");
     return false;
-  } else if (rawFile.size / 1024 / 1024 > 5) {
-    ElMessage.error("图片大小不能超过 5MB!");
+  } else if (rawFile.size / 1024 / 1024 > 2) {
+    ElMessage.error("图片大小不能超过 2MB!");
     return false;
   }
   return true;
 };
 
-const handleSuccess = response => {
+const handleSuccess = (response, field) => {
   if (response.code !== 200) {
     ElMessage.error(response.msg)
+    formValues[field] = []
   }
 }
 
