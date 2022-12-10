@@ -20,8 +20,9 @@
         class="table-class"
         v-loading="listLoading"
       >
-        <el-table-column prop="productId" label="产品编码" />
+        <el-table-column prop="productNum" label="产品编码" />
         <el-table-column prop="productName" label="产品名称" />
+        <el-table-column prop="duration" label="时长（分钟）" />
         <el-table-column
           v-if="route.query.type === 'edit'"
           label="操作"
@@ -87,7 +88,7 @@
             label="序号"
             width="100"
           ></el-table-column>
-          <el-table-column prop="productId" label="产品编码" width="200" />
+          <el-table-column prop="productNum" label="产品编码" width="200" />
           <el-table-column prop="productName" label="产品名称" />
           <el-table-column
             prop="duration"
