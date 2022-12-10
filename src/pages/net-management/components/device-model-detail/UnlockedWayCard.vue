@@ -294,23 +294,27 @@ const handleCurrentChange = (type, page) => {
 };
 
 const handleBindProduct = () => {
-  bindLoading.value = true;
-  const list = multipleSelection.value.map((item) => {
-    item.deviceTypeId = route.params.id;
-    return item;
-  });
-  // 绑定产品
-  deviceTypeBindProduct(list)
-    .then(() => {
-      ElMessage.success('操作成功！')
-      showModal.value = false;
-      if (route.params.id) {
-        fetchProductList({ deviceTypeId: route.params.id });
-      }
-    })
-    .finally(() => {
-      bindLoading.value = false;
+  if (multipleSelection.value.length > 0) {
+    bindLoading.value = true;
+    const list = multipleSelection.value.map((item) => {
+      item.deviceTypeId = route.params.id;
+      return item;
     });
+    // 绑定产品
+    deviceTypeBindProduct(list)
+      .then(() => {
+        ElMessage.success('操作成功！')
+        showModal.value = false;
+        if (route.params.id) {
+          fetchProductList({ deviceTypeId: route.params.id });
+        }
+      })
+      .finally(() => {
+        bindLoading.value = false;
+      });
+  } else {
+    showModal.value = false;
+  }
 };
 
 const getSwitchValue = () => switchValue.value;
