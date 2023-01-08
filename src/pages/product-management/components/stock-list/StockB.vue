@@ -55,7 +55,7 @@
     draggable
   >
     <div class="content">
-      <el-button type="primary" plain @click="downloadQRCode">打印二维码</el-button>
+      <el-button type="primary" plain @click="downloadQRCode" :loading="loading3">{{ loading3 ? '数据处理中...' : '打印二维码' }}</el-button>
 
       <el-table
         :data="tableData2"
@@ -247,6 +247,7 @@ const total = ref(100);
 const total2 = ref(100);
 const loading = ref(false);
 const loading2 = ref(false);
+const loading3 = ref(false);
 const showModal = ref(false);
 const showStoreModal = ref(false);
 const selectValue = ref("");
@@ -422,6 +423,8 @@ const resetDataClose = () => {
 }
 
 const downloadQRCode = () => {
+  if (loading3.value) return
+  loading3.value = true
   getProductBatchBoxAll({ batchId: currentRow.value.batchId }).then(res => {
     const list = res.map(v => {
       return {
@@ -432,6 +435,8 @@ const downloadQRCode = () => {
     })
     window.sessionStorage.setItem('list', JSON.stringify(list))
     window.open('/download')
+  }).finally(() => {
+    loading3.value = false
   })
 }
 </script>

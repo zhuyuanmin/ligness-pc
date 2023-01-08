@@ -84,6 +84,13 @@ const searchFields = ref([
     type: "input",
     label: "产品编码",
     field: "productNum",
+    rules: [
+      {
+        required: true,
+        message: "请输入产品编码",
+        trigger: ["blur", "change"],
+      },
+    ],
   },
   {
     type: "select",
