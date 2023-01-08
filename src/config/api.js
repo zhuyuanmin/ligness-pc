@@ -41,6 +41,7 @@ const product = {
   entryStore: baseUrl + "/product/enterStorehouse", // 产品入库
   entryStoreRecord: baseUrl + "/batch/selectByProductInfoPage", // 入库记录
   batchBox: baseUrl + "/box/selectByConditionPage", // 查询批次下套盒列表
+  batchBoxAll: baseUrl + "/box/selectByCondition", // 查询批次下套盒所有列表
   updBatchBox: baseUrl + "/box/updateByPrimaryKeySelective", // 更新套盒信息
   consume: baseUrl + "/boxconsume/selectByProductInfoPage", // 套盒消耗列表
   consumeDetail: baseUrl + "/boxconsume/selectByProductInfo", // 查询套盒消耗明细

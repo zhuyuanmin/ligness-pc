@@ -73,6 +73,15 @@ export const getProductBatchBox = async params => {
   })
 }
 
+// 查询批次下套盒所有列表
+export const getProductBatchBoxAll = async params => {
+  return await request({
+    url: api.product.batchBoxAll,
+    method: 'post',
+    data: params
+  })
+}
+
 // 更新套盒信息
 export const updateProductBatchBox = async params => {
   return await request({

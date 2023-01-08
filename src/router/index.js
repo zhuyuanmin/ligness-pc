@@ -146,6 +146,7 @@ export default createRouter({
   history: createWebHistory(),
   routes: [
     { path: '/login', component: () => import('@/pages/Login.vue') },
+    { path: '/download', component: () => import('@/pages/Download.vue') },
     { path: '/', component: () => import('@/pages/Home.vue'), redirect: '/net-management', children: menuRoute },
     { path: '/:pathMatch(.*)*', component: () => import('@/pages/404NotFound.vue') },
   ]

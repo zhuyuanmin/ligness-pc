@@ -55,17 +55,7 @@
     draggable
   >
     <div class="content">
-      <el-row :gutter="20">
-        <el-col
-          :span="8"
-          v-for="item in dialogFields"
-          :key="item.field"
-          class="class-col"
-        >
-          <span class="grid-label">{{ item.label }}：</span>
-          <span class="grid-value">{{ item.value }}</span>
-        </el-col>
-      </el-row>
+      <el-button type="primary" plain @click="downloadQRCode">打印二维码</el-button>
 
       <el-table
         :data="tableData2"
@@ -75,7 +65,7 @@
       >
         <el-table-column type="index" label="序号" width="100" />
         <el-table-column prop="boxNo" label="商品编号" />
-        <el-table-column prop="productSign" label="产品二维码">
+        <el-table-column prop="productSign" label="商品二维码">
           <template #default="scope">
             <el-button text type="primary" @click="handViewQRCode(scope.row)"
               >查看</el-button
@@ -123,7 +113,7 @@
     </div>
     <template #footer>
       <span class="dialog-footer">
-        <el-button @click="showModal = false">关闭</el-button>
+        <el-button @click="resetDataClose">关闭</el-button>
       </span>
     </template>
   </el-dialog>
@@ -142,8 +132,6 @@ import {
   ElButton,
   ElPagination,
   ElDialog,
-  ElRow,
-  ElCol,
   ElMessageBox,
   ElLoading,
   ElMessage,
@@ -155,6 +143,7 @@ import {
   entryProductStoreRecord,
   getProductBatchBox,
   updateProductBatchBox,
+  getProductBatchBoxAll,
 } from "../../request/product";
 import dayjs from "dayjs";
 import useBrandStore from "@/store/brandStore";
@@ -373,14 +362,23 @@ const handViewQRCode = (row) => {
       ElMessageBox({
         title: "查看二维码",
         message: h(
-          "img",
-          {
-            src: url,
-            alt: "",
-            srcset: "",
-            width: "200",
-          },
-          null
+          "div", {}, [
+            h(
+              "img",
+              {
+                src: url,
+                alt: "",
+                srcset: "",
+                width: "200",
+              },
+              null
+            ),
+            h(
+              "p",
+              { style: 'transform: translateY(-20px);' },
+              row.boxNo
+            )
+          ]
         ),
         showCancelButton: false,
         showConfirmButton: false,
@@ -416,6 +414,26 @@ const getStoreList = (values) => {
     });
   });
 };
+
+const resetDataClose = () => {
+  currentPage2.value = 1;
+  pageSize2.value = 10;
+  showModal.value = false
+}
+
+const downloadQRCode = () => {
+  getProductBatchBoxAll({ batchId: currentRow.value.batchId }).then(res => {
+    const list = res.map(v => {
+      return {
+        boxNo: v.boxNo,
+        boxAvailableTimes: v.boxAvailableTimes,
+        duration: currentRow.value.duration
+      }
+    })
+    window.sessionStorage.setItem('list', JSON.stringify(list))
+    window.open('/download')
+  })
+}
 </script>
 <style lang="scss" scoped>
 .modal-class-store2 {
