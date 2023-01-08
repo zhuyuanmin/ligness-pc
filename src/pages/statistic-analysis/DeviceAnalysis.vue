@@ -101,7 +101,10 @@ onMounted(() => {
         xAxis: [
           {
             type: 'category',
-            data: deviceName
+            data: deviceName,
+            axisLabel: {
+              rotate: 45
+            }
           }
         ],
         yAxis: [
@@ -151,6 +154,11 @@ onMounted(() => {
             },
             data: exLine
           },
+        ],
+        dataZoom: [
+          {
+            type: 'inside'
+          }
         ]
       });
     })
