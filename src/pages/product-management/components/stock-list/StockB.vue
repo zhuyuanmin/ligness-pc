@@ -374,11 +374,11 @@ const handViewQRCode = (row) => {
               },
               null
             ),
-            h(
-              "p",
-              { style: 'transform: translateY(-20px);' },
-              row.boxNo
-            )
+            // h(
+            //   "p",
+            //   { style: 'transform: translateY(-20px);' },
+            //   row.boxNo
+            // )
           ]
         ),
         showCancelButton: false,
@@ -434,7 +434,7 @@ const downloadQRCode = () => {
       }
     })
     window.sessionStorage.setItem('list', JSON.stringify(list))
-    window.open('/download')
+    window.open('/print')
   }).finally(() => {
     loading3.value = false
   })

@@ -2,13 +2,16 @@
   <ul class="ul-class">
     <li v-for="item in codeList" :key="item.boxNo">
       <img :src="item.url" alt="" srcset="">
-      <p>{{ item.boxNo }}</p>
+      <!-- <p>{{ item.boxNo }}</p> -->
     </li>
   </ul>
 </template>
 <script setup>
 import { ref, nextTick } from 'vue'
 import QRCode from "qrcode"
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
 
 const codeList = ref([])
 
@@ -18,7 +21,12 @@ if (list) {
   const pAll = newList.map(v => {
     return new Promise(resolve => {
       const enCode = window.btoa(`${v.duration || ''}@${v.boxNo}@${v.boxAvailableTimes || ''}`)
-      QRCode.toDataURL(enCode, { errorCorrectionLevel: "H" })
+      QRCode.toDataURL(enCode, {
+        width: 200,
+        height: 200,
+        margin: 1,
+        errorCorrectionLevel: "H"
+      })
         .then(url => resolve({ url, boxNo: v.boxNo }))
         .catch((err) => {
           console.error(err);
@@ -35,6 +43,8 @@ if (list) {
       window.close();
     })
   })
+} else {
+  router.replace('/404')
 }
 </script>
 <style lang="scss" scoped>
@@ -51,7 +61,6 @@ if (list) {
     align-items: center;
     justify-content: center;
     flex-direction: column;
-    margin: 0 10px;
     p {
       font-size: 12px;
       margin: 0;
